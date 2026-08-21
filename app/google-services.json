@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "71341451975",
+    "project_id": "legal-ai-a42f0",
+    "storage_bucket": "legal-ai-a42f0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71341451975:android:e78570e481a1c8feabace2",
+        "android_client_info": {
+          "package_name": "com.example.nyayalegalai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71341451975-sfbac9q4bii6pivsh02b4sulnev6epvs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwBzBjYUqTl0uBwoM7JXjlNRGmM60B5sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71341451975-sfbac9q4bii6pivsh02b4sulnev6epvs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

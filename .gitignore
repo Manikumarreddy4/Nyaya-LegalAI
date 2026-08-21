@@ -1,0 +1,28 @@
+# Android Studio / Gradle
+.gradle/
+.kotlin/
+.idea/
+build/
+app/build/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# WebApp
+webapp/node_modules/
+webapp/dist/
+node_modules/
+
+# Secrets and credentials
+*.jks
+*.keystore
+.env
+.env.*
+apikeys.properties
+secrets.properties
+
+# OS files
+.DS_Store
+Thumbs.db

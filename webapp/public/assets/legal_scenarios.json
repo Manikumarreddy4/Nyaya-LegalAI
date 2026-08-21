@@ -1,0 +1,56 @@
+[
+  {
+    "keywords": ["police", "bike", "license", "helmet", "rc", "stopped", "fine", "challan"],
+    "category": "Traffic Law",
+    "issue": "Traffic challan verification and document inspection.",
+    "responsibility": "Cannot determine without specific violation details.",
+    "reason": "Having valid documents (license, RC, helmet) does not automatically mean no violation occurred. The challan may be for overspeeding, signal violation, wrong-side driving, or other specific offenses observed by the officer.",
+    "relevant_laws": "Motor Vehicles Act, 1988 (Section 129, 130, 177)",
+    "guidance": "Politely ask the officer for the specific violation recorded. You can show documents via mParivahan or DigiLocker. Always ask for a valid receipt (challan) if a fine is imposed."
+  },
+  {
+    "keywords": ["landlord", "evict", "house", "notice", "leave", "tenant", "rent"],
+    "category": "Property Law",
+    "issue": "Tenant eviction dispute and rights of possession.",
+    "responsibility": "Likely landlord if procedure is not followed.",
+    "reason": "A landlord cannot arbitrarily evict a tenant without following the due process of law, which includes providing a formal legal notice as per the state Rent Control Act or the signed Tenancy Agreement.",
+    "relevant_laws": "State Rent Control Acts, Transfer of Property Act (Section 106)",
+    "guidance": "Request a written notice if not provided. Review your tenancy agreement for the notice period. If forced physically, approach the nearest police station or the Rent Controller."
+  },
+  {
+    "keywords": ["refund", "defective", "product", "warranty", "consumer", "service", "shop", "online"],
+    "category": "Consumer Law",
+    "issue": "Consumer rights violation or deficient service.",
+    "responsibility": "Seller or Manufacturer.",
+    "reason": "Sellers are legally obligated to provide goods that are of merchantable quality and match the description. Failure to provide a refund for defective goods violates consumer rights.",
+    "relevant_laws": "Consumer Protection Act, 2019",
+    "guidance": "Send a formal written complaint to the seller. If unresolved, file a complaint on the NCH (National Consumer Helpline) or the E-Daakhil portal."
+  },
+  {
+    "keywords": ["hacked", "fraud", "cyber", "scam", "otp", "online transaction", "transaction"],
+    "category": "Cyber Crime",
+    "issue": "Financial cyber fraud or unauthorized account access.",
+    "responsibility": "The fraudster (primary); User (secondary if OTP shared).",
+    "reason": "Unauthorized transactions are criminal acts under the IT Act. However, sharing sensitive data like OTPs can complicate the recovery process under RBI guidelines.",
+    "relevant_laws": "Information Technology Act, 2000 (Section 66), IPC Section 420",
+    "guidance": "Report immediately to 1930 (National Cyber Crime Helpline). Block all bank cards and accounts. File a report on cybercrime.gov.in."
+  },
+  {
+    "keywords": ["salary", "job", "fired", "employer", "terminated", "employment", "company"],
+    "category": "Employment Law",
+    "issue": "Wrongful termination or withholding of wages.",
+    "responsibility": "Determined by Employment Contract.",
+    "reason": "Employers must adhere to the terms of the employment contract regarding notice periods and full and final settlements. Arbitrary firing without cause or notice may be illegal.",
+    "relevant_laws": "Industrial Disputes Act, 1947; State Shops and Establishments Act",
+    "guidance": "Check your appointment letter for termination clauses. Send a formal legal notice for unpaid dues. If unresolved, approach the Labor Commissioner."
+  },
+  {
+    "keywords": ["cheating", "fraud", "scam", "deceived", "fake", "property fraud", "investment fraud"],
+    "category": "Criminal Law",
+    "issue": "Cheating and Dishonestly inducing delivery of property.",
+    "responsibility": "The person who deceived or induced the delivery.",
+    "reason": "Section 420 IPC applies when there is a dishonest intention from the beginning to deceive someone into handing over property or money.",
+    "relevant_laws": "Indian Penal Code (Section 420)",
+    "guidance": "File a FIR (First Information Report) at the nearest police station. Provide evidence of the transaction and communication that proves the intent to deceive. Up to 7 years imprisonment and fine can be imposed."
+  }
+]

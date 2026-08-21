@@ -1,0 +1,232 @@
+{
+  "categories": [
+    {
+      "id": "constitution",
+      "name": "Constitution of India",
+      "description": "Supreme law of India establishing fundamental rights, directive principles, and government framework.",
+      "iconName": "AccountBalance"
+    },
+    {
+      "id": "criminal_law",
+      "name": "Criminal Law",
+      "description": "Indian Penal Code (IPC), Bharatiya Nyaya Sanhita (BNS), CrPC, BNSS, and criminal justice provisions.",
+      "iconName": "Gavel"
+    },
+    {
+      "id": "civil_law",
+      "name": "Civil Law",
+      "description": "Code of Civil Procedure, law of torts, injunctions, and civil remedies.",
+      "iconName": "Balance"
+    },
+    {
+      "id": "family_law",
+      "name": "Family Law",
+      "description": "Marriage, divorce, maintenance, succession, and guardianship laws.",
+      "iconName": "FamilyRestroom"
+    },
+    {
+      "id": "property_law",
+      "name": "Property Law",
+      "description": "Transfer of Property Act, easements, real estate, and tenancy regulations.",
+      "iconName": "Home"
+    },
+    {
+      "id": "contract_law",
+      "name": "Contract Law",
+      "description": "Indian Contract Act, specific relief, partnerships, and sale of goods.",
+      "iconName": "Description"
+    },
+    {
+      "id": "cyber_law",
+      "name": "Cyber Law",
+      "description": "Information Technology Act, data protection, digital privacy, and cyber offenses.",
+      "iconName": "Security"
+    },
+    {
+      "id": "consumer_law",
+      "name": "Consumer Law",
+      "description": "Consumer Protection Act, consumer rights, unfair trade practices, and redressal forums.",
+      "iconName": "ShoppingCart"
+    },
+    {
+      "id": "labour_law",
+      "name": "Labour Law",
+      "description": "Industrial disputes, minimum wages, employee compensation, and social security codes.",
+      "iconName": "Work"
+    },
+    {
+      "id": "other_laws",
+      "name": "Other Laws",
+      "description": "Environmental law, taxation, motor vehicle regulations, and special statutory acts.",
+      "iconName": "Category"
+    }
+  ],
+  "acts": [
+    {
+      "id": "constitution_of_india",
+      "title": "Constitution of India",
+      "shortDescription": "The supreme legal document outlining the framework of political principles, state institutions, and citizen rights.",
+      "category": "Constitution of India",
+      "year": 1950,
+      "chapters": [
+        {
+          "id": "part_3_fundamental_rights",
+          "chapterNumber": 3,
+          "title": "Part III: Fundamental Rights",
+          "description": "Basic civil liberties and freedoms guaranteed to all citizens of India against arbitrary state action.",
+          "sections": [
+            {
+              "id": "article_14",
+              "number": "Article 14",
+              "title": "Equality Before Law",
+              "shortMeaning": "The State shall not deny to any person equality before the law or the equal protection of the laws within the territory of India.",
+              "detailedExplanation": "Article 14 embodies the principle of rule of law. It guarantees both negative equality (no person is above the law) and positive equality (equal protection in similar circumstances). Reasonable classification is permissible if founded on an intelligible differentia with a rational nexus to the objective.",
+              "keyPoints": [
+                "Applies to all persons, citizens and non-citizens alike",
+                "Prohibits class legislation and arbitrary state action",
+                "Allows reasonable classification with intelligible differentia"
+              ],
+              "example": "A law providing special educational assistance to economically weaker sections is valid under the principle of equal protection of the laws.",
+              "relatedProvisions": ["Article 15", "Article 16", "Article 21"]
+            },
+            {
+              "id": "article_19",
+              "number": "Article 19",
+              "title": "Protection of Certain Rights Regarding Freedom of Speech, etc.",
+              "shortMeaning": "Guarantees six basic democratic freedoms including freedom of speech and expression, peaceful assembly, forming associations, free movement, residence, and practicing any trade.",
+              "detailedExplanation": "Article 19(1) confers fundamental democratic freedoms upon Indian citizens. These rights are not absolute and are subject to reasonable restrictions under clauses (2) to (6) in the interests of sovereignty, integrity of India, security of the State, public order, decency, or morality.",
+              "keyPoints": [
+                "Available only to citizens of India",
+                "Includes freedom of the press and right to peaceful protest",
+                "Subject to reasonable restrictions defined by law"
+              ],
+              "example": "Citizens have the right to organize a peaceful assembly without arms to voice their opinions on a public policy.",
+              "relatedProvisions": ["Article 14", "Article 21", "Article 22"]
+            },
+            {
+              "id": "article_21",
+              "number": "Article 21",
+              "title": "Protection of Life and Personal Liberty",
+              "shortMeaning": "No person shall be deprived of his life or personal liberty except according to procedure established by law.",
+              "detailedExplanation": "Article 21 is the cornerstone of fundamental rights. The Supreme Court has interpreted 'life' to mean a life with human dignity, and 'procedure established by law' must be just, fair, and reasonable. It encompasses rights including privacy, clean environment, health, speedy trial, and legal aid.",
+              "keyPoints": [
+                "Guaranteed to every person (citizens and non-citizens)",
+                "Procedure depriving liberty must be fair, just, and reasonable (Maneka Gandhi case)",
+                "Encompasses the Fundamental Right to Privacy (Puttaswamy case)"
+              ],
+              "example": "Every arrested individual is entitled to free legal aid if unable to engage a lawyer, ensuring protection of personal liberty.",
+              "relatedProvisions": ["Article 14", "Article 19", "Article 22", "Article 32"]
+            },
+            {
+              "id": "article_32",
+              "number": "Article 32",
+              "title": "Remedies for Enforcement of Fundamental Rights",
+              "shortMeaning": "The right to move the Supreme Court of India by appropriate proceedings for the enforcement of Fundamental Rights.",
+              "detailedExplanation": "Described by Dr. B.R. Ambedkar as the 'heart and soul of the Constitution', Article 32 empowers the Supreme Court to issue prerogative writs including Habeas Corpus, Mandamus, Prohibition, Quo Warranto, and Certiorari for the enforcement of fundamental rights.",
+              "keyPoints": [
+                "A Fundamental Right in itself to protect other Fundamental Rights",
+                "Supreme Court has original jurisdiction under Article 32",
+                "Empowers issuance of five constitutional writs"
+              ],
+              "example": "If a person is unlawfully detained without judicial remand, a writ of Habeas Corpus can be filed before the Supreme Court under Article 32.",
+              "relatedProvisions": ["Article 226", "Article 21", "Article 14"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bharatiya_nyaya_sanhita",
+      "title": "Bharatiya Nyaya Sanhita (BNS)",
+      "shortDescription": "The primary criminal code of India defining offenses, criminal liability, and statutory punishments.",
+      "category": "Criminal Law",
+      "year": 2023,
+      "chapters": [
+        {
+          "id": "bns_general_exceptions",
+          "chapterNumber": 3,
+          "title": "General Exceptions",
+          "description": "Circumstances and defenses under which an act that would otherwise be an offense is not considered criminal.",
+          "sections": [
+            {
+              "id": "bns_private_defence",
+              "number": "Section 34",
+              "title": "Act done in Private Defence",
+              "shortMeaning": "Nothing is an offense which is done in the exercise of the right of private defence.",
+              "detailedExplanation": "Every individual possesses the inherent right to protect their own body and property, as well as the body and property of others, against unlawful aggression. The force used must be proportional to the threat faced.",
+              "keyPoints": [
+                "Right of defence is protective, not punitive",
+                "Cannot be claimed against lawful acts of public servants acting in good faith",
+                "Force exercised must be proportional to the impending harm"
+              ],
+              "example": "A person resisting an armed robbery using reasonable defensive force to prevent grievous bodily harm.",
+              "relatedProvisions": ["Section 35", "Section 36", "Section 37"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "consumer_protection_act",
+      "title": "Consumer Protection Act",
+      "shortDescription": "Law safeguarding consumer rights against unfair trade practices, defective goods, and deficiency in services.",
+      "category": "Consumer Law",
+      "year": 2019,
+      "chapters": [
+        {
+          "id": "cpa_consumer_rights",
+          "chapterNumber": 1,
+          "title": "Consumer Rights & Redressal",
+          "description": "Core rights of consumers and three-tier dispute redressal commissions.",
+          "sections": [
+            {
+              "id": "cpa_rights",
+              "number": "Section 2(9)",
+              "title": "Consumer Rights",
+              "shortMeaning": "Defines fundamental consumer rights including safety, information, choice, hearing, redressal, and awareness.",
+              "detailedExplanation": "The Act recognizes six consumer rights: right to be protected against hazardous goods, right to be informed about quality and price, right to assured access to competitive goods, right to be heard, right to seek redressal against unfair trade practices, and right to consumer education.",
+              "keyPoints": [
+                "Right to safety and quality standard information",
+                "Right to compensation for product liability and service deficiency",
+                "Covers e-commerce transactions and tele-shopping"
+              ],
+              "example": "A consumer receiving a defective electronic appliance with refusal of warranty service can claim replacement and damages before the District Commission.",
+              "relatedProvisions": ["Section 35", "Section 47", "Section 58"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "information_technology_act",
+      "title": "Information Technology Act",
+      "shortDescription": "Primary Indian law dealing with cybercrime, electronic commerce, digital signatures, and electronic records.",
+      "category": "Cyber Law",
+      "year": 2000,
+      "chapters": [
+        {
+          "id": "it_offenses",
+          "chapterNumber": 11,
+          "title": "Cyber Offenses & Penalties",
+          "description": "Statutory definitions and punishments for digital crimes, unauthorized access, and electronic fraud.",
+          "sections": [
+            {
+              "id": "it_sec_66c",
+              "number": "Section 66C",
+              "title": "Punishment for Identity Theft",
+              "shortMeaning": "Prohibits fraudulent or dishonest use of electronic signature, password, or other unique identification feature of any other person.",
+              "detailedExplanation": "Whoever fraudulently uses another individual's digital credentials, passwords, biometric records, or OTP for financial gain or deception is punishable with imprisonment up to three years and fine.",
+              "keyPoints": [
+                "Addresses digital credential theft and phishing",
+                "Punishable with imprisonment up to 3 years and fine up to 1 lakh rupees",
+                "Cognizable offense under Indian cyber law"
+              ],
+              "example": "Unauthorizedly obtaining another person's banking OTP or digital login password to transfer money.",
+              "relatedProvisions": ["Section 66D", "Section 43"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
