@@ -10,11 +10,150 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Filter
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.Timestamp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+
+fun DocumentSnapshot.getSafeLong(fieldName: String, defaultValue: Long = 0L): Long {
+    return try {
+        when (val value = get(fieldName)) {
+            is com.google.firebase.Timestamp -> value.toDate().time
+            is Number -> value.toLong()
+            is String -> value.toLongOrNull() ?: defaultValue
+            else -> defaultValue
+        }
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_HISTORY", "Invalid timestamp/Long in document $id for field $fieldName", e)
+        defaultValue
+    }
+}
+
+fun DocumentSnapshot.toLawyerProfile(): LawyerProfile? {
+    if (!exists()) return null
+    return try {
+        val lawyerId = getString("lawyerId") ?: getString("userId") ?: id
+        val userId = getString("userId") ?: getString("lawyerId") ?: id
+        val name = getString("name") ?: ""
+        val email = getString("email") ?: ""
+        val phone = getString("phone") ?: ""
+        val profileImage = getString("profileImage") ?: getString("profilePhotoUrl") ?: ""
+        val profilePhotoUrl = getString("profilePhotoUrl") ?: getString("profileImage") ?: ""
+        val enrollmentNumber = getString("enrollmentNumber") ?: getString("barCouncilNumber") ?: ""
+        val barCouncilNumber = getString("barCouncilNumber") ?: getString("enrollmentNumber") ?: ""
+        val barCouncil = getString("barCouncil") ?: getString("stateBarCouncil") ?: ""
+        val stateBarCouncil = getString("stateBarCouncil") ?: getString("barCouncil") ?: ""
+        val specialization = getString("specialization") ?: ""
+        val additionalSpecializations = getString("additionalSpecializations") ?: ""
+        val experience = getString("experience") ?: ""
+        val qualification = getString("qualification") ?: ""
+        val university = getString("university") ?: ""
+        val location = getString("location") ?: getString("city") ?: ""
+        val city = getString("city") ?: getString("location") ?: ""
+        val state = getString("state") ?: ""
+        val languages = getString("languages") ?: ""
+        val bio = getString("bio") ?: ""
+        
+        val feeVal = get("consultationFee")
+        val consultationFee = when (feeVal) {
+            is Number -> feeVal.toDouble()
+            is String -> feeVal.toDoubleOrNull() ?: 500.0
+            else -> 500.0
+        }
+        
+        val onlineAvailable = getBoolean("onlineAvailable") ?: false
+        val inPersonAvailable = getBoolean("inPersonAvailable") ?: false
+        val emergencyAvailable = getBoolean("emergencyAvailable") ?: false
+        val officeAddress = getString("officeAddress") ?: ""
+        val availableDays = getString("availableDays") ?: "Mon - Sat"
+        val availableTime = getString("availableTime") ?: "09:00 AM - 06:00 PM"
+        val verificationStatus = getString("verificationStatus") ?: "PENDING"
+        val availability = getString("availability") ?: "Available"
+        
+        val ratingVal = get("rating")
+        val rating = when (ratingVal) {
+            is Number -> ratingVal.toDouble()
+            is String -> ratingVal.toDoubleOrNull() ?: 4.8
+            else -> 4.8
+        }
+        
+        val rcVal = get("reviewCount")
+        val reviewCount = when (rcVal) {
+            is Number -> rcVal.toInt()
+            else -> 0
+        }
+        
+        val ccVal = get("consultationCount")
+        val consultationCount = when (ccVal) {
+            is Number -> ccVal.toInt()
+            else -> 0
+        }
+        
+        val role = getString("role") ?: "LAWYER"
+        val fullName = getString("fullName") ?: ""
+        val displayName = getString("displayName") ?: ""
+        val isAvailable = getBoolean("isAvailable") ?: getBoolean("onlineAvailable") ?: false
+        val availabilityUpdatedAt = getTimestamp("availabilityUpdatedAt")
+        val isInPersonAvailable = getBoolean("isInPersonAvailable") ?: getBoolean("inPersonAvailable") ?: false
+        val inPersonAvailabilityUpdatedAt = getTimestamp("inPersonAvailabilityUpdatedAt")
+        val createdAt = getTimestamp("createdAt") ?: com.google.firebase.Timestamp.now()
+        val updatedAt = getTimestamp("updatedAt") ?: com.google.firebase.Timestamp.now()
+        
+        LawyerProfile(
+            lawyerId = lawyerId,
+            userId = userId,
+            name = name,
+            email = email,
+            phone = phone,
+            profileImage = profileImage,
+            profilePhotoUrl = profilePhotoUrl,
+            enrollmentNumber = enrollmentNumber,
+            barCouncilNumber = barCouncilNumber,
+            barCouncil = barCouncil,
+            stateBarCouncil = stateBarCouncil,
+            specialization = specialization,
+            additionalSpecializations = additionalSpecializations,
+            experience = experience,
+            qualification = qualification,
+            university = university,
+            location = location,
+            city = city,
+            state = state,
+            languages = languages,
+            bio = bio,
+            consultationFee = consultationFee,
+            onlineAvailable = onlineAvailable,
+            inPersonAvailable = inPersonAvailable,
+            emergencyAvailable = emergencyAvailable,
+            officeAddress = officeAddress,
+            availableDays = availableDays,
+            availableTime = availableTime,
+            verificationStatus = verificationStatus,
+            availability = availability,
+            rating = rating,
+            reviewCount = reviewCount,
+            consultationCount = consultationCount,
+            role = role,
+            fullName = fullName,
+            displayName = displayName,
+            isAvailable = isAvailable,
+            availabilityUpdatedAt = availabilityUpdatedAt,
+            isInPersonAvailable = isInPersonAvailable,
+            inPersonAvailabilityUpdatedAt = inPersonAvailabilityUpdatedAt,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+    } catch (e: Exception) {
+        Log.e("FIND_LAWYER", "Error deserializing document ${id}", e)
+        null
+    }
+}
 
 class FirebaseAuthRepository(private val auth: FirebaseAuth = FirebaseAuth.getInstance()) {
     fun getCurrentUser() = auth.currentUser
@@ -31,6 +170,41 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth = FirebaseAuth.getIn
 
     suspend fun sendEmailVerification() {
         auth.currentUser?.sendEmailVerification()?.await()
+    }
+}
+
+fun DocumentSnapshot.toFirestoreChatSession(): FirestoreChatSession? {
+    if (!exists()) return null
+    return try {
+        val sessionIdVal = get("sessionId")
+        val sessionId = when (sessionIdVal) {
+            is Number -> sessionIdVal.toLong().toString()
+            is String -> sessionIdVal
+            else -> id
+        }
+        val userId = getString("userId") ?: ""
+        val chatbotType = getString("chatbotType") ?: "AI_ASSISTANT"
+        val title = getString("title") ?: ""
+        val isPinned = getBoolean("isPinned") ?: false
+        
+        val updatedAtVal = get("updatedAt")
+        val updatedAt = when (updatedAtVal) {
+            is Timestamp -> updatedAtVal
+            is Number -> Timestamp(java.util.Date(updatedAtVal.toLong()))
+            else -> Timestamp.now()
+        }
+        
+        FirestoreChatSession(
+            sessionId = sessionId,
+            userId = userId,
+            chatbotType = chatbotType,
+            title = title,
+            updatedAt = updatedAt,
+            isPinned = isPinned
+        )
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_DEBUG", "Error parsing FirestoreChatSession for doc $id", e)
+        null
     }
 }
 
@@ -76,6 +250,24 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
     suspend fun updateUserProfile(userId: String, updates: Map<String, Any>) {
         if (userId.isBlank()) return
         db.collection("users").document(userId).update(updates).await()
+        try {
+            val lawyerDoc = db.collection("lawyers").document(userId).get().await()
+            if (lawyerDoc.exists()) {
+                db.collection("lawyers").document(userId).update(updates).await()
+            }
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_DEBUG", "Failed to update lawyers collection profile", e)
+        }
+    }
+
+    suspend fun deleteUserProfile(userId: String) {
+        if (userId.isBlank()) return
+        db.collection("users").document(userId).delete().await()
+    }
+
+    suspend fun deleteLawyerProfile(userId: String) {
+        if (userId.isBlank()) return
+        db.collection("lawyers").document(userId).delete().await()
     }
 
     suspend fun getLawyerProfile(lawyerId: String): LawyerProfile? {
@@ -83,10 +275,10 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         return try {
             val doc = db.collection("users").document(lawyerId).get().await()
             if (doc.exists()) {
-                doc.toObject(LawyerProfile::class.java)
+                doc.toLawyerProfile()
             } else {
                 val lawyerDoc = db.collection("lawyers").document(lawyerId).get().await()
-                if (lawyerDoc.exists()) lawyerDoc.toObject(LawyerProfile::class.java) else null
+                if (lawyerDoc.exists()) lawyerDoc.toLawyerProfile() else null
             }
         } catch (e: Exception) {
             Log.e("FIRESTORE_DEBUG", "Error fetching lawyer profile for UID: $lawyerId", e)
@@ -111,18 +303,22 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         val listener = db.collection("lawyers").document(lawyerId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    Log.e("FIRESTORE_DEBUG", "Error listening to lawyer profile", error)
+                    Log.e("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY ERROR: ${error.message}", error)
                     trySend(null)
                     return@addSnapshotListener
                 }
                 if (snapshot != null && snapshot.exists()) {
-                    trySend(snapshot.toObject(LawyerProfile::class.java))
+                    val profile = snapshot.toLawyerProfile()
+                    Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Listener received = ${profile?.isAvailable ?: true}")
+                    trySend(profile)
                 } else {
                     // Fallback to check users collection
                     db.collection("users").document(lawyerId).get()
                         .addOnSuccessListener { userDoc ->
                             if (userDoc.exists()) {
-                                trySend(userDoc.toObject(LawyerProfile::class.java))
+                                val profile = userDoc.toLawyerProfile()
+                                Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Listener received = ${profile?.isAvailable ?: true}")
+                                trySend(profile)
                             } else {
                                 trySend(null)
                             }
@@ -138,7 +334,9 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
     suspend fun updateLawyerAvailability(lawyerId: String, isAvailable: Boolean) {
         if (lawyerId.isBlank()) return
         val updates = mapOf(
+            "isAvailable" to isAvailable,
             "onlineAvailable" to isAvailable,
+            "availabilityUpdatedAt" to com.google.firebase.Timestamp.now(),
             "updatedAt" to com.google.firebase.Timestamp.now()
         )
         try {
@@ -147,79 +345,272 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
             Log.e("FIRESTORE_DEBUG", "Failed to update users collection availability", e)
         }
         try {
-            db.collection("lawyers").document(lawyerId).update(updates).await()
+            val lawyerDoc = db.collection("lawyers").document(lawyerId).get().await()
+            if (lawyerDoc.exists()) {
+                db.collection("lawyers").document(lawyerId).update(updates).await()
+            }
         } catch (e: Exception) {
             Log.e("FIRESTORE_DEBUG", "Failed to update lawyers collection availability", e)
         }
     }
 
-    fun getAllLawyersFlow(): Flow<List<LawyerProfile>> = callbackFlow {
-        val listener = db.collection("lawyers")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Log.e("FIND_LAWYER", "Failed to load lawyers snapshot. Firestore listener error: ${error.message}", error)
-                    // Do NOT close flow or send emptyList. Keep listener active.
-                    return@addSnapshotListener
+    suspend fun updateLawyerInPersonAvailability(lawyerId: String, isInPersonAvailable: Boolean) {
+        if (lawyerId.isBlank()) return
+        val updates = mapOf(
+            "isInPersonAvailable" to isInPersonAvailable,
+            "inPersonAvailabilityUpdatedAt" to com.google.firebase.Timestamp.now(),
+            "updatedAt" to com.google.firebase.Timestamp.now()
+        )
+        try {
+            db.collection("users").document(lawyerId).update(updates).await()
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_DEBUG", "Failed to update users collection in-person availability", e)
+        }
+        try {
+            val lawyerDoc = db.collection("lawyers").document(lawyerId).get().await()
+            if (lawyerDoc.exists()) {
+                db.collection("lawyers").document(lawyerId).update(updates).await()
+            }
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_DEBUG", "Failed to update lawyers collection in-person availability", e)
+        }
+    }
+
+    fun getAllLawyersFlow(): Flow<List<LawyerProfile>> {
+        val currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        Log.d("FIND_LAWYERS", "FIND_LAWYERS: Fetching lawyers")
+        Log.d("FIND_LAWYERS", "FIND_LAWYERS: Current user ID = $currentUserId")
+
+        val flowLawyers = callbackFlow {
+            val listener = db.collection("lawyers")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore listener error (lawyers)", error)
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val list = mutableListOf<LawyerProfile>()
+                        for (document in snapshot.documents) {
+                            val profile = document.toLawyerProfile()
+                            if (profile != null) {
+                                list.add(profile)
+                            }
+                        }
+                        trySend(list)
+                    }
                 }
-                if (snapshot != null) {
-                    val rawList = snapshot.toObjects(LawyerProfile::class.java)
-                    Log.d("FIND_LAWYER", "Collection name: lawyers")
-                    Log.d("FIND_LAWYER", "Number of documents loaded: ${rawList.size}")
-                    
-                    val filteredList = rawList.filter { profile ->
-                        val roleLower = profile.role.lowercase().trim()
-                        val isLawyer = roleLower == "lawyer" || roleLower == "advocate"
-                        val resolvedName = profile.displayNameString.trim()
-                        
-                        if (isLawyer && resolvedName.isNotBlank() && !resolvedName.equals("Advocate", ignoreCase = true)) {
-                            Log.d("FIND_LAWYER", "Loaded lawyer: uid=${profile.userId.ifBlank { profile.lawyerId }}, name=$resolvedName, role=${profile.role}, specialization=${profile.specialization}, location=${profile.displayLocation}")
-                            true
-                        } else {
-                            Log.w("FIND_LAWYER", "Skipping non-lawyer or incomplete profile: uid=${profile.userId.ifBlank { profile.lawyerId }}, name=${profile.name}, role=${profile.role}")
-                            false
+            awaitClose { listener.remove() }
+        }
+
+        val flowUsersUpper = callbackFlow {
+            val listener = db.collection("users")
+                .whereEqualTo("role", "LAWYER")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore listener error (users LAWYER)", error)
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val list = mutableListOf<LawyerProfile>()
+                        for (document in snapshot.documents) {
+                            val profile = document.toLawyerProfile()
+                            if (profile != null) {
+                                list.add(profile)
+                            }
+                        }
+                        trySend(list)
+                    }
+                }
+            awaitClose { listener.remove() }
+        }
+
+        val flowUsersLower = callbackFlow {
+            val listener = db.collection("users")
+                .whereEqualTo("role", "lawyer")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore listener error (users lawyer)", error)
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val list = mutableListOf<LawyerProfile>()
+                        for (document in snapshot.documents) {
+                            val profile = document.toLawyerProfile()
+                            if (profile != null) {
+                                list.add(profile)
+                            }
+                        }
+                        trySend(list)
+                    }
+                }
+            awaitClose { listener.remove() }
+        }
+
+        return kotlinx.coroutines.flow.combine(flowLawyers, flowUsersUpper, flowUsersLower) { list1, list2, list3 ->
+            val mergedMap = mutableMapOf<String, LawyerProfile>()
+            val validUserIds = (list2 + list3).map { it.userId.ifBlank { it.lawyerId } }.filter { it.isNotBlank() }.toSet()
+            
+            val totalDocs = list1.size + list2.size + list3.size
+            Log.d("FIND_LAWYERS", "FIND_LAWYERS: Total Firestore documents = $totalDocs")
+
+            list1.forEach { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
+                Log.d("FIND_LAWYERS", "FIND_LAWYERS: Processing lawyer ID = $id")
+                if (id.isNotBlank()) {
+                    if (validUserIds.contains(id)) {
+                        mergedMap[id] = profile
+                    } else {
+                        Log.d("FIND_LAWYERS", "FIND_LAWYERS: Deleted/orphan profile skipped = $id")
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                db.collection("lawyers").document(id).delete().await()
+                                Log.d("FIND_LAWYERS", "FIND_LAWYERS: Successfully deleted orphan profile doc: $id")
+                            } catch (e: Exception) {
+                                Log.w("FIND_LAWYERS", "FIND_LAWYERS: Failed to delete orphan profile doc $id: ${e.message}")
+                            }
                         }
                     }
-                    trySend(filteredList)
                 } else {
-                    trySend(emptyList())
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = null/empty ID")
                 }
             }
-        awaitClose { listener.remove() }
+
+            (list2 + list3).forEach { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
+                Log.d("FIND_LAWYERS", "FIND_LAWYERS: Processing lawyer ID = $id")
+                if (id.isNotBlank()) {
+                    val existing = mergedMap[id]
+                    if (existing == null) {
+                        mergedMap[id] = profile
+                    } else {
+                        val mergedProfile = if (profile.specialization.isNotBlank() && existing.specialization.isBlank()) {
+                            profile
+                        } else {
+                            existing
+                        }
+                        mergedMap[id] = mergedProfile
+                    }
+                } else {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = null/empty ID")
+                }
+            }
+
+            val rawMerged = mergedMap.values.toList()
+            val filteredList = rawMerged.filter { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
+                val roleLower = profile.role.lowercase().trim()
+                val isLawyer = roleLower == "lawyer" || roleLower == "advocate"
+                val resolvedName = profile.displayNameString.trim()
+                val isValid = isLawyer && resolvedName.isNotBlank() && id.isNotBlank()
+                if (isValid) {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Valid lawyer added = $resolvedName")
+                } else {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = $id")
+                }
+                isValid
+            }
+            Log.d("FIND_LAWYERS", "FIND_LAWYERS: Listener updated")
+            filteredList
+        }
     }
 
     suspend fun getAllLawyers(): List<LawyerProfile> {
         return try {
-            val usersList = db.collection("users")
-                .whereIn("role", listOf("lawyer", "LAWYER"))
-                .get()
-                .await()
-                .toObjects(LawyerProfile::class.java)
-
-            val rawList = if (usersList.isNotEmpty()) {
-                usersList
-            } else {
-                db.collection("lawyers")
-                    .get()
-                    .await()
-                    .toObjects(LawyerProfile::class.java)
-            }
-            Log.d("FIND_LAWYER", "Collection name: lawyers (fallback/suspend)")
-            Log.d("FIND_LAWYER", "Number of documents loaded: ${rawList.size}")
+            Log.d("FIND_LAWYERS", "FIND_LAWYERS: Fetching lawyers")
             
-            rawList.filter { profile ->
+            val list1 = try {
+                val snapshot = db.collection("lawyers").get().await()
+                snapshot.documents.mapNotNull { document ->
+                    document.toLawyerProfile()
+                }
+            } catch (e: Exception) {
+                Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore lawyer query failed (lawyers)", e)
+                emptyList()
+            }
+
+            val list2 = try {
+                val snapshot = db.collection("users").whereEqualTo("role", "LAWYER").get().await()
+                snapshot.documents.mapNotNull { document ->
+                    document.toLawyerProfile()
+                }
+            } catch (e: Exception) {
+                Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore lawyer query failed (LAWYER in users)", e)
+                emptyList()
+            }
+
+            val list3 = try {
+                val snapshot = db.collection("users").whereEqualTo("role", "lawyer").get().await()
+                snapshot.documents.mapNotNull { document ->
+                    document.toLawyerProfile()
+                }
+            } catch (e: Exception) {
+                Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Firestore lawyer query failed (lawyer in users)", e)
+                emptyList()
+            }
+
+            val mergedMap = mutableMapOf<String, LawyerProfile>()
+            val validUserIds = (list2 + list3).map { it.userId.ifBlank { it.lawyerId } }.filter { it.isNotBlank() }.toSet()
+            
+            val totalDocs = list1.size + list2.size + list3.size
+            Log.d("FIND_LAWYERS", "FIND_LAWYERS: Total Firestore documents = $totalDocs")
+
+            list1.forEach { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
+                Log.d("FIND_LAWYERS", "FIND_LAWYERS: Processing lawyer ID = $id")
+                if (id.isNotBlank()) {
+                    if (validUserIds.contains(id)) {
+                        mergedMap[id] = profile
+                    } else {
+                        Log.d("FIND_LAWYERS", "FIND_LAWYERS: Deleted/orphan profile skipped = $id")
+                        try {
+                            db.collection("lawyers").document(id).delete()
+                            Log.d("FIND_LAWYERS", "FIND_LAWYERS: Successfully triggered delete for orphan profile doc: $id")
+                        } catch (e: Exception) {
+                            Log.w("FIND_LAWYERS", "FIND_LAWYERS: Failed to delete orphan profile doc $id: ${e.message}")
+                        }
+                    }
+                } else {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = null/empty ID")
+                }
+            }
+
+            (list2 + list3).forEach { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
+                Log.d("FIND_LAWYERS", "FIND_LAWYERS: Processing lawyer ID = $id")
+                if (id.isNotBlank()) {
+                    val existing = mergedMap[id]
+                    if (existing == null) {
+                        mergedMap[id] = profile
+                    } else {
+                        val mergedProfile = if (profile.specialization.isNotBlank() && existing.specialization.isBlank()) {
+                            profile
+                        } else {
+                            existing
+                        }
+                        mergedMap[id] = mergedProfile
+                    }
+                } else {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = null/empty ID")
+                }
+            }
+
+            val rawMerged = mergedMap.values.toList()
+            val filteredList = rawMerged.filter { profile ->
+                val id = profile.userId.ifBlank { profile.lawyerId }
                 val roleLower = profile.role.lowercase().trim()
                 val isLawyer = roleLower == "lawyer" || roleLower == "advocate"
                 val resolvedName = profile.displayNameString.trim()
-                
-                if (isLawyer && resolvedName.isNotBlank() && !resolvedName.equals("Advocate", ignoreCase = true)) {
-                    Log.d("FIND_LAWYER", "Loaded lawyer: uid=${profile.userId.ifBlank { profile.lawyerId }}, name=$resolvedName, role=${profile.role}, specialization=${profile.specialization}, location=${profile.displayLocation}")
-                    true
+                val isValid = isLawyer && resolvedName.isNotBlank() && id.isNotBlank()
+                if (isValid) {
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Valid lawyer added = $resolvedName")
                 } else {
-                    false
+                    Log.d("FIND_LAWYERS", "FIND_LAWYERS: Invalid lawyer skipped = $id")
                 }
+                isValid
             }
+            filteredList
         } catch (e: Exception) {
-            Log.e("FIRESTORE_DEBUG", "Error fetching all lawyers", e)
+            Log.e("FIND_LAWYERS", "FIND_LAWYERS ERROR: Error fetching all lawyers", e)
             emptyList()
         }
     }
@@ -275,11 +666,21 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 try {
                     doc.toObject(LearningHistory::class.java)
                 } catch (e: Exception) {
-                    val question = doc.getString("question") ?: ""
-                    val answer = doc.getString("answer") ?: ""
-                    val timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()
-                    val id = doc.getLong("id")?.toInt() ?: doc.id.toIntOrNull() ?: 0
-                    LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
+                    try {
+                        val question = doc.getString("question") ?: doc.getString("query") ?: ""
+                        val answer = doc.getString("answer") ?: doc.getString("explanation") ?: ""
+                        val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
+                        val idVal = doc.get("id")
+                        val id = when (idVal) {
+                            is Number -> idVal.toInt()
+                            is String -> idVal.toIntOrNull() ?: doc.id.hashCode()
+                            else -> doc.id.hashCode()
+                        }
+                        LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
+                    } catch (innerEx: Exception) {
+                        Log.e("FIRESTORE_HISTORY", "Error parsing learning history document ${doc.id}", innerEx)
+                        null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -301,7 +702,30 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
-                snapshot?.let { trySend(it.toObjects(LearningHistory::class.java)) }
+                snapshot?.let {
+                    val list = it.documents.mapNotNull { doc ->
+                        try {
+                            doc.toObject(LearningHistory::class.java)
+                        } catch (e: Exception) {
+                            try {
+                                val question = doc.getString("question") ?: doc.getString("query") ?: ""
+                                val answer = doc.getString("answer") ?: doc.getString("explanation") ?: ""
+                                val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
+                                val idVal = doc.get("id")
+                                val id = when (idVal) {
+                                    is Number -> idVal.toInt()
+                                    is String -> idVal.toIntOrNull() ?: doc.id.hashCode()
+                                    else -> doc.id.hashCode()
+                                }
+                                LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
+                            } catch (innerEx: Exception) {
+                                Log.e("FIRESTORE_HISTORY", "Error parsing learning history document ${doc.id}", innerEx)
+                                null
+                            }
+                        }
+                    }
+                    trySend(list)
+                }
             }
         awaitClose { listener.remove() }
     }
@@ -309,6 +733,21 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
     suspend fun deleteLearningHistoryItem(uid: String, docId: String) {
         if (uid.isBlank() || docId.isBlank()) return
         db.collection("users").document(uid).collection("learningHistory").document(docId).delete().await()
+    }
+
+    suspend fun deleteLearningHistoryItemByTimestamp(uid: String, timestamp: Long) {
+        if (uid.isBlank()) return
+        try {
+            val snapshot = db.collection("users").document(uid).collection("learningHistory")
+                .whereEqualTo("timestamp", timestamp)
+                .get().await()
+            for (doc in snapshot.documents) {
+                doc.reference.delete().await()
+            }
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_DEBUG", "Error deleting learning history item by timestamp", e)
+            throw e
+        }
     }
 
     // ==========================================
@@ -335,6 +774,29 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         }
 
         val listener = db.collection("users").document(userId)
+            .collection("chatSessions")
+            .orderBy("updatedAt", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val sessions = snapshot.documents.mapNotNull { it.toFirestoreChatSession() }
+                    trySend(sessions)
+                }
+            }
+        awaitClose { listener.remove() }
+    }
+
+    fun getProblemHistoryFlow(userId: String): Flow<List<FirestoreChatSession>> = callbackFlow {
+        if (userId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+
+        val listener = db.collection("users").document(userId)
             .collection("problemHistory")
             .orderBy("updatedAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
@@ -343,7 +805,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    val sessions = snapshot.toObjects(FirestoreChatSession::class.java)
+                    val sessions = snapshot.documents.mapNotNull { it.toFirestoreChatSession() }
                     trySend(sessions)
                 }
             }
@@ -411,9 +873,30 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         awaitClose { listener.remove() }
     }
 
-    // ==========================================
-    // 5. Consultations (users/{uid}/consultations)
-    // ==========================================
+    suspend fun checkLawyerBusy(lawyerId: String, appointmentDateTime: com.google.firebase.Timestamp): Boolean {
+        if (lawyerId.isBlank()) return false
+        return try {
+            val snapshot = db.collection("consultations")
+                .whereEqualTo("lawyerId", lawyerId)
+                .whereEqualTo("status", "ACCEPTED")
+                .get()
+                .await()
+            for (doc in snapshot.documents) {
+                val booking = doc.toObject(Consultation::class.java)
+                if (booking != null) {
+                    val apptDate = booking.parsedAppointmentDate()
+                    val targetDate = appointmentDateTime.toDate()
+                    if (apptDate != null && apptDate.time == targetDate.time) {
+                        return true
+                    }
+                }
+            }
+            false
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_DEBUG", "Error checking if lawyer is busy", e)
+            false
+        }
+    }
 
     suspend fun createConsultation(consultation: Consultation) {
         val uid = consultation.clientId.ifBlank { consultation.userId }
@@ -426,6 +909,11 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
             consultationId = docId,
             clientId = uid,
             userId = uid,
+            bookingId = "",
+            userPhone = consultation.userPhone.ifBlank { consultation.contactNumber },
+            userEmail = consultation.userEmail,
+            language = consultation.language.ifBlank { consultation.preferredLanguage },
+            additionalNotes = consultation.additionalNotes.ifBlank { consultation.notes },
             createdAt = com.google.firebase.Timestamp.now(),
             updatedAt = com.google.firebase.Timestamp.now()
         )
@@ -461,31 +949,27 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
             )
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                Log.e("FIRESTORE_DEBUG", "Error listening to user consultations", error)
-                trySend(emptyList())
+                Log.e("MY_BOOKINGS", "Firestore booking query failed", error)
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                Log.d("BOOKING_SYNC", "Logged in UID: $userId")
-                Log.d("BOOKING_SYNC", "Collection being queried: consultations")
-                Log.d("BOOKING_SYNC", "Number of bookings found: ${snapshot.size()}")
+                Log.d("MY_BOOKINGS", "Firestore query started")
+                Log.d("MY_BOOKINGS", "Current user ID = $userId")
+                Log.d("MY_BOOKINGS", "Total bookings received = ${snapshot.size()}")
 
                 val list = mutableListOf<Consultation>()
                 for (document in snapshot.documents) {
-                    var booking = document.toObject(Consultation::class.java)
-                    if (booking != null) {
-                        if (booking.consultationId.isBlank()) {
-                            booking = booking.copy(consultationId = document.id)
+                    try {
+                        Log.d("MY_BOOKINGS", "Booking loaded: id=${document.id}, data=${document.data}")
+                        var booking = document.toObject(Consultation::class.java)
+                        if (booking != null) {
+                            if (booking.consultationId.isBlank()) {
+                                booking = booking.copy(consultationId = document.id)
+                            }
+                            list.add(booking)
                         }
-                        Log.d(
-                            "BOOKING_SYNC",
-                            "Document=${document.id}, " +
-                            "userId=${booking.userId}, " +
-                            "clientId=${booking.clientId}, " +
-                            "lawyerId=${booking.lawyerId}, " +
-                            "status=${booking.status}"
-                        )
-                        list.add(booking)
+                    } catch (e: Exception) {
+                        Log.e("MY_BOOKINGS", "Firestore booking query failed", e)
                     }
                 }
                 val sortedList = list.sortedByDescending { it.createdAt }
@@ -501,38 +985,49 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
             close()
             return@callbackFlow
         }
+        Log.d("CONSULTATION_SYNC", "CONSULTATION_SYNC: Listener attached for lawyerId = $lawyerId")
         val listener = db.collection("consultations")
             .whereEqualTo("lawyerId", lawyerId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
+                    Log.e("MY_BOOKINGS", "MY BOOKINGS CRASH / ERROR", error)
                     Log.e("FIRESTORE_DEBUG", "Error listening to lawyer consultations", error)
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    Log.d("BOOKING_SYNC", "Logged in Lawyer UID: $lawyerId")
-                    Log.d("BOOKING_SYNC", "Collection being queried: consultations")
-                    Log.d("BOOKING_SYNC", "Number of bookings found: ${snapshot.size()}")
+                    Log.d("CONSULTATION_SYNC", "CONSULTATION_SYNC: Firestore snapshot received")
+                    Log.d("CONSULTATION_SYNC", "CONSULTATION_SYNC: Total consultations = ${snapshot.size()}")
 
                     val list = mutableListOf<Consultation>()
+                    val docIds = mutableListOf<String>()
+                    
                     for (document in snapshot.documents) {
-                        var booking = document.toObject(Consultation::class.java)
-                        if (booking != null) {
-                            if (booking.consultationId.isBlank()) {
-                                booking = booking.copy(consultationId = document.id)
+                        try {
+                            var booking = document.toObject(Consultation::class.java)
+                            if (booking != null) {
+                                if (booking.consultationId.isBlank()) {
+                                    booking = booking.copy(consultationId = document.id)
+                                }
+                                docIds.add(booking.consultationId)
+                                Log.d(
+                                    "CONSULTATION_SYNC",
+                                    "consultationId=${booking.consultationId}, " +
+                                    "userId=${booking.userId}, " +
+                                    "lawyerId=${booking.lawyerId}, " +
+                                    "status=${booking.status}, " +
+                                    "appointmentDate=${booking.date}, " +
+                                    "appointmentTime=${booking.time}"
+                                )
+                                list.add(booking)
                             }
-                            Log.d(
-                                "BOOKING_SYNC",
-                                "Document=${document.id}, " +
-                                "userId=${booking.userId}, " +
-                                "clientId=${booking.clientId}, " +
-                                "lawyerId=${booking.lawyerId}, " +
-                                "status=${booking.status}"
-                            )
-                            list.add(booking)
+                        } catch (e: Exception) {
+                            Log.e("MY_BOOKINGS", "MY BOOKINGS CRASH / deserialization error for document ${document.id}", e)
                         }
                     }
                     val sortedList = list.sortedByDescending { it.createdAt }
+                    val pendingCount = sortedList.count { it.status.uppercase() == "PENDING" }
+                    Log.d("CONSULTATION_SYNC", "CONSULTATION_SYNC: Pending consultations = $pendingCount")
                     trySend(sortedList)
                 }
             }
@@ -542,19 +1037,57 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
     suspend fun updateConsultationStatus(id: String, status: String, currentUid: String? = null) {
         val uid = currentUid ?: FirebaseAuth.getInstance().currentUser?.uid ?: ""
         try {
-            val updateMap = mapOf(
-                "status" to status,
-                "updatedAt" to com.google.firebase.Timestamp.now()
-            )
+            val docRef = db.collection("consultations").document(id)
+            
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(docRef)
+                if (snapshot.exists()) {
+                    val existingStatus = snapshot.getString("status") ?: "PENDING"
+                    if (existingStatus.uppercase() == "EXPIRED") {
+                        return@runTransaction
+                    }
 
-            // Update root collection
-            db.collection("consultations").document(id).update(updateMap).await()
+                    val updateMap = mutableMapOf<String, Any>(
+                        "status" to status,
+                        "updatedAt" to com.google.firebase.Timestamp.now()
+                    )
 
-            // Update client/lawyer subcollections if they exist
+                    if (status.equals("ACCEPTED", ignoreCase = true)) {
+                        val existingBookingId = snapshot.getString("bookingId")
+                        val bookingId = if (!existingBookingId.isNullOrBlank()) {
+                            existingBookingId
+                        } else {
+                            "NYA-2026-${java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8).uppercase()}"
+                        }
+                        updateMap["bookingId"] = bookingId
+                        updateMap["acceptedAt"] = com.google.firebase.Timestamp.now()
+                    } else if (status.equals("REJECTED", ignoreCase = true)) {
+                        updateMap["rejectedAt"] = com.google.firebase.Timestamp.now()
+                    }
+
+                    transaction.update(docRef, updateMap)
+                }
+            }.await()
+
+            // Update subcollections if they exist
             val rootDoc = db.collection("consultations").document(id).get().await()
             val consultation = rootDoc.toObject(Consultation::class.java)
 
             if (consultation != null) {
+                val updateMap = mutableMapOf<String, Any>(
+                    "status" to consultation.status,
+                    "updatedAt" to (consultation.updatedAt ?: com.google.firebase.Timestamp.now())
+                )
+                if (consultation.bookingId.isNotBlank()) {
+                    updateMap["bookingId"] = consultation.bookingId
+                }
+                if (consultation.acceptedAt != null) {
+                    updateMap["acceptedAt"] = consultation.acceptedAt
+                }
+                if (consultation.rejectedAt != null) {
+                    updateMap["rejectedAt"] = consultation.rejectedAt
+                }
+
                 val client = consultation.clientId.ifBlank { consultation.userId }
                 if (client.isNotBlank()) {
                     val clientDoc = db.collection("users").document(client)
@@ -571,6 +1104,10 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                     }
                 }
             } else if (uid.isNotBlank()) {
+                val updateMap = mapOf(
+                    "status" to status,
+                    "updatedAt" to com.google.firebase.Timestamp.now()
+                )
                 val fallbackDoc = db.collection("users").document(uid)
                     .collection("consultations").document(id)
                 if (fallbackDoc.get().await().exists()) {
@@ -710,13 +1247,18 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 try {
                     doc.toObject(ChatSession::class.java)
                 } catch (e: Exception) {
-                    val title = doc.getString("title") ?: ""
-                    val type = doc.getString("chatbotType") ?: "AI_ASSISTANT"
-                    val createdAt = doc.getLong("createdAt") ?: System.currentTimeMillis()
-                    val updatedAt = doc.getLong("updatedAt") ?: System.currentTimeMillis()
-                    val isPinned = doc.getBoolean("isPinned") ?: false
-                    val id = doc.getLong("sessionId") ?: doc.id.toLongOrNull() ?: 0L
-                    ChatSession(sessionId = id, title = title, chatbotType = type, createdAt = createdAt, updatedAt = updatedAt, isPinned = isPinned)
+                    try {
+                        val title = doc.getString("title") ?: ""
+                        val type = doc.getString("chatbotType") ?: "AI_ASSISTANT"
+                        val createdAt = doc.getSafeLong("createdAt", System.currentTimeMillis())
+                        val updatedAt = doc.getSafeLong("updatedAt", System.currentTimeMillis())
+                        val isPinned = doc.getBoolean("isPinned") ?: false
+                        val id = doc.getSafeLong("sessionId", doc.id.toLongOrNull() ?: 0L)
+                        ChatSession(sessionId = id, title = title, chatbotType = type, createdAt = createdAt, updatedAt = updatedAt, isPinned = isPinned)
+                    } catch (innerEx: Exception) {
+                        Log.e("FIRESTORE_HISTORY", "Error parsing chat session document ${doc.id}", innerEx)
+                        null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -737,17 +1279,92 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 try {
                     doc.toObject(ChatHistoryMessage::class.java)
                 } catch (e: Exception) {
-                    val sender = doc.getString("sender") ?: "Bot"
-                    val message = doc.getString("message") ?: ""
-                    val timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()
-                    val msgId = doc.getLong("messageId") ?: doc.id.toLongOrNull() ?: 0L
-                    val sessId = doc.getLong("sessionId") ?: sessionId
-                    ChatHistoryMessage(messageId = msgId, sessionId = sessId, sender = sender, message = message, timestamp = timestamp)
+                    try {
+                        val sender = doc.getString("sender") ?: "Bot"
+                        val message = doc.getString("message") ?: ""
+                        val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
+                        val msgId = doc.getSafeLong("messageId", doc.id.toLongOrNull() ?: 0L)
+                        val sessId = doc.getSafeLong("sessionId", sessionId)
+                        ChatHistoryMessage(messageId = msgId, sessionId = sessId, sender = sender, message = message, timestamp = timestamp)
+                    } catch (innerEx: Exception) {
+                        Log.e("FIRESTORE_HISTORY", "Error parsing chat message document ${doc.id}", innerEx)
+                        null
+                    }
                 }
             }
         } catch (e: Exception) {
             Log.e("FIRESTORE_DEBUG", "Error getting room chat messages list for UID: $uid", e)
             emptyList()
+        }
+    }
+
+    fun getLawyerReviewsFlow(lawyerId: String): Flow<List<LawyerReview>> = callbackFlow {
+        if (lawyerId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+        val query = db.collection("reviews")
+            .whereEqualTo("lawyerId", lawyerId)
+            
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("FIRESTORE_REVIEWS", "Error listening to reviews", error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val list = mutableListOf<LawyerReview>()
+                for (doc in snapshot.documents) {
+                    try {
+                        val review = doc.toObject(LawyerReview::class.java)
+                        if (review != null) {
+                            val finalReview = if (review.reviewId.isBlank()) {
+                                review.copy(reviewId = doc.id)
+                            } else {
+                                review
+                            }
+                            list.add(finalReview)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("FIRESTORE_REVIEWS", "Error deserializing review document", e)
+                    }
+                }
+                val sorted = list.sortedByDescending { it.createdAt }
+                trySend(sorted)
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    suspend fun submitReview(review: LawyerReview) {
+        val docId = review.reviewId.ifBlank { review.consultationId }
+        if (docId.isBlank()) return
+        
+        db.collection("reviews").document(docId).set(review).await()
+        
+        val updates = mapOf(
+            "hasReviewed" to true,
+            "reviewId" to docId,
+            "updatedAt" to com.google.firebase.Timestamp.now()
+        )
+        db.collection("consultations").document(review.consultationId).update(updates).await()
+        
+        try {
+            val consultation = db.collection("consultations").document(review.consultationId).get().await()
+            if (consultation.exists()) {
+                val clientId = consultation.getString("clientId") ?: ""
+                val userId = consultation.getString("userId") ?: ""
+                val lawyerId = consultation.getString("lawyerId") ?: ""
+                val cId = clientId.ifBlank { userId }
+                if (cId.isNotBlank()) {
+                    db.collection("users").document(cId).collection("consultations").document(review.consultationId).update(updates).await()
+                }
+                if (lawyerId.isNotBlank()) {
+                    db.collection("users").document(lawyerId).collection("consultations").document(review.consultationId).update(updates).await()
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("REVIEW_SUBMISSION", "Failed to update nested subcollections for reviews", e)
         }
     }
 }

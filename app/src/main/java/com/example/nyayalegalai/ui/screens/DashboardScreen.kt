@@ -38,6 +38,7 @@ import com.example.nyayalegalai.R
 import com.example.nyayalegalai.database.ChatSession
 import com.example.nyayalegalai.ui.navigation.Route
 import com.example.nyayalegalai.ui.navigation.navigateToChat
+import android.util.Log
 import com.example.nyayalegalai.utils.SessionManager
 import com.example.nyayalegalai.viewmodel.HistoryViewModel
 import java.text.SimpleDateFormat
@@ -46,10 +47,20 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewModel) {
+    android.util.Log.d("APP_CRASH_TRACE", "Dashboard opened")
+    Log.d("NYAYA_STARTUP", "NYAYA_STARTUP: Dashboard initialization started")
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val user = remember { sessionManager.getUser() }
     val recentSessions by historyViewModel.allSessions.collectAsState(initial = emptyList())
+    
+    val statsState by remember(user) {
+        if (user != null && user.uid.isNotEmpty()) {
+            historyViewModel.getActivityStats(user.uid)
+        } else {
+            kotlinx.coroutines.flow.flowOf(com.example.nyayalegalai.repository.ActivityStats())
+        }
+    }.collectAsState(initial = com.example.nyayalegalai.repository.ActivityStats())
 
     LaunchedEffect(user) {
         if (user != null && user.role.uppercase() == "LAWYER") {
@@ -140,39 +151,6 @@ fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewM
             }
 
 
-            // Search Bar Portal
-            item {
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { 
-                        Text(
-                            text = "Search laws, sections, or lawyers...", 
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        ) 
-                    },
-                    leadingIcon = { 
-                        Icon(
-                            imageVector = Icons.Default.Search, 
-                            contentDescription = null, 
-                            tint = secondaryColor
-                        ) 
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clickable { navController.navigate(Route.LawEncyclopedia.route) },
-                    enabled = false,
-                    shape = RoundedCornerShape(28.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                        disabledContainerColor = MaterialTheme.colorScheme.surface,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    )
-                )
-            }
-
             // Categories Section (2-Column Responsive Grid)
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -198,6 +176,10 @@ fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewM
                             ) {
                                 rowItems.forEach { item ->
                                     CategoryCard(item, modifier = Modifier.weight(1f)) {
+                                        if (item.route == Route.LawyerHistory.route) {
+                                            Log.d("MY_BOOKINGS", "MY_BOOKINGS: Button clicked")
+                                            Log.d("MY_BOOKINGS", "MY_BOOKINGS: Navigation started")
+                                        }
                                         navController.navigate(item.route)
                                     }
                                 }
@@ -212,10 +194,6 @@ fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewM
 
             // Activity Overview (Statistics Card)
             item {
-                val chatCount = recentSessions.count { it.chatbotType == "AI_ASSISTANT" }
-                val learningCount = recentSessions.count { it.chatbotType == "LEGAL_LEARNING" }
-                val totalSessions = chatCount + learningCount
-
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
@@ -238,21 +216,21 @@ fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewM
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            StatItem("Total Chats", totalSessions.toString(), modifier = Modifier.weight(1f))
+                            StatItem("Total Chats", statsState.totalCount.toString(), modifier = Modifier.weight(1f))
                             HorizontalDivider(
                                 modifier = Modifier
                                     .height(36.dp)
                                     .width(1.dp),
                                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                             )
-                            StatItem("AI Help", chatCount.toString(), modifier = Modifier.weight(1f))
+                            StatItem("AI Help", statsState.chatCount.toString(), modifier = Modifier.weight(1f))
                             HorizontalDivider(
                                 modifier = Modifier
                                     .height(36.dp)
                                     .width(1.dp),
                                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                             )
-                            StatItem("Learning", learningCount.toString(), modifier = Modifier.weight(1f))
+                            StatItem("Learning", statsState.learningCount.toString(), modifier = Modifier.weight(1f))
                         }
                     }
                 }

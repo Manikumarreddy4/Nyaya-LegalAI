@@ -31,65 +31,61 @@ class LoginViewModel(
             _loginState.value = LoginState.Error("Email and password cannot be empty")
             return
         }
+        if (_loginState.value is LoginState.Loading) {
+            return
+        }
 
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
-                Log.d("FIRESTORE_DEBUG", "Starting Login Auth for $email...")
+                Log.d("LOGIN_PERF", "Login Auth started for $email")
                 val authResult = authRepo.login(email.trim(), pass)
                 val firebaseUser = authResult.user ?: FirebaseAuth.getInstance().currentUser ?: throw Exception("Login failed: No Firebase user returned")
                 val userId = firebaseUser.uid
 
-                Log.d("FIRESTORE_DEBUG", "Login Auth SUCCESS, UID: $userId. Fetching user profile...")
-                
-                // Fetch profile with a timeout to avoid hangs
-                val userProfile = try {
-                    withTimeout(8000) {
-                        firestoreRepo.getUserProfile(userId)
-                    }
-                } catch (e: Exception) {
-                    Log.e("FIRESTORE_DEBUG", "User profile fetch error/timeout: ${e.message}")
-                    null
+                // Step 1: Check cached accounts
+                val savedAccount = sessionManager.getSavedAccounts().find { it.uid == userId || it.email.equals(email.trim(), ignoreCase = true) }
+                var role = savedAccount?.role?.uppercase()
+
+                if (savedAccount != null && role != null) {
+                    sessionManager.saveUser(LocalUser(userId, email.trim(), savedAccount.name, role, ""), pass)
+                    _loginState.value = LoginState.Success(role)
+                    return@launch
                 }
 
-                var role = "USER"
+                // Step 2: Fetch profile from Firestore
+                var userProfile: UserProfile? = null
+                try {
+                    withTimeout(4000) { userProfile = firestoreRepo.getUserProfile(userId) }
+                } catch (e: Exception) {
+                    Log.w("LOGIN_PERF", "UserProfile fetch timeout: ${e.message}")
+                }
+                
+                var finalRole = "USER"
                 if (userProfile != null) {
-                    role = if (userProfile.role.equals("CLIENT", ignoreCase = true) || userProfile.role.equals("user", ignoreCase = true) || userProfile.role.equals("USER", ignoreCase = true)) "USER" else userProfile.role.uppercase()
-                    sessionManager.saveUser(LocalUser(userProfile.userId, userProfile.email, userProfile.name, role, userProfile.phone), pass)
+                    finalRole = if (userProfile!!.role.equals("CLIENT", ignoreCase = true) || userProfile!!.role.equals("user", ignoreCase = true) || userProfile!!.role.equals("USER", ignoreCase = true)) "USER" else userProfile!!.role.uppercase()
+                    sessionManager.saveUser(LocalUser(userId, userProfile!!.email, userProfile!!.name, finalRole, userProfile!!.phone), pass)
                 } else {
-                    val lawyerProfile = try {
-                        withTimeout(8000) {
-                            firestoreRepo.getLawyerProfile(userId)
-                        }
+                    var lawyerProfile: com.example.nyayalegalai.models.LawyerProfile? = null
+                    try {
+                        withTimeout(4000) { lawyerProfile = firestoreRepo.getLawyerProfile(userId) }
                     } catch (e: Exception) {
-                        null
+                        Log.w("LOGIN_PERF", "LawyerProfile fetch timeout")
                     }
 
                     if (lawyerProfile != null) {
-                        role = "LAWYER"
-                        sessionManager.saveUser(LocalUser(lawyerProfile.lawyerId, lawyerProfile.email, lawyerProfile.name, "LAWYER", lawyerProfile.phone, lawyerProfile.barCouncilNumber), pass)
+                        finalRole = "LAWYER"
+                        sessionManager.saveUser(LocalUser(userId, lawyerProfile!!.email, lawyerProfile!!.name, "LAWYER", lawyerProfile!!.phone, lawyerProfile!!.barCouncilNumber), pass)
                     } else {
-                        // First time profile creation if not exists
-                        val defaultProfile = UserProfile(
-                            userId = userId,
-                            name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                            email = email.trim(),
-                            role = "USER"
-                        )
-                        try {
-                            firestoreRepo.saveUserProfile(defaultProfile)
-                        } catch (e: Exception) {
-                            Log.e("FIRESTORE_DEBUG", "Error saving default profile", e)
-                        }
+                        val defaultProfile = UserProfile(userId = userId, name = email.substringBefore("@").replaceFirstChar { it.uppercase() }, email = email.trim(), role = "USER")
+                        try { firestoreRepo.saveUserProfile(defaultProfile) } catch (e: Exception) { Log.e("LOGIN_PERF", "Default profile save error", e) }
                         sessionManager.saveUser(LocalUser(userId, email.trim(), defaultProfile.name, "USER", ""), pass)
                     }
                 }
 
-                // Restore all existing user data from Firestore for this UID
-                restoreUserData(userId)
-
-                _loginState.value = LoginState.Success(role)
+                _loginState.value = LoginState.Success(finalRole)
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 Log.e("FIRESTORE_DEBUG", "Login FLOW FAILED", e)
                 _loginState.value = LoginState.Error(e.localizedMessage ?: "Invalid credentials or network issue")
             }
@@ -99,57 +95,68 @@ class LoginViewModel(
     suspend fun restoreUserData(userId: String) {
         Log.d("FIRESTORE_DEBUG", "Restoring complete user data from Firestore users/$userId")
         try {
-            // 1. Clear local SQLite user data cache tables to guarantee complete account separation
-            db.chatDao().clearHistory()
-            db.learningHistoryDao().clearHistory()
-            db.unifiedHistoryDao().deleteAllSessions()
-            db.unifiedHistoryDao().deleteAllMessages()
-            db.userProfileDao().clearProfile()
+            // 1. Clear local SQLite user data cache
+            try {
+                db.chatDao().clearHistory()
+                db.learningHistoryDao().clearHistory()
+                db.unifiedHistoryDao().deleteAllSessions()
+                db.unifiedHistoryDao().deleteAllMessages()
+                db.userProfileDao().clearProfile()
+            } catch (e: Exception) { Log.e("FIRESTORE_DEBUG", "Clear local DB failed", e) }
 
             // 2. Restore profile to SQLite
-            val profile = firestoreRepo.getUserProfile(userId)
-            if (profile != null) {
-                db.userProfileDao().updateProfile(
-                    com.example.nyayalegalai.database.UserProfile(
-                        id = 1,
-                        name = profile.name,
-                        language = sessionManager.getLanguage() ?: "en",
-                        learningProgress = 0
+            try {
+                val profile = firestoreRepo.getUserProfile(userId)
+                if (profile != null) {
+                    db.userProfileDao().updateProfile(
+                        com.example.nyayalegalai.database.UserProfile(
+                            id = 1,
+                            name = profile.name,
+                            language = sessionManager.getLanguage() ?: "en",
+                            learningProgress = 0
+                        )
                     )
-                )
-            }
+                }
+            } catch (e: Exception) { Log.e("FIRESTORE_DEBUG", "Restore profile failed", e) }
 
             // 3. Restore settings
-            val settings = firestoreRepo.getUserSettings(userId)
-            if (settings != null) {
-                sessionManager.setDarkMode(settings.darkMode)
-                sessionManager.setThemeColor(settings.themeColor)
-                sessionManager.setFontColor(settings.fontColor)
-                settings.language?.let { sessionManager.setLanguage(it) }
-            }
-
-            // 4. Restore chat sessions & messages from users/{uid}/chatSessions
-            val chatSessions = firestoreRepo.getRoomChatSessionsList(userId)
-            Log.d("FIRESTORE_DEBUG", "Restoring ${chatSessions.size} chat sessions from Firestore for UID: $userId")
-            for (session in chatSessions) {
-                db.unifiedHistoryDao().insertSession(session)
-                val messages = firestoreRepo.getRoomChatMessagesList(userId, session.sessionId)
-                Log.d("FIRESTORE_DEBUG", "Restoring ${messages.size} messages for session ${session.sessionId}")
-                for (msg in messages) {
-                    db.unifiedHistoryDao().insertMessage(msg)
+            try {
+                val settings = firestoreRepo.getUserSettings(userId)
+                if (settings != null) {
+                    sessionManager.setDarkMode(settings.darkMode)
+                    sessionManager.setThemeColor(settings.themeColor)
+                    sessionManager.setFontColor(settings.fontColor)
+                    settings.language?.let { sessionManager.setLanguage(it) }
                 }
+            } catch (e: Exception) { Log.e("FIRESTORE_DEBUG", "Restore settings failed", e) }
+
+            // 4. Restore chat sessions & messages
+            try {
+                val chatSessions = firestoreRepo.getRoomChatSessionsList(userId)
+                for (session in chatSessions) {
+                    db.unifiedHistoryDao().insertSession(session)
+                    val messages = firestoreRepo.getRoomChatMessagesList(userId, session.sessionId)
+                    for (msg in messages) {
+                        db.unifiedHistoryDao().insertMessage(msg)
+                    }
+                }
+            } catch (e: Exception) { Log.e("FIRESTORE_DEBUG", "Restore chat history failed", e) }
+
+            // 5. Restore learning history
+            try {
+                val learningList = firestoreRepo.getLearningHistoryList(userId)
+                for (item in learningList) {
+                    db.learningHistoryDao().insertHistory(item)
+                }
+            } catch (e: Exception) { 
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Log.e("FIRESTORE_DEBUG", "Restore learning history failed", e) 
             }
 
-            // 5. Restore learning history list from users/{uid}/learningHistory
-            val learningList = firestoreRepo.getLearningHistoryList(userId)
-            Log.d("FIRESTORE_DEBUG", "Restoring ${learningList.size} learning history items from Firestore for UID: $userId")
-            for (item in learningList) {
-                db.learningHistoryDao().insertHistory(item)
-            }
-
-            Log.d("FIRESTORE_DEBUG", "All user data restored successfully for UID: $userId.")
+            Log.d("FIRESTORE_DEBUG", "User data restored for UID: $userId.")
         } catch (e: Exception) {
-            Log.e("FIRESTORE_DEBUG", "Failed to restore user data: ${e.message}", e)
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Log.e("FIRESTORE_DEBUG", "General failure in restoreUserData", e)
         }
     }
 
@@ -163,6 +170,7 @@ class LoginViewModel(
                 authRepo.sendPasswordResetEmail(email.trim())
                 _loginState.value = LoginState.Message("Password reset email sent")
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 _loginState.value = LoginState.Error(e.localizedMessage ?: "Failed to send reset email")
             }
         }

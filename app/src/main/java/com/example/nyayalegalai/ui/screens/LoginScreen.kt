@@ -83,13 +83,17 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 
     // Handle LoginState changes
     LaunchedEffect(loginState) {
+        android.util.Log.d("NYAYA_CRASH_DEBUG", "LoginScreen: LaunchedEffect observed loginState = $loginState")
         if (loginState is LoginState.Success) {
             val role = (loginState as LoginState.Success).role
             val dest = if (role.uppercase() == "LAWYER") Route.LawyerDashboard.route else Route.Dashboard.route
+            android.util.Log.i("NYAYA_CRASH_DEBUG", "LoginScreen: Login successful. Navigating to dest = $dest with role = $role")
             navController.navigate(dest) {
                 popUpTo(Route.Login.route) { inclusive = true }
             }
             loginViewModel.resetState()
+        } else if (loginState is LoginState.Error) {
+            android.util.Log.e("NYAYA_CRASH_DEBUG", "LoginScreen: Login error = ${(loginState as LoginState.Error).message}")
         }
     }
 
@@ -378,6 +382,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                             .shadow(2.dp, RoundedCornerShape(26.dp))
                             .clip(RoundedCornerShape(26.dp))
                             .clickable(enabled = canSubmit) {
+                                android.util.Log.i("NYAYA_CRASH_DEBUG", "LoginScreen: Login button clicked - email = $email")
                                 loginViewModel.login(email, password)
                             },
                         color = Color.Transparent
@@ -426,6 +431,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                     password = account.password ?: ""
                     showAccountPicker = false
                     if (email.isNotBlank() && password.isNotBlank()) {
+                        android.util.Log.i("NYAYA_CRASH_DEBUG", "LoginScreen: Saved account selected from picker - email = $email")
                         loginViewModel.login(email, password)
                     }
                 },

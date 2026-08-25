@@ -24,19 +24,29 @@ data class LocalUser(
 
 class SessionManager(private val context: Context) {
     private val gson = Gson()
-    private val masterKey = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "nyaya_legal_session",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+    private val sharedPreferences: SharedPreferences = try {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        EncryptedSharedPreferences.create(
+            context,
+            "nyaya_legal_session",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    } catch (e: Exception) {
+        android.util.Log.e("NYAYA_CRASH_DEBUG", "SessionManager: EncryptedSharedPreferences creation failed. Falling back to plain SharedPreferences.", e)
+        try {
+            context.deleteSharedPreferences("nyaya_legal_session")
+        } catch (ex: Exception) {
+            android.util.Log.w("NYAYA_CRASH_DEBUG", "SessionManager: Failed to delete backing shared preferences file", ex)
+        }
+        context.getSharedPreferences("nyaya_legal_session_fallback", Context.MODE_PRIVATE)
+    }
 
     fun saveUser(user: LocalUser, password: String? = null) {
+        android.util.Log.d("NYAYA_CRASH_DEBUG", "SessionManager: saveUser called - uid=${user.uid}, email=${user.email}, role=${user.role}")
         val userJson = gson.toJson(user)
         sharedPreferences.edit()
             .putString("logged_in_user", userJson)
@@ -92,10 +102,12 @@ class SessionManager(private val context: Context) {
 
     fun getUser(): LocalUser? {
         val userJson = sharedPreferences.getString("logged_in_user", null)
+        android.util.Log.d("NYAYA_CRASH_DEBUG", "SessionManager: getUser loaded JSON=${userJson ?: "Null"}")
         return if (userJson != null) {
             try {
                 gson.fromJson(userJson, LocalUser::class.java)
             } catch (e: Exception) {
+                android.util.Log.e("NYAYA_CRASH_DEBUG", "SessionManager: getUser parse error", e)
                 null
             }
         } else null
@@ -176,6 +188,7 @@ class SessionManager(private val context: Context) {
     }
 
     fun logout() {
+        android.util.Log.i("NYAYA_CRASH_DEBUG", "SessionManager: logout triggered - clearing session preference cache")
         sharedPreferences.edit()
             .remove("logged_in_user")
             .remove("is_logged_in")
@@ -184,8 +197,9 @@ class SessionManager(private val context: Context) {
         // 1. Sign out Firebase Auth
         try {
             FirebaseAuth.getInstance().signOut()
+            android.util.Log.i("NYAYA_CRASH_DEBUG", "SessionManager: Firebase Auth signed out successfully")
         } catch (e: Exception) {
-            android.util.Log.e("SessionManager", "Error signing out from FirebaseAuth", e)
+            android.util.Log.e("NYAYA_CRASH_DEBUG", "SessionManager: Firebase Auth signout error", e)
         }
 
         // 2. Clear local SQLite cache only. Never delete Firestore data.

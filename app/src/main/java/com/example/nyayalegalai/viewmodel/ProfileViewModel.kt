@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ProfileViewModel(
     private val sessionManager: SessionManager,
@@ -28,6 +29,9 @@ class ProfileViewModel(
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName.asStateFlow()
 
+    private val _userPhone = MutableStateFlow("")
+    val userPhone: StateFlow<String> = _userPhone.asStateFlow()
+
     private val _userRole = MutableStateFlow("")
     val userRole: StateFlow<String> = _userRole.asStateFlow()
 
@@ -37,16 +41,35 @@ class ProfileViewModel(
     private val _profilePhotoUrl = MutableStateFlow("")
     val profilePhotoUrl: StateFlow<String> = _profilePhotoUrl.asStateFlow()
 
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            _userProfile.value = null
+            _userName.value = ""
+            _userPhone.value = ""
+            _userRole.value = ""
+            _userEmail.value = ""
+            _profilePhotoUrl.value = ""
+        } else {
+            loadUserInfo()
+        }
+    }
+
     init {
-        loadUserInfo()
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
     }
 
     fun loadUserInfo() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val uid = currentUser?.uid ?: sessionManager.getUser()?.uid
         val localUser = sessionManager.getUser()
         if (!uid.isNullOrBlank()) {
-            _userEmail.value = localUser?.email ?: FirebaseAuth.getInstance().currentUser?.email ?: ""
-            _userName.value = localUser?.name ?: "User"
+            val authEmail = currentUser?.email ?: ""
+            val authDisplayName = currentUser?.displayName ?: ""
+
+            _userEmail.value = localUser?.email?.ifBlank { null } ?: authEmail
+            _userName.value = localUser?.name?.ifBlank { null } ?: authDisplayName.ifBlank { "User" }
+            _userPhone.value = localUser?.phone ?: ""
             val rawRole = localUser?.role ?: "USER"
             _userRole.value = if (rawRole.equals("lawyer", ignoreCase = true) || rawRole.equals("LAWYER", ignoreCase = true)) "LAWYER" else "USER"
             _profilePhotoUrl.value = sessionManager.getUserProfilePhoto(uid)
@@ -56,10 +79,11 @@ class ProfileViewModel(
                     val profile = firestoreRepo.getUserProfile(uid)
                     _userProfile.value = profile
                     profile?.let {
-                        _userName.value = it.name
+                        _userName.value = it.name.ifBlank { authDisplayName.ifBlank { "User" } }
+                        _userPhone.value = it.phone
                         val firestoreRole = if (it.role.equals("lawyer", ignoreCase = true) || it.role.equals("LAWYER", ignoreCase = true)) "LAWYER" else "USER"
                         _userRole.value = firestoreRole
-                        if (it.email.isNotBlank()) _userEmail.value = it.email
+                        _userEmail.value = it.email.ifBlank { authEmail }
                         if (it.profilePhotoUrl.isNotBlank()) {
                             _profilePhotoUrl.value = it.profilePhotoUrl
                             sessionManager.setUserProfilePhoto(uid, it.profilePhotoUrl)
@@ -72,25 +96,25 @@ class ProfileViewModel(
         } else {
             _userProfile.value = null
             _userName.value = ""
+            _userPhone.value = ""
             _userRole.value = ""
             _userEmail.value = ""
             _profilePhotoUrl.value = ""
         }
     }
 
-    fun updateProfile(name: String, role: String) {
+    fun updateProfile(name: String, phone: String) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid ?: return
-        val normalizedRole = if (role.equals("Lawyer", ignoreCase = true) || role.equals("LAWYER", ignoreCase = true)) "LAWYER" else "USER"
         viewModelScope.launch {
             try {
                 val updates = mapOf(
                     "name" to name,
-                    "role" to normalizedRole
+                    "phone" to phone
                 )
                 firestoreRepo.updateUserProfile(uid, updates)
                 val currentLocal = sessionManager.getUser()
                 if (currentLocal != null) {
-                    sessionManager.saveUser(currentLocal.copy(name = name, role = normalizedRole))
+                    sessionManager.saveUser(currentLocal.copy(name = name, phone = phone))
                 }
                 loadUserInfo()
             } catch (e: Exception) {
@@ -144,5 +168,52 @@ class ProfileViewModel(
         _language.value = lang
         sessionManager.setLanguage(code)
         LocaleHelper.setLocale(context, code)
+    }
+
+    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uid = user?.uid ?: sessionManager.getUser()?.uid
+        if (uid.isNullOrBlank()) {
+            onError("User session not found")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                // Delete user document from Firestore users collection
+                firestoreRepo.deleteUserProfile(uid)
+                // Delete lawyer profile from Firestore lawyers collection (if exists)
+                firestoreRepo.deleteLawyerProfile(uid)
+                
+                // Clear local session and cache
+                sessionManager.logout()
+
+                // Also delete from FirebaseAuth if signed in
+                if (user != null) {
+                    try {
+                        user.delete().await()
+                    } catch (authEx: Exception) {
+                        Log.w("ProfileViewModel", "Failed to delete Firebase Auth user (could be already deleted)", authEx)
+                    }
+                }
+                
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error deleting account for UID $uid", e)
+                try {
+                    sessionManager.logout()
+                } catch (ex: Exception) {}
+                onError(e.localizedMessage ?: "Failed to delete account from server")
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+        } catch (e: Exception) {
+            Log.e("ProfileViewModel", "Error removing authStateListener", e)
+        }
     }
 }

@@ -60,7 +60,13 @@ interface LearningHistoryDao {
     suspend fun findBySectionPart(sectionPart: String): LawEntry?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHistory(history: LearningHistory)
+    suspend fun insertHistory(history: LearningHistory): Long
+
+    @Delete
+    suspend fun deleteHistory(history: LearningHistory)
+
+    @Query("SELECT * FROM learning_history")
+    suspend fun getAllHistoryList(): List<LearningHistory>
 
     @Query("DELETE FROM learning_history")
     suspend fun clearHistory()
@@ -145,6 +151,9 @@ interface UnifiedHistoryDao {
 
     @Query("SELECT * FROM chat_sessions WHERE sessionId = :id")
     suspend fun getSessionById(id: Long): ChatSession?
+
+    @Query("SELECT * FROM chat_sessions")
+    suspend fun getAllSessionsList(): List<ChatSession>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(session: ChatSession): Long

@@ -41,6 +41,7 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
 
     var lawyerProfile by remember { mutableStateOf<LawyerProfile?>(null) }
     LaunchedEffect(lawyerId) {
+        viewModel.resetUploadState()
         val repo = FirestoreRepository()
         val fetched = repo.getLawyerProfile(lawyerId)
         if (fetched != null) {
@@ -73,6 +74,13 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
     val uploadState by viewModel.uploadState.collectAsState()
 
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    val inPersonAvailable = lawyerProfile?.isInPersonAvailable ?: true
+    LaunchedEffect(inPersonAvailable) {
+        if (!inPersonAvailable && consultationType == "In-Person") {
+            consultationType = "Online"
+        }
+    }
 
     val calendar = java.util.Calendar.getInstance()
     val datePickerDialog = android.app.DatePickerDialog(
@@ -107,6 +115,8 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
             navController.navigate(Route.LawyerHistory.route) {
                 popUpTo(Route.LawyerConsultation.route) { inclusive = false }
             }
+        } else if (uploadState is UploadState.Error) {
+            Toast.makeText(context, (uploadState as UploadState.Error).message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -347,15 +357,50 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
                             modifier = Modifier
                                 .weight(1f)
                                 .height(46.dp)
-                                .clickable { consultationType = "In-Person" },
+                                .clickable(enabled = inPersonAvailable) { consultationType = "In-Person" },
                             shape = RoundedCornerShape(12.dp),
-                            color = if (consultationType == "In-Person") primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            border = BorderStroke(1.dp, if (consultationType == "In-Person") primaryColor else MaterialTheme.colorScheme.outlineVariant)
+                            color = if (!inPersonAvailable) {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+                            } else if (consultationType == "In-Person") {
+                                primaryColor
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            },
+                            border = BorderStroke(
+                                1.dp, 
+                                if (!inPersonAvailable) {
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                } else if (consultationType == "In-Person") {
+                                    primaryColor
+                                } else {
+                                    MaterialTheme.colorScheme.outlineVariant
+                                }
+                            )
                         ) {
                             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Business, contentDescription = null, tint = if (consultationType == "In-Person") Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Icon(
+                                    Icons.Default.Business, 
+                                    contentDescription = null, 
+                                    tint = if (!inPersonAvailable) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                    } else if (consultationType == "In-Person") {
+                                        Color.White
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("In-Person", fontWeight = FontWeight.Bold, color = if (consultationType == "In-Person") Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    text = if (inPersonAvailable) "In-Person" else "In-Person (Unavailable)", 
+                                    fontWeight = FontWeight.Bold, 
+                                    color = if (!inPersonAvailable) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                    } else if (consultationType == "In-Person") {
+                                        Color.White
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
                             }
                         }
                     }
@@ -518,7 +563,8 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
             }
 
             // Confirm Booking Button
-            val isFormValid = clientName.isNotBlank() && caseTitle.isNotBlank() && caseDescription.isNotBlank() && contactNumber.isNotBlank() && date.isNotBlank() && selectedTimeSlot.isNotBlank()
+            val isConsultationTypeValid = consultationType == "Online" || (consultationType == "In-Person" && inPersonAvailable)
+            val isFormValid = clientName.isNotBlank() && caseTitle.isNotBlank() && caseDescription.isNotBlank() && contactNumber.isNotBlank() && date.isNotBlank() && selectedTimeSlot.isNotBlank() && isConsultationTypeValid
 
             Button(
                 onClick = {

@@ -98,12 +98,12 @@ fun LawyerProfileDetailScreen(
                             modifier = Modifier
                                 .height(50.dp)
                                 .padding(start = 16.dp),
-                            enabled = lawyer!!.onlineAvailable
+                            enabled = lawyer!!.isAvailable
                         ) {
                             Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (lawyer!!.onlineAvailable) "Book Consultation" else "Unavailable",
+                                text = if (lawyer!!.isAvailable) "Book Consultation" else "Unavailable",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
@@ -251,39 +251,152 @@ fun LawyerProfileDetailScreen(
                     DetailRow(label = "Available Days", value = prof.availableDays)
                     DetailRow(label = "Available Time", value = prof.availableTime)
                     
-                    Spacer(modifier = Modifier.height(4.dp))
-                    if (!prof.onlineAvailable) {
-                        AssistChip(
-                            onClick = {},
-                            label = { Text("Currently Unavailable", fontSize = 12.sp, color = MaterialTheme.colorScheme.error) },
-                            leadingIcon = { Icon(Icons.Default.Block, contentDescription = null, tint = MaterialTheme.colorScheme.error) }
-                        )
-                    } else {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (prof.onlineAvailable) {
-                                AssistChip(
-                                    onClick = {},
-                                    label = { Text("Online Consultation Available", fontSize = 12.sp) },
-                                    leadingIcon = { Icon(Icons.Default.VideoCall, contentDescription = null, tint = primaryColor) }
-                                )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Online Consultation Card
+                        val isOnlineAvailable = prof.isAvailable
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, if (isOnlineAvailable) Color(0xFFC8E6C9) else MaterialTheme.colorScheme.outlineVariant),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isOnlineAvailable) Color(0xFFF1F8E9) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.VideoCall,
+                                        contentDescription = null,
+                                        tint = if (isOnlineAvailable) Color(0xFF2E7D32) else Color.Gray,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            text = "Online Consultation",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp,
+                                            color = if (isOnlineAvailable) Color(0xFF2E7D32) else Color.Gray
+                                        )
+                                        Text(
+                                            text = if (isOnlineAvailable) "Available for video call" else "Currently Unavailable",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = if (isOnlineAvailable) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                                        contentDescription = null,
+                                        tint = if (isOnlineAvailable) Color(0xFF2E7D32) else Color.Gray,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (isOnlineAvailable) "ON" else "OFF",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = if (isOnlineAvailable) Color(0xFF2E7D32) else Color.Gray
+                                    )
+                                }
                             }
-                            if (prof.inPersonAvailable) {
-                                AssistChip(
-                                    onClick = {},
-                                    label = { Text("In-Person Available", fontSize = 12.sp) },
-                                    leadingIcon = { Icon(Icons.Default.Business, contentDescription = null, tint = primaryColor) }
-                                )
+                        }
+
+                        // In-Person Consultation Card
+                        val isInPersonAvailable = prof.isAvailable && prof.isInPersonAvailable
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, if (isInPersonAvailable) Color(0xFFC8E6C9) else MaterialTheme.colorScheme.outlineVariant),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isInPersonAvailable) Color(0xFFF1F8E9) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Business,
+                                        contentDescription = null,
+                                        tint = if (isInPersonAvailable) Color(0xFF2E7D32) else Color.Gray,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            text = "In-Person Consultation",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp,
+                                            color = if (isInPersonAvailable) Color(0xFF2E7D32) else Color.Gray
+                                        )
+                                        Text(
+                                            text = if (isInPersonAvailable) "Available for Offline Meetings" else "Not Available for Offline Meetings",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = if (isInPersonAvailable) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                                        contentDescription = null,
+                                        tint = if (isInPersonAvailable) Color(0xFF2E7D32) else Color.Gray,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (isInPersonAvailable) "ON" else "OFF",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = if (isInPersonAvailable) Color(0xFF2E7D32) else Color.Gray
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
                 // Customer Reviews Section
+                val reviews by remember(viewModel, prof.lawyerId.ifBlank { prof.userId }) {
+                    viewModel.getLawyerReviewsFlow(prof.lawyerId.ifBlank { prof.userId })
+                }.collectAsState(initial = emptyList())
+
                 DetailSectionCard("Client Reviews", Icons.Default.Star) {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        val lawyerNameText = lawyer?.name?.ifBlank { "this advocate" } ?: "this advocate"
-                        SampleReviewCard("Ramesh Patel", 5.0, "Advocate $lawyerNameText is highly knowledgeable in property law. Provided clear guidance during our consultation.")
-                        SampleReviewCard("Priya Sharma", 4.8, "Very professional, patient and helpful. Solved my legal notice query quickly.")
+                    if (reviews.isEmpty()) {
+                        Text(
+                            text = "No client reviews yet.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            reviews.forEach { r ->
+                                SampleReviewCard(
+                                    clientName = r.userName.ifBlank { r.clientName.ifBlank { "Client" } },
+                                    rating = r.rating,
+                                    comment = r.comment
+                                )
+                            }
+                        }
                     }
                 }
 

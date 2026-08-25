@@ -8,9 +8,10 @@ import {
   orderBy, 
   doc, 
   setDoc, 
-  serverTimestamp 
+  serverTimestamp,
+  deleteDoc
 } from 'firebase/firestore';
-import { MessageSquare, Plus, Send, AlertTriangle, ShieldCheck, ChevronRight, HelpCircle, Loader2 } from 'lucide-react';
+import { MessageSquare, Plus, Send, AlertTriangle, ShieldCheck, ChevronRight, HelpCircle, Loader2, Trash2 } from 'lucide-react';
 
 export default function LegalAssistant({ user, preselectedSessionId }) {
   const [sessions, setSessions] = useState([]);
@@ -32,17 +33,32 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
     async function loadSessions() {
       if (!user || !user.uid) return;
       try {
-        const sessionsRef = collection(db, 'users', user.uid, 'problemHistory');
+        const sessionsRef = collection(db, 'users', user.uid, 'chatSessions');
         const q = query(sessionsRef, orderBy('updatedAt', 'desc'));
         const querySnapshot = await getDocs(q);
         const docs = [];
         querySnapshot.forEach(d => {
-          docs.push({ id: d.id, ...d.data() });
+          const data = d.data();
+          if (data.chatbotType !== 'AI_ASSISTANT') return;
+          const title = data.title || '';
+          const isTitleEmptyOrDefault = !title.trim() || 
+            title.startsWith('New Legal Query') || 
+            title.startsWith('New Chat') || 
+            title.startsWith('Untitled');
+          if (!isTitleEmptyOrDefault) {
+            docs.push({ 
+              id: d.id, 
+              ...data,
+              sessionId: data.sessionId || d.id
+            });
+          }
         });
         setSessions(docs);
         
         if (docs.length > 0 && !currentSessionId) {
-          setCurrentSessionId(docs[0].id);
+          setCurrentSessionId(String(docs[0].sessionId));
+        } else if (docs.length === 0 && !currentSessionId) {
+          setCurrentSessionId('temp_' + Date.now());
         }
       } catch (e) {
         console.error('Error fetching sessions', e);
@@ -56,12 +72,12 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
   // Load messages for current session
   useEffect(() => {
     async function loadMessages() {
-      if (!user || !user.uid || !currentSessionId) {
+      if (!user || !user.uid || !currentSessionId || String(currentSessionId).startsWith('temp_')) {
         setMessages([]);
         return;
       }
       try {
-        const messagesRef = collection(db, 'users', user.uid, 'problemHistory', currentSessionId, 'messages');
+        const messagesRef = collection(db, 'users', user.uid, 'chatSessions', String(currentSessionId), 'messages');
         const q = query(messagesRef, orderBy('timestamp', 'asc'));
         const querySnapshot = await getDocs(q);
         const msgs = [];
@@ -81,28 +97,40 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const handleStartNewSession = async () => {
+  const handleStartNewSession = () => {
     if (!user || !user.uid) return;
+    const sessionId = 'temp_' + Date.now();
+    setCurrentSessionId(sessionId);
+    setMessages([]);
+  };
+
+  const handleDeleteSession = async (e, sessId) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this conversation?")) return;
     try {
-      const sessionId = 'session_' + Date.now();
-      const newSession = {
-        sessionId,
-        userId: user.uid,
-        chatbotType: 'AI_ASSISTANT',
-        title: 'New Legal Query ' + new Date().toLocaleDateString(),
-        updatedAt: new Date(),
-        isPinned: false
-      };
+      console.log(`[HISTORY_DELETE] Deleting history ID = ${sessId}`);
       
-      // Save session doc in firestore
-      await setDoc(doc(db, 'users', user.uid, 'problemHistory', sessionId), newSession);
+      // Delete messages first
+      const messagesRef = collection(db, 'users', user.uid, 'chatSessions', String(sessId), 'messages');
+      const msgSnapshot = await getDocs(messagesRef);
+      for (const msgDoc of msgSnapshot.docs) {
+        await deleteDoc(msgDoc.ref);
+      }
       
-      setSessions(prev => [newSession, ...prev]);
-      setCurrentSessionId(sessionId);
-      setMessages([]);
-    } catch (e) {
-      console.error(e);
-      alert('Failed to start new chat: ' + e.message);
+      // Delete session doc
+      const sessionRef = doc(db, 'users', user.uid, 'chatSessions', String(sessId));
+      await deleteDoc(sessionRef);
+      
+      console.log(`[HISTORY_DELETE] Delete successful`);
+      
+      // Update local state
+      setSessions(prev => prev.filter(s => s.sessionId !== sessId));
+      if (currentSessionId === sessId) {
+        setCurrentSessionId(null);
+        setMessages([]);
+      }
+    } catch (err) {
+      console.error(`[HISTORY_DELETE] Delete failed = ${err.message}`);
     }
   };
 
@@ -119,43 +147,49 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
     if (!textToSend.trim() || loading || !user || !user.uid) return;
 
     let sessionId = currentSessionId;
+    let isNewSession = false;
+    let numericSessionId = Number(sessionId);
     
-    // Create new session if none selected
-    if (!sessionId) {
+    // Create new session if none selected or if it's a temporary session
+    if (!sessionId || String(sessionId).startsWith('temp_')) {
       try {
-        sessionId = 'session_' + Date.now();
+        numericSessionId = Date.now();
+        sessionId = String(numericSessionId);
         const newSession = {
-          sessionId,
+          sessionId: numericSessionId,
           userId: user.uid,
           chatbotType: 'AI_ASSISTANT',
           title: textToSend.substring(0, 30) + '...',
-          updatedAt: new Date(),
+          createdAt: numericSessionId,
+          updatedAt: numericSessionId,
           isPinned: false
         };
-        await setDoc(doc(db, 'users', user.uid, 'problemHistory', sessionId), newSession);
+        await setDoc(doc(db, 'users', user.uid, 'chatSessions', sessionId), newSession);
         setSessions(prev => [newSession, ...prev]);
         setCurrentSessionId(sessionId);
+        isNewSession = true;
       } catch (err) {
         console.error(err);
         return;
       }
     }
 
+    const numericMessageId = Date.now();
     const userMessage = {
-      messageId: 'msg_' + Date.now() + '_user',
-      sessionId,
+      messageId: numericMessageId,
+      sessionId: numericSessionId,
       sender: 'User',
       message: textToSend,
-      timestamp: new Date()
+      timestamp: numericMessageId
     };
 
     setInputMessage('');
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => isNewSession ? [userMessage] : [...prev, userMessage]);
     setLoading(true);
 
     try {
       // Save user message to Firestore
-      const userMsgRef = doc(db, 'users', user.uid, 'problemHistory', sessionId, 'messages', userMessage.messageId);
+      const userMsgRef = doc(db, 'users', user.uid, 'chatSessions', sessionId, 'messages', String(userMessage.messageId));
       await setDoc(userMsgRef, userMessage);
 
       // Call secure backend proxy
@@ -166,7 +200,7 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: textToSend,
-          conversation: messages.slice(-10) // Only send the last 10 messages of history
+          conversation: isNewSession ? [] : messages.slice(-10) // Only send the last 10 messages of history, or empty if new
         })
       });
 
@@ -178,22 +212,23 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
         throw new Error(responseData.error || `HTTP ${response.status}`);
       }
 
+      const numericBotMessageId = Date.now() + 1;
       const assistantMessage = {
-        messageId: 'msg_' + Date.now() + '_bot',
-        sessionId,
+        messageId: numericBotMessageId,
+        sessionId: numericSessionId,
         sender: 'Bot',
         message: responseData.reply,
-        timestamp: new Date()
+        timestamp: numericBotMessageId
       };
 
       // Save assistant message to Firestore
-      const botMsgRef = doc(db, 'users', user.uid, 'problemHistory', sessionId, 'messages', assistantMessage.messageId);
+      const botMsgRef = doc(db, 'users', user.uid, 'chatSessions', sessionId, 'messages', String(assistantMessage.messageId));
       await setDoc(botMsgRef, assistantMessage);
 
       // Update session title and time in Firestore
-      const sessionDocRef = doc(db, 'users', user.uid, 'problemHistory', sessionId);
+      const sessionDocRef = doc(db, 'users', user.uid, 'chatSessions', sessionId);
       await setDoc(sessionDocRef, {
-        updatedAt: new Date(),
+        updatedAt: Date.now(),
         title: textToSend.substring(0, 30) + '...'
       }, { merge: true });
 
@@ -248,12 +283,24 @@ export default function LegalAssistant({ user, preselectedSessionId }) {
                 key={s.id} 
                 style={{
                   ...styles.sessionItem,
-                  background: currentSessionId === s.sessionId ? 'var(--primary)' : 'transparent'
+                  background: currentSessionId === s.sessionId ? 'var(--primary)' : 'transparent',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }}
                 onClick={() => setCurrentSessionId(s.sessionId)}
               >
-                <MessageSquare size={16} style={{flexShrink: 0}} />
-                <span style={styles.sessionTitle}>{s.title}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden', flex: 1 }}>
+                  <MessageSquare size={16} style={{flexShrink: 0}} />
+                  <span style={styles.sessionTitle}>{s.title}</span>
+                </div>
+                <button 
+                  onClick={(e) => handleDeleteSession(e, s.sessionId)} 
+                  style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px', opacity: 0.7 }}
+                  title="Delete Conversation"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             ))}
           </div>

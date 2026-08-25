@@ -4,8 +4,9 @@ import { collection, query, getDocs, limit, orderBy, where, onSnapshot } from 'f
 import { MessageSquare, School, BookOpen, Search, Calendar, ChevronRight, Clock, ShieldAlert, Bot, Sparkles } from 'lucide-react';
 
 export default function ClientDashboard({ user, onNavigate }) {
-  const [recentChats, setRecentChats] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
+  const [previews, setPreviews] = useState({});
   
   const [stats, setStats] = useState({ totalChats: 0, aiHelp: 0, learning: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
@@ -23,35 +24,57 @@ export default function ClientDashboard({ user, onNavigate }) {
     let learningDocs = [];
 
     const updateStats = () => {
+      console.log(`[ACTIVITY_SYNC] ACTIVITY_SYNC: Current user ID = ${user.uid}`);
+      console.log(`[ACTIVITY_SYNC] ACTIVITY_SYNC: Firestore snapshot received`);
+
       // Calculate AI Help: count of unique AI Assistant conversations
       const aiAssistantSessionIds = new Set();
       
       problemSessions.forEach(s => {
-        aiAssistantSessionIds.add(s.id || s.sessionId);
+        const titleText = (s.title || '').trim();
+        const isTitleEmptyOrDefault = titleText.length === 0 || 
+          titleText.startsWith('New Legal Query') || 
+          titleText.startsWith('New Chat') || 
+          titleText.startsWith('Untitled');
+        if (!isTitleEmptyOrDefault) {
+          aiAssistantSessionIds.add(String(s.id || s.sessionId));
+        }
       });
       
       chatSessions.forEach(s => {
         if (s.chatbotType === 'AI_ASSISTANT') {
-          aiAssistantSessionIds.add(s.id || s.sessionId);
+          const titleText = (s.title || '').trim();
+          const isTitleEmptyOrDefault = titleText.length === 0 || 
+            titleText.startsWith('New Legal Query') || 
+            titleText.startsWith('New Chat') || 
+            titleText.startsWith('Untitled');
+          if (!isTitleEmptyOrDefault) {
+            aiAssistantSessionIds.add(String(s.id || s.sessionId));
+          }
         }
       });
       
       const aiHelpCount = aiAssistantSessionIds.size;
 
-      // Calculate Legal Learning: count of learning searches + chatSessions of type LEGAL_LEARNING
+      // Calculate Legal Learning: count of learning searches
       const learningActivityIds = new Set();
       learningDocs.forEach(d => {
-        learningActivityIds.add(d.id);
-      });
-      chatSessions.forEach(s => {
-        if (s.chatbotType === 'LEGAL_LEARNING') {
-          learningActivityIds.add(s.id || s.sessionId);
+        const questionText = (d.query || d.question || '').trim();
+        const isQuestionEmptyOrDefault = questionText.length === 0 || 
+          questionText.startsWith('New Search') || 
+          questionText.startsWith('Untitled');
+        if (!isQuestionEmptyOrDefault) {
+          learningActivityIds.add(String(d.id));
         }
       });
       const learningCount = learningActivityIds.size;
 
       // Total Chats: AI Help + Legal Learning
       const totalChatsCount = aiHelpCount + learningCount;
+
+      console.log(`[ACTIVITY_SYNC] ACTIVITY_SYNC: AI Help count = ${aiHelpCount}`);
+      console.log(`[ACTIVITY_SYNC] ACTIVITY_SYNC: Legal Learning count = ${learningCount}`);
+      console.log(`[ACTIVITY_SYNC] ACTIVITY_SYNC: Total Chats = ${totalChatsCount}`);
 
       setStats({
         totalChats: totalChatsCount,
@@ -66,7 +89,8 @@ export default function ClientDashboard({ user, onNavigate }) {
     unsubProblemHistory = onSnapshot(problemHistoryRef, (snapshot) => {
       problemSessions = [];
       snapshot.forEach(docSnapshot => {
-        problemSessions.push({ id: docSnapshot.id, ...docSnapshot.data() });
+        const data = docSnapshot.data();
+        problemSessions.push({ ...data, id: docSnapshot.id });
       });
       updateStats();
     }, (error) => {
@@ -78,7 +102,8 @@ export default function ClientDashboard({ user, onNavigate }) {
     unsubChatSessions = onSnapshot(chatSessionsRef, (snapshot) => {
       chatSessions = [];
       snapshot.forEach(docSnapshot => {
-        chatSessions.push({ id: docSnapshot.id, ...docSnapshot.data() });
+        const data = docSnapshot.data();
+        chatSessions.push({ ...data, id: docSnapshot.id });
       });
       updateStats();
     }, (error) => {
@@ -90,7 +115,8 @@ export default function ClientDashboard({ user, onNavigate }) {
     unsubLearningHistory = onSnapshot(learningHistoryRef, (snapshot) => {
       learningDocs = [];
       snapshot.forEach(docSnapshot => {
-        learningDocs.push({ id: docSnapshot.id, ...docSnapshot.data() });
+        const data = docSnapshot.data();
+        learningDocs.push({ ...data, id: docSnapshot.id });
       });
       updateStats();
     }, (error) => {
@@ -104,33 +130,150 @@ export default function ClientDashboard({ user, onNavigate }) {
     };
   }, [user]);
 
-  useEffect(() => {
-    async function loadRecentChats() {
-      if (!user || !user.uid) return;
-      try {
-        const chatsRef = collection(db, 'users', user.uid, 'problemHistory');
-        const q = query(chatsRef, orderBy('updatedAt', 'desc'), limit(3));
-        const querySnapshot = await getDocs(q);
-        
-        const sessions = [];
-        querySnapshot.forEach(doc => {
-          const data = doc.data();
-          sessions.push({
-            id: doc.id,
-            ...data,
-            // Format Timestamp
-            dateStr: data.updatedAt ? new Date(data.updatedAt.seconds * 1000).toLocaleDateString() : 'Recent'
-          });
-        });
-        setRecentChats(sessions);
-      } catch (e) {
-        console.error('Error loading recent chats', e);
-      } finally {
-        setLoading(false);
-      }
+  // Helper to fetch last bot message preview
+  const fetchLastBotMessage = async (uid, sessionId) => {
+    try {
+      const messagesRef = collection(db, 'users', uid, 'chatSessions', sessionId, 'messages');
+      const snap = await getDocs(messagesRef);
+      let botMsg = null;
+      let latestTime = 0;
+      snap.forEach(d => {
+        const data = d.data();
+        const time = data.timestamp || 0;
+        if (data.sender === 'Bot' && time >= latestTime) {
+          botMsg = data.message || data.content;
+          latestTime = time;
+        }
+      });
+      return botMsg || '';
+    } catch (err) {
+      console.error("Error fetching last bot message:", err);
+      return '';
     }
-    loadRecentChats();
+  };
+
+  // Listen to both chatSessions and learningHistory collections
+  useEffect(() => {
+    if (!user || !user.uid) return;
+    setLoadingActivities(true);
+
+    let unsubChat = () => {};
+    let unsubLearn = () => {};
+
+    let chatList = [];
+    let learnList = [];
+
+    const combineAndSort = () => {
+      // Process chat list (AI Assistant)
+      const chats = chatList
+        .filter(c => {
+          if (c.chatbotType !== 'AI_ASSISTANT') return false;
+          const title = (c.title || '').trim();
+          return title.length > 0 && 
+            !title.startsWith('New Legal Query') && 
+            !title.startsWith('New Chat') && 
+            !title.startsWith('Untitled');
+        })
+        .map(c => {
+          let ms = 0;
+          if (c.updatedAt) {
+            ms = typeof c.updatedAt === 'number' ? c.updatedAt : (c.updatedAt.seconds * 1000 || 0);
+          } else if (c.createdAt) {
+            ms = typeof c.createdAt === 'number' ? c.createdAt : (c.createdAt.seconds * 1000 || 0);
+          }
+          return {
+            id: c.id,
+            type: 'AI_ASSISTANT',
+            chatbotType: 'AI_ASSISTANT',
+            title: c.title || 'AI Assistant Conversation',
+            timestamp: ms,
+            rawItem: c
+          };
+        });
+
+      // Process learning list (Legal Learning)
+      const learns = learnList
+        .filter(l => {
+          const queryText = (l.query || l.question || '').trim();
+          return queryText.length > 0 && 
+            !queryText.startsWith('New Search') && 
+            !queryText.startsWith('Untitled');
+        })
+        .map(l => {
+          let ms = 0;
+          if (l.timestamp) {
+            ms = typeof l.timestamp === 'number' ? l.timestamp : (l.timestamp.seconds * 1000 || 0);
+          }
+          return {
+            id: l.id,
+            type: 'LEGAL_LEARNING',
+            chatbotType: 'LEGAL_LEARNING',
+            title: l.query || l.question || 'Legal Search',
+            timestamp: ms,
+            preview: l.explanation || l.answer || '',
+            rawItem: l
+          };
+        });
+
+      // Combine and sort by timestamp desc
+      const combined = [...chats, ...learns].sort((a, b) => b.timestamp - a.timestamp);
+      setRecentActivities(combined);
+      setLoadingActivities(false);
+    };
+
+    const chatRef = collection(db, 'users', user.uid, 'chatSessions');
+    unsubChat = onSnapshot(chatRef, (snap) => {
+      chatList = [];
+      snap.forEach(docSnap => {
+        chatList.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      combineAndSort();
+    }, (err) => {
+      console.error("Error listening to chatSessions:", err);
+      setLoadingActivities(false);
+    });
+
+    const learnRef = collection(db, 'users', user.uid, 'learningHistory');
+    unsubLearn = onSnapshot(learnRef, (snap) => {
+      learnList = [];
+      snap.forEach(docSnap => {
+        learnList.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      combineAndSort();
+    }, (err) => {
+      console.error("Error listening to learningHistory:", err);
+      setLoadingActivities(false);
+    });
+
+    return () => {
+      unsubChat();
+      unsubLearn();
+    };
   }, [user]);
+
+  // Load bot previews for AI assistant sessions as needed
+  useEffect(() => {
+    if (!user || !user.uid || recentActivities.length === 0) return;
+    recentActivities.forEach(activity => {
+      if (activity.type === 'AI_ASSISTANT' && !previews[activity.id]) {
+        fetchLastBotMessage(user.uid, activity.id).then(msg => {
+          setPreviews(prev => ({ ...prev, [activity.id]: msg }));
+        });
+      }
+    });
+  }, [user, recentActivities, previews]);
+
+  function formatTimestamp(ms) {
+    if (!ms) return '';
+    const date = new Date(ms);
+    const day = String(date.getDate()).padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day} ${month} ${year}, ${hours}:${minutes}`;
+  }
 
   const categories = [
     {
@@ -191,8 +334,7 @@ export default function ClientDashboard({ user, onNavigate }) {
         <div style={styles.statsGrid}>
           <div 
             className="glass-panel activity-card" 
-            style={styles.statCard} 
-            onClick={() => onNavigate('legal-assistant')}
+            style={styles.statCard}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(168, 85, 247, 0.1)', color: 'var(--tertiary)' }}>
               <Bot size={20} />
@@ -206,8 +348,7 @@ export default function ClientDashboard({ user, onNavigate }) {
 
           <div 
             className="glass-panel activity-card" 
-            style={styles.statCard} 
-            onClick={() => onNavigate('legal-learning')}
+            style={styles.statCard}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(16, 185, 129, 0.1)', color: 'var(--secondary)' }}>
               <BookOpen size={20} />
@@ -220,9 +361,8 @@ export default function ClientDashboard({ user, onNavigate }) {
           </div>
 
           <div 
-            className="glass-panel activity-card" 
-            style={styles.statCard} 
-            onClick={() => onNavigate('legal-assistant')}
+            className="glass-panel" 
+            style={styles.statCard}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
               <MessageSquare size={20} />
@@ -259,46 +399,77 @@ export default function ClientDashboard({ user, onNavigate }) {
       </div>
 
       {/* Recent Activity */}
-      <div style={styles.activityRow}>
-        <div className="glass-panel" style={styles.recentPanel}>
-          <div style={styles.panelHeader}>
-            <Clock size={20} color="var(--primary)" />
-            <h3 style={styles.panelTitle}>Recent AI Consultations</h3>
-          </div>
-          
-          {loading ? (
-            <div style={styles.loader}>Loading recent activity...</div>
-          ) : recentChats.length === 0 ? (
-            <div style={styles.emptyText}>No recent chats found. Start a conversation with our AI Assistant!</div>
-          ) : (
-            <div style={styles.list}>
-              {recentChats.map((chat) => (
-                <div 
-                  key={chat.id} 
-                  style={styles.listItem} 
-                  onClick={() => onNavigate('legal-assistant', { sessionId: chat.id })}
-                >
-                  <div style={styles.listItemLeft}>
-                    <MessageSquare size={16} color="var(--text-muted)" />
-                    <span style={styles.listItemTitle}>{chat.title || 'Untitled Session'}</span>
-                  </div>
-                  <span style={styles.listItemDate}>{chat.dateStr}</span>
-                </div>
-              ))}
-            </div>
-          )}
+      <div style={styles.activitySection}>
+        <div style={styles.sectionHeaderRow}>
+          <h3 style={styles.sectionHeader}>Recent Activity</h3>
+          <button 
+            className="btn btn-secondary" 
+            style={styles.viewAllBtn} 
+            onClick={() => onNavigate('chat-history')}
+          >
+            View All
+          </button>
         </div>
 
-        {/* Disclaimer / Notice */}
-        <div className="glass-panel" style={styles.disclaimerPanel}>
-          <div style={styles.panelHeader}>
-            <ShieldAlert size={20} color="var(--accent)" />
-            <h3 style={styles.panelTitle}>Legal Disclaimer</h3>
+        {loadingActivities ? (
+          <div style={styles.loader}>Loading recent activity...</div>
+        ) : recentActivities.length === 0 ? (
+          <div className="glass-panel" style={styles.emptyActivityCard}>
+            <Clock size={32} color="var(--border)" style={{marginBottom: '12px'}} />
+            <p>No recent activity found. Start learning or ask our AI assistant!</p>
           </div>
-          <p style={styles.disclaimerText}>
-            Nyaya Legal AI is an automated generative AI legal assistant. The information provided by the chatbot is for informational/learning purposes only and does NOT constitute formal legal advice. Please seek professional counsel from a vetted advocate for complex legal scenarios.
-          </p>
+        ) : (
+          <div style={styles.activityGrid}>
+            {recentActivities.slice(0, 3).map((activity) => (
+              <div 
+                key={activity.id} 
+                className="glass-panel activity-item-card" 
+                style={styles.activityItemCard}
+                onClick={() => {
+                  if (activity.type === 'AI_ASSISTANT') {
+                    onNavigate('legal-assistant', { sessionId: activity.id });
+                  } else {
+                    onNavigate('legal-learning');
+                  }
+                }}
+              >
+                <div style={styles.activityCardHeader}>
+                  <div style={styles.activityIconContainer}>
+                    {activity.type === 'AI_ASSISTANT' ? (
+                      <MessageSquare size={16} color="var(--primary)" />
+                    ) : (
+                      <School size={16} color="var(--secondary)" />
+                    )}
+                  </div>
+                  <div style={styles.activityMeta}>
+                    <span style={styles.activityModuleName}>
+                      {activity.type === 'AI_ASSISTANT' ? 'AI PROBLEM ASSISTANT' : 'LEGAL LEARNING'}
+                    </span>
+                    <span style={styles.activityTime}>{formatTimestamp(activity.timestamp)}</span>
+                  </div>
+                </div>
+                <h4 style={styles.activityTitle}>{activity.title}</h4>
+                <p style={styles.activityPreview}>
+                  {activity.type === 'AI_ASSISTANT' 
+                    ? (previews[activity.id] || 'Loading preview...') 
+                    : activity.preview
+                  }
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Disclaimer / Notice */}
+      <div className="glass-panel" style={styles.disclaimerPanel}>
+        <div style={styles.panelHeader}>
+          <ShieldAlert size={20} color="var(--accent)" />
+          <h3 style={styles.panelTitle}>Legal Disclaimer</h3>
         </div>
+        <p style={styles.disclaimerText}>
+          Nyaya Legal AI is an automated generative AI legal assistant. The information provided by the chatbot is for informational/learning purposes only and does NOT constitute formal legal advice. Please seek professional counsel from a vetted advocate for complex legal scenarios.
+        </p>
       </div>
     </div>
   );
@@ -459,7 +630,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: '16px 20px',
-    cursor: 'pointer',
+    cursor: 'default',
     gap: '16px'
   },
   statIconContainer: {
@@ -492,5 +663,91 @@ const styles = {
     padding: '16px',
     fontSize: '14px',
     color: 'var(--text-muted)'
+  },
+  activitySection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    marginTop: '12px'
+  },
+  sectionHeaderRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  viewAllBtn: {
+    padding: '6px 14px',
+    fontSize: '13px',
+    fontWeight: '700'
+  },
+  emptyActivityCard: {
+    padding: '36px 20px',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    color: 'var(--text-muted)'
+  },
+  activityGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: '20px'
+  },
+  activityItemCard: {
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    cursor: 'pointer',
+    transition: 'all 0.2s'
+  },
+  activityCardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  },
+  activityIconContainer: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
+  },
+  activityMeta: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px'
+  },
+  activityModuleName: {
+    fontSize: '10px',
+    fontWeight: '800',
+    color: 'var(--secondary)',
+    letterSpacing: '0.5px'
+  },
+  activityTime: {
+    fontSize: '11px',
+    color: 'var(--text-muted)'
+  },
+  activityTitle: {
+    fontSize: '15px',
+    fontWeight: '700',
+    color: 'var(--text-main)',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  activityPreview: {
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    lineHeight: '1.5',
+    maxHeight: '40px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical'
   }
 };

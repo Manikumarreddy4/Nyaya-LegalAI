@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Date
+import android.util.Log
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -42,6 +44,7 @@ import androidx.lifecycle.LifecycleEventObserver
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationViewModel) {
+    android.util.Log.d("APP_CRASH_TRACE", "Dashboard opened")
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val user = sessionManager.getUser()
@@ -50,29 +53,44 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
 
     // 1. Redirection Logic (Users/Clients cannot access the Lawyer Dashboard)
     LaunchedEffect(user) {
-        if (user == null || user.role.uppercase() != "LAWYER") {
+        if (user != null && user.role.uppercase() != "LAWYER") {
             navController.navigate(Route.Dashboard.route) {
                 popUpTo(Route.LawyerDashboard.route) { inclusive = true }
             }
         }
     }
 
-    var isOnline by remember { mutableStateOf(true) }
-    var lawyerProfile by remember { mutableStateOf<LawyerProfile?>(null) }
+    val profileFlow = remember(user?.uid) {
+        if (user != null && user.uid.isNotBlank()) {
+            repo.getLawyerProfileFlow(user.uid)
+        } else {
+            kotlinx.coroutines.flow.flowOf(null)
+        }
+    }
+    val lawyerProfile by profileFlow.collectAsState(initial = null)
     var selectedTab by remember { mutableStateOf("Pending") }
 
     LaunchedEffect(user?.uid) {
         if (user != null && user.uid.isNotBlank()) {
-            repo.getLawyerProfileFlow(user.uid).collect { profile ->
-                if (profile != null) {
-                    lawyerProfile = profile
-                    isOnline = profile.onlineAvailable
-                }
-            }
+            Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Dashboard opened")
+            Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Lawyer ID = ${user.uid}")
         }
     }
 
-    val allRequests by viewModel.getLawyerRequests().collectAsState(initial = emptyList())
+    LaunchedEffect(lawyerProfile) {
+        lawyerProfile?.let {
+            Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Loaded status = ${it.isAvailable}")
+            Log.d("IN_PERSON_AVAILABILITY", "IN_PERSON_AVAILABILITY: Loaded = ${it.isInPersonAvailable}")
+        }
+    }
+
+    var localAvailableOverride by remember { mutableStateOf<Boolean?>(null) }
+    val isOnline = localAvailableOverride ?: lawyerProfile?.isAvailable ?: true
+
+    var localInPersonAvailableOverride by remember { mutableStateOf<Boolean?>(null) }
+    val isInPersonOnline = localInPersonAvailableOverride ?: lawyerProfile?.isInPersonAvailable ?: true
+
+    val allRequests by remember(viewModel) { viewModel.getLawyerRequestsFlow() }.collectAsState()
 
     // 2. Classify Consultations
     val pendingRequests = remember(allRequests) { allRequests.filter { it.status.equals("PENDING", ignoreCase = true) } }
@@ -111,22 +129,30 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
         cal.time
     }
 
-    val todayAppointments = remember(allRequests, todayMidnight) {
+    val todayAppointments = remember(allRequests, todayMidnight, currentDate) {
         allRequests.filter { it.status.equals("ACCEPTED", ignoreCase = true) }
             .filter {
                 val apptDate = it.parseDateOnly()
                 apptDate != null && apptDate.time == todayMidnight.time
+            }
+            .filter {
+                val apptDateTime = it.parsedAppointmentDate()
+                apptDateTime != null && apptDateTime.after(currentDate)
             }
             .sortedWith(
                 compareBy<Consultation, Date?>(nullsLast()) { it.parseTimeOnly() }
             )
     }
 
-    val upcomingAppointments = remember(allRequests, todayMidnight) {
+    val upcomingAppointments = remember(allRequests, todayMidnight, currentDate) {
         allRequests.filter { it.status.equals("ACCEPTED", ignoreCase = true) }
             .filter {
                 val apptDate = it.parseDateOnly()
                 apptDate != null && apptDate.after(todayMidnight)
+            }
+            .filter {
+                val apptDateTime = it.parsedAppointmentDate()
+                apptDateTime != null && apptDateTime.after(currentDate)
             }
             .sortedWith(
                 compareBy<Consultation, Date?>(nullsLast()) { it.parseDateOnly() }
@@ -275,25 +301,126 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Consultation Status", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            Text(if (isOnline) "Available (Accepting Client Requests)" else "Offline (Do Not Disturb)", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Switch(
-                            checked = isOnline,
-                            onCheckedChange = { checked ->
-                                isOnline = checked
-                                scope.launch {
-                                    if (user != null && user.uid.isNotBlank()) {
-                                        repo.updateLawyerAvailability(user.uid, checked)
-                                    }
-                                }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Availability Status", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (isOnline) "🟢 Online" else "⚫ Offline",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = if (isOnline) Color(0xFF2E7D32) else Color.Gray
+                                )
+                                Text(
+                                    text = if (isOnline) "Available for Consultations" else "Currently Offline",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
+                            Switch(
+                                checked = isOnline,
+                                onCheckedChange = { checked ->
+                                    val previous = isOnline
+                                    localAvailableOverride = checked
+                                    Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: User changed status to = $checked")
+                                    scope.launch {
+                                        if (user != null && user.uid.isNotBlank()) {
+                                            try {
+                                                Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Updating Firestore")
+                                                repo.updateLawyerAvailability(user.uid, checked)
+                                                Log.d("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY: Update successful")
+                                                localAvailableOverride = null
+                                            } catch (e: Exception) {
+                                                Log.e("LAWYER_AVAILABILITY", "LAWYER_AVAILABILITY ERROR: ${e.message}", e)
+                                                localAvailableOverride = null
+                                            }
+                                        }
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Color(0xFF2E7D32),
+                                    checkedBorderColor = Color(0xFF1B5E20),
+                                    uncheckedThumbColor = Color(0xFFECEFF1),
+                                    uncheckedTrackColor = Color(0xFF90A4AE),
+                                    uncheckedBorderColor = Color(0xFF546E7A)
+                                ),
+                                modifier = Modifier.scale(1.15f)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "When offline, you will not appear in Find Lawyer and users cannot send new consultation requests.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+
+            // In-Person Availability Settings Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("In-Person Consultation", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (isInPersonOnline) "🟢 Available for Offline Meetings" else "⚫ Not Available for Offline Meetings",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = if (isInPersonOnline) Color(0xFF2E7D32) else Color.Gray
+                                )
+                            }
+                            Switch(
+                                checked = isInPersonOnline,
+                                onCheckedChange = { checked ->
+                                    val previous = isInPersonOnline
+                                    localInPersonAvailableOverride = checked
+                                    Log.d("IN_PERSON_AVAILABILITY", "IN_PERSON_AVAILABILITY: Lawyer changed status = $checked")
+                                    scope.launch {
+                                        if (user != null && user.uid.isNotBlank()) {
+                                            try {
+                                                Log.d("IN_PERSON_AVAILABILITY", "IN_PERSON_AVAILABILITY: Updating Firestore")
+                                                repo.updateLawyerInPersonAvailability(user.uid, checked)
+                                                Log.d("IN_PERSON_AVAILABILITY", "IN_PERSON_AVAILABILITY: Update successful")
+                                                localInPersonAvailableOverride = null
+                                            } catch (e: Exception) {
+                                                Log.e("IN_PERSON_AVAILABILITY", "IN_PERSON_AVAILABILITY ERROR: ${e.message}", e)
+                                                localInPersonAvailableOverride = null
+                                            }
+                                        }
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Color(0xFF2E7D32),
+                                    checkedBorderColor = Color(0xFF1B5E20),
+                                    uncheckedThumbColor = Color(0xFFECEFF1),
+                                    uncheckedTrackColor = Color(0xFF90A4AE),
+                                    uncheckedBorderColor = Color(0xFF546E7A)
+                                ),
+                                modifier = Modifier.scale(1.15f)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "When turned off, users can still book online consultations if your main availability status is enabled.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -520,9 +647,11 @@ fun LawyerRequestCard(
     onReject: () -> Unit,
     onClick: () -> Unit
 ) {
-    val (statusLabel, statusBg, statusTextColor) = when (request.status.uppercase()) {
+    val safeStatus = request.status ?: "PENDING"
+    val (statusLabel, statusBg, statusTextColor) = when (safeStatus.uppercase()) {
         "ACCEPTED" -> Triple("ACCEPTED", Color(0xFFE8F5E9), Color(0xFF2E7D32)) // Soft Green
         "REJECTED" -> Triple("REJECTED", Color(0xFFFFEBEE), Color(0xFFC62828)) // Soft Red
+        "EXPIRED" -> Triple("EXPIRED", Color(0xFFF5F5F5), Color(0xFF616161)) // Soft Gray
         "COMPLETED" -> Triple("COMPLETED", Color(0xFFE3F2FD), Color(0xFF1565C0)) // Soft Blue
         else -> Triple("PENDING", Color(0xFFFFF3E0), Color(0xFFEF6C00))        // Soft Orange
     }
@@ -572,13 +701,21 @@ fun LawyerRequestCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Time: ${request.displayDate}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "📅 Date: ${request.resolvedDate}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "🕒 Time: ${request.resolvedTime}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 Text(
                     text = "Type: ${request.consultationType}",
                     style = MaterialTheme.typography.bodySmall,
@@ -595,16 +732,53 @@ fun LawyerRequestCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
             )
 
-            if (request.contactNumber.isNotBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Contact: ${request.contactNumber}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
+            if (safeStatus.uppercase() == "ACCEPTED") {
+                if (request.bookingId.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Booking ID: ${request.bookingId}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                val phone = request.userPhone.ifBlank { request.contactNumber }
+                if (phone.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Contact: $phone",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+                if (request.userEmail.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Email: ${request.userEmail}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            }
+
+            if (safeStatus.uppercase() == "EXPIRED") {
+                Spacer(modifier = Modifier.height(10.dp))
+                Surface(
+                    color = Color(0xFFF5F5F5),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Automatically expired because no response was given before the appointment time.",
+                        color = Color(0xFF616161),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
             }
             
-            if (request.status.uppercase() == "PENDING") {
+            if (safeStatus.uppercase() == "PENDING") {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(

@@ -24,6 +24,16 @@ fun NyayaNavGraph(
     themeViewModel: ThemeViewModel,
     historyViewModel: HistoryViewModel
 ) {
+    androidx.compose.runtime.DisposableEffect(navController) {
+        val listener = androidx.navigation.NavController.OnDestinationChangedListener { _, destination, arguments ->
+            android.util.Log.i("NYAYA_CRASH_DEBUG", "NavGraph: Navigation destination changed to route = ${destination.route}, args = $arguments")
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Route.Splash.route

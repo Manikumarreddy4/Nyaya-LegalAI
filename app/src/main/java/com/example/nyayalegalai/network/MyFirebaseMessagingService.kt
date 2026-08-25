@@ -32,7 +32,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val channelId = "nyaya_fcm_channel"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Ensure this exists or use a generic one
+            .setSmallIcon(R.mipmap.ic_launcher) // Use mipmap ic_launcher which is more standard
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)

@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
         ChatSession::class,
         ChatHistoryMessage::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

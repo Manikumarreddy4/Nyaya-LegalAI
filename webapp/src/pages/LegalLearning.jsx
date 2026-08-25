@@ -8,9 +8,11 @@ import {
   limit, 
   doc, 
   setDoc, 
-  addDoc 
+  addDoc,
+  onSnapshot,
+  deleteDoc
 } from 'firebase/firestore';
-import { BookOpen, Search, HelpCircle, History, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { BookOpen, Search, HelpCircle, History, Sparkles, Loader2, ArrowRight, Trash2 } from 'lucide-react';
 
 export default function LegalLearning({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,27 +21,52 @@ export default function LegalLearning({ user }) {
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
-  // Load search history from Firestore
+  // Load search history from Firestore in real-time
   useEffect(() => {
-    async function loadHistory() {
-      if (!user || !user.uid) return;
-      try {
-        const historyRef = collection(db, 'users', user.uid, 'learningHistory');
-        const q = query(historyRef, orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(q);
-        const docs = [];
-        querySnapshot.forEach(d => {
-          docs.push({ id: d.id, ...d.data() });
-        });
-        setHistory(docs);
-      } catch (e) {
-        console.error('Error fetching history', e);
-      } finally {
-        setLoadingHistory(false);
-      }
-    }
-    loadHistory();
+    if (!user || !user.uid) return;
+    setLoadingHistory(true);
+    const historyRef = collection(db, 'users', user.uid, 'learningHistory');
+    const q = query(historyRef, orderBy('timestamp', 'desc'), limit(10));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const docs = [];
+      querySnapshot.forEach(d => {
+        const data = d.data();
+        const queryText = (data.query || data.question || '').trim();
+        const explanationText = (data.explanation || data.answer || '').trim();
+        if (queryText.length > 0) {
+          docs.push({ 
+            id: d.id, 
+            ...data,
+            query: queryText,
+            question: queryText,
+            explanation: explanationText,
+            answer: explanationText
+          });
+        }
+      });
+      setHistory(docs);
+      setLoadingHistory(false);
+    }, (error) => {
+      console.error('Error listening to learningHistory', error);
+      setLoadingHistory(false);
+    });
+
+    return () => unsubscribe();
   }, [user]);
+
+  const handleDeleteHistoryItem = async (e, itemId) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this learning history item?")) return;
+    try {
+      console.log(`[HISTORY_DELETE] Deleting history ID = ${itemId}`);
+      const docRef = doc(db, 'users', user.uid, 'learningHistory', String(itemId));
+      await deleteDoc(docRef);
+      console.log(`[HISTORY_DELETE] Delete successful`);
+    } catch (err) {
+      console.error(`[HISTORY_DELETE] Delete failed = ${err.message}`);
+    }
+  };
 
   const handleSearch = async (e, forcedQuery = null) => {
     if (e) e.preventDefault();
@@ -79,11 +106,12 @@ export default function LegalLearning({ user }) {
         const entry = {
           id: newDocId,
           query: queryText,
+          question: queryText,
           explanation: explanation,
-          timestamp: new Date()
+          answer: explanation,
+          timestamp: Date.now() // Save as millisecond Long number for Android compatibility
         };
         await setDoc(doc(historyRef, newDocId), entry);
-        setHistory(prev => [entry, ...prev.filter(item => item.query !== queryText)].slice(0, 10));
       }
     } catch (err) {
       console.error(err);
@@ -100,6 +128,13 @@ export default function LegalLearning({ user }) {
     "Section 420 Punishment",
     "CrPC 154 FIR"
   ];
+
+  const validHistory = history.filter(
+    item =>
+      item &&
+      (item.query || item.question) &&
+      (item.query || item.question).trim().length > 0
+  );
 
   return (
     <div className="fade-in-up" style={styles.container}>
@@ -166,20 +201,29 @@ export default function LegalLearning({ user }) {
         </div>
         {loadingHistory ? (
           <div style={styles.loader}>Loading search history...</div>
-        ) : history.length === 0 ? (
-          <div style={styles.emptyHistory}>Your learning history is empty. Try explaining a section!</div>
+        ) : validHistory.length === 0 ? (
+          <div style={styles.emptyHistory}>No recent learning searches.</div>
         ) : (
           <div style={styles.historyGrid}>
-            {history.map((h) => (
+            {validHistory.map((h) => (
               <div 
                 key={h.id} 
                 className="glass-panel" 
                 style={styles.historyItem}
-                onClick={() => { setSearchQuery(h.query); setResult(h.explanation); }}
+                onClick={() => { setSearchQuery(h.query || h.question); setResult(h.explanation || h.answer); }}
               >
                 <div style={styles.historyMeta}>
-                  <span style={styles.historyTitle}>{h.query}</span>
-                  <ArrowRight size={14} color="var(--primary)" />
+                  <span style={styles.historyTitle}>{h.query || h.question}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button 
+                      onClick={(e) => handleDeleteHistoryItem(e, h.id)} 
+                      style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
+                      title="Delete History Item"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                    <ArrowRight size={14} color="var(--primary)" style={{ flexShrink: 0 }} />
+                  </div>
                 </div>
               </div>
             ))}

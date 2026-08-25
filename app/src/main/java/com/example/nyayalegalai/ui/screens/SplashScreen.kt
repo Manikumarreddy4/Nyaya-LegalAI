@@ -42,30 +42,36 @@ fun SplashScreen(navController: NavController) {
         launch {
             scale.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(durationMillis = 1000)
+                animationSpec = tween(durationMillis = 400)
             )
         }
         launch {
             alpha.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(durationMillis = 1200)
+                animationSpec = tween(durationMillis = 500)
             )
         }
         
-        delay(2200) // Allow animation to finish before navigating
+        delay(600) // Allow animation to finish before navigating
         
         val authUser = FirebaseAuth.getInstance().currentUser
         if (authUser != null && sessionManager.isLoggedIn()) {
             val user = sessionManager.getUser()
             val dest = if (user?.role?.uppercase() == "LAWYER") Route.LawyerDashboard.route else Route.Dashboard.route
+            android.util.Log.d("APP_CRASH_TRACE", "Navigating to $dest")
+            android.util.Log.d("APP_START", "Navigating to = $dest")
             navController.navigate(dest) {
                 popUpTo(Route.Splash.route) { inclusive = true }
             }
         } else if (sessionManager.isFirstTime()) {
+            android.util.Log.d("APP_CRASH_TRACE", "Navigating to ${Route.AppTutorial.route}")
+            android.util.Log.d("APP_START", "Navigating to = ${Route.AppTutorial.route}")
             navController.navigate(Route.AppTutorial.route) {
                 popUpTo(Route.Splash.route) { inclusive = true }
             }
         } else {
+            android.util.Log.d("APP_CRASH_TRACE", "Navigating to ${Route.Login.route}")
+            android.util.Log.d("APP_START", "Navigating to = ${Route.Login.route}")
             navController.navigate(Route.Login.route) {
                 popUpTo(Route.Splash.route) { inclusive = true }
             }

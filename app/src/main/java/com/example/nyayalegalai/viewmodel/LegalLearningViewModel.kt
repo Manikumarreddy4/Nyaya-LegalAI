@@ -27,6 +27,18 @@ class LegalLearningViewModel(
 
     private val TAG = "CHAT_DEBUG"
 
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            _currentSessionId.value = null
+            _isLoading.value = false
+        }
+    }
+
+    init {
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+    }
+
     private val _currentSessionId = MutableStateFlow<Long?>(null)
     val currentSessionId: StateFlow<Long?> = _currentSessionId.asStateFlow()
 
@@ -118,22 +130,69 @@ class LegalLearningViewModel(
 
                 // Save to History (local SQLite and remote Firestore)
                 val learningItem = LearningHistory(question = trimmedQuery, answer = result, timestamp = System.currentTimeMillis())
-                db.learningHistoryDao().insertHistory(learningItem)
+                val newId = db.learningHistoryDao().insertHistory(learningItem)
+                val savedItem = learningItem.copy(id = newId.toInt())
 
                 val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
                 if (!uid.isNullOrBlank()) {
                     try {
-                        firestoreRepo.saveLearningHistory(uid, learningItem)
+                        firestoreRepo.saveLearningHistory(uid, savedItem)
                     } catch (e: Exception) {
+                        if (e is kotlinx.coroutines.CancellationException) throw e
                         Log.e(TAG, "Error syncing learning history to Firestore", e)
                     }
                 }
 
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 Log.e(TAG, "Error in performAnalysis (Learning)", e)
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun deleteLearningHistory(item: LearningHistory) {
+        viewModelScope.launch {
+            try {
+                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Deleting history ID = ${item.id}")
+                db.learningHistoryDao().deleteHistory(item)
+                
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
+                if (!uid.isNullOrBlank()) {
+                    firestoreRepo.deleteLearningHistoryItemByTimestamp(uid, item.timestamp)
+                }
+                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Delete successful")
+            } catch (e: Exception) {
+                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Delete failed = ${e.message}", e)
+            }
+        }
+    }
+
+    fun deleteLearningHistories(items: List<LearningHistory>) {
+        viewModelScope.launch {
+            try {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
+                items.forEach { item ->
+                    Log.d("HISTORY_DELETE", "HISTORY_DELETE: Deleting history ID = ${item.id}")
+                    db.learningHistoryDao().deleteHistory(item)
+                    if (!uid.isNullOrBlank()) {
+                        firestoreRepo.deleteLearningHistoryItemByTimestamp(uid, item.timestamp)
+                    }
+                }
+                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Delete successful")
+            } catch (e: Exception) {
+                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Delete failed = ${e.message}", e)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+        } catch (e: Exception) {
+            Log.e("LegalLearningViewModel", "Error removing authStateListener onCleared", e)
         }
     }
 }

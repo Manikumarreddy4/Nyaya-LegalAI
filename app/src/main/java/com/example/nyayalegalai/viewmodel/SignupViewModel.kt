@@ -157,6 +157,7 @@ class SignupViewModel(
                         }
                     }
                 } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
                     Log.e("SIGNUP_DEBUG", "Firestore save failed or timed out. Proceeding to success state.", e)
                     sessionManager.saveUser(LocalUser(userId, email.trim(), name.trim(), roleString, phone.trim()), pass)
                 }
@@ -165,6 +166,7 @@ class SignupViewModel(
                     try {
                         authRepo.sendEmailVerification()
                     } catch (e: Exception) {
+                        if (e is kotlinx.coroutines.CancellationException) throw e
                         Log.e("SIGNUP_DEBUG", "Verification background error", e)
                     }
                 }
@@ -178,6 +180,7 @@ class SignupViewModel(
             } catch (e: FirebaseAuthUserCollisionException) {
                 _signupState.value = SignupState.Error("An account already exists with this email address.")
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 _signupState.value = SignupState.Error(e.localizedMessage ?: "Signup failed. Check connection.")
             }
         }

@@ -1,6 +1,7 @@
 package com.example.nyayalegalai.models
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 
 data class UserProfile(
     val userId: String = "",
@@ -10,6 +11,12 @@ data class UserProfile(
     val role: String = "USER",
     val profilePhotoUrl: String = "",
     val rating: Double = 4.5,
+    @get:PropertyName("isAvailable")
+    val isAvailable: Boolean = true,
+    val availabilityUpdatedAt: Timestamp? = null,
+    @get:PropertyName("isInPersonAvailable")
+    val isInPersonAvailable: Boolean = true,
+    val inPersonAvailabilityUpdatedAt: Timestamp? = null,
     val createdAt: Timestamp = Timestamp.now()
 )
 
@@ -50,6 +57,12 @@ data class LawyerProfile(
     val role: String = "LAWYER",
     val fullName: String = "",
     val displayName: String = "",
+    @get:PropertyName("isAvailable")
+    val isAvailable: Boolean = true,
+    val availabilityUpdatedAt: Timestamp? = null,
+    @get:PropertyName("isInPersonAvailable")
+    val isInPersonAvailable: Boolean = true,
+    val inPersonAvailabilityUpdatedAt: Timestamp? = null,
     val createdAt: Timestamp = Timestamp.now(),
     val updatedAt: Timestamp = Timestamp.now()
 ) {
@@ -87,32 +100,91 @@ data class Consultation(
     val date: String = "",
     val dateTime: String = "",
     val time: String = "",
+    val appointmentDate: String = "",
+    val appointmentTime: String = "",
+    val consultationDate: String = "",
+    val consultationTime: String = "",
     val preferredLanguage: String = "English",
     val contactNumber: String = "",
     val documentUrls: List<String> = emptyList(),
     val status: String = "PENDING", // PENDING, ACCEPTED, REJECTED, CANCELLED, COMPLETED
     val fee: Double = 0.0,
     val notes: String = "",
+    val bookingId: String = "",
+    val userPhone: String = "",
+    val userEmail: String = "",
+    val language: String = "",
+    val additionalNotes: String = "",
+    val acceptedAt: Timestamp? = null,
+    val rejectedAt: Timestamp? = null,
+    val appointmentDateTime: Timestamp? = null,
     val createdAt: Timestamp = Timestamp.now(),
-    val updatedAt: Timestamp = Timestamp.now()
+    val updatedAt: Timestamp = Timestamp.now(),
+    @get:PropertyName("hasReviewed")
+    val hasReviewed: Boolean = false,
+    @get:PropertyName("reviewId")
+    val reviewId: String = ""
 ) {
+    init {
+        val safeId = consultationId ?: ""
+        val safeDate = resolvedDate
+        val safeTime = resolvedTime
+        val safeStatus = status ?: "PENDING"
+        android.util.Log.d(
+            "CONSULTATION_DATA",
+            "CONSULTATION_DATA: ID = $safeId, Date = $safeDate, Time = $safeTime, Status = $safeStatus"
+        )
+    }
+
+    val resolvedDate: String
+        get() = (date ?: "").ifBlank { (dateTime ?: "").ifBlank { (appointmentDate ?: "").ifBlank { (consultationDate ?: "") } } }
+
+    val resolvedTime: String
+        get() = (time ?: "").ifBlank { (appointmentTime ?: "").ifBlank { (consultationTime ?: "").ifBlank { "Not scheduled" } } }
+
+    fun parsedAppointmentDate(): java.util.Date? {
+        val stored = appointmentDateTime
+        if (stored != null) {
+            return stored.toDate()
+        }
+        
+        val parsedDate = parseDateOnly() ?: return null
+        val parsedTime = parseTimeOnly()
+        
+        val cal = java.util.Calendar.getInstance()
+        cal.time = parsedDate
+        
+        if (parsedTime != null) {
+            val timeCal = java.util.Calendar.getInstance()
+            timeCal.time = parsedTime
+            cal.set(java.util.Calendar.HOUR_OF_DAY, timeCal.get(java.util.Calendar.HOUR_OF_DAY))
+            cal.set(java.util.Calendar.MINUTE, timeCal.get(java.util.Calendar.MINUTE))
+        } else {
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 23)
+            cal.set(java.util.Calendar.MINUTE, 59)
+        }
+        cal.set(java.util.Calendar.SECOND, 0)
+        cal.set(java.util.Calendar.MILLISECOND, 0)
+        return cal.time
+    }
+
     val displayClientName: String
-        get() = clientName.ifBlank { userName.ifBlank { "Client" } }
+        get() = (clientName ?: "").ifBlank { (userName ?: "").ifBlank { "Client" } }
 
     val displayCaseTitle: String
-        get() = caseTitle.ifBlank { issueTitle.ifBlank { issueType.ifBlank { "Legal Consultation" } } }
+        get() = (caseTitle ?: "").ifBlank { (issueTitle ?: "").ifBlank { (issueType ?: "").ifBlank { "Legal Consultation" } } }
 
     val displayDescription: String
-        get() = caseDescription.ifBlank { issueDescription }
+        get() = (caseDescription ?: "").ifBlank { (issueDescription ?: "") }
 
     val displayDate: String
-        get() = date.ifBlank { dateTime }
+        get() = resolvedDate
 
     val effectiveClientId: String
-        get() = clientId.ifBlank { userId }
+        get() = (clientId ?: "").ifBlank { (userId ?: "") }
 
     fun parseDateOnly(): java.util.Date? {
-        val dateStr = date.ifBlank { dateTime }
+        val dateStr = resolvedDate
         if (dateStr.isBlank()) return null
         
         val cleanDateStr = dateStr.trim()
@@ -191,8 +263,8 @@ data class Consultation(
     }
 
     fun parseTimeOnly(): java.util.Date? {
-        if (time.isBlank()) return null
-        val cleanTime = time.trim()
+        if (resolvedTime.isBlank()) return null
+        val cleanTime = resolvedTime.trim()
         val formats = listOf(
             "hh:mm a",
             "h:mm a",
@@ -214,8 +286,11 @@ data class Consultation(
 
 data class LawyerReview(
     val reviewId: String = "",
-    val lawyerId: String = "",
+    val consultationId: String = "",
+    val userId: String = "",
     val clientId: String = "",
+    val lawyerId: String = "",
+    val userName: String = "",
     val clientName: String = "",
     val rating: Double = 5.0,
     val comment: String = "",

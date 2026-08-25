@@ -40,8 +40,26 @@ fun LawyerListingScreen(
     consultationViewModel: ConsultationViewModel,
     lawyerViewModel: LawyerViewModel
 ) {
+    val auth = remember { com.google.firebase.auth.FirebaseAuth.getInstance() }
+    var currentUid by remember { mutableStateOf(auth.currentUser?.uid) }
+    
+    DisposableEffect(auth) {
+        val listener = com.google.firebase.auth.FirebaseAuth.AuthStateListener { firebaseAuth ->
+            currentUid = firebaseAuth.currentUser?.uid
+        }
+        auth.addAuthStateListener(listener)
+        onDispose {
+            auth.removeAuthStateListener(listener)
+        }
+    }
+    
+    LaunchedEffect(currentUid) {
+        lawyerViewModel.loadLawyers(force = true)
+    }
+
     val lawyers by lawyerViewModel.lawyers.collectAsState()
     val isLoading by lawyerViewModel.isLoading.collectAsState()
+    val errorMsg by lawyerViewModel.error.collectAsState()
     val searchQuery by lawyerViewModel.searchQuery.collectAsState()
     val selectedSpec by lawyerViewModel.selectedSpecialization.collectAsState()
     val selectedSort by lawyerViewModel.selectedSort.collectAsState()
@@ -224,15 +242,46 @@ fun LawyerListingScreen(
                 ) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
+            } else if (errorMsg != null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ErrorOutline,
+                            contentDescription = "Error",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Text(
+                            text = errorMsg ?: "Unable to load lawyers.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Button(
+                            onClick = { lawyerViewModel.loadLawyers() },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Retry", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
             } else if (lawyers.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    val noLawyersInSystem = searchQuery.isBlank() && selectedSpec == "All"
                     EmptyState(
                         icon = Icons.Default.PersonSearch,
-                        title = "No Lawyers Found",
-                        description = "No verified legal professionals match your current search and filter criteria. Try clearing filters."
+                        title = if (noLawyersInSystem) "No Lawyers Available" else "No Lawyers Found",
+                        description = if (noLawyersInSystem) "No lawyers are currently available." else "No verified legal professionals match your current search and filter criteria. Try clearing filters."
                     )
                 }
             } else {
@@ -338,6 +387,29 @@ fun CompactBadge(
             text = text,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = contentColor
+        )
+    }
+}
+
+@Composable
+fun AvailabilityBadge(
+    text: String,
+    isActive: Boolean
+) {
+    val containerColor = if (isActive) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
+    val contentColor = if (isActive) Color(0xFF2E7D32) else Color(0xFF9E9E9E)
+    val borderColor = if (isActive) Color(0xFFC8E6C9) else Color(0xFFE0E0E0)
+
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, borderColor)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
             color = contentColor
         )
     }
@@ -508,7 +580,7 @@ fun ProfessionalLawyerCard(
                   )
               }
 
-              // Pricing and status badges
+              // Pricing Row
               Row(
                   modifier = Modifier.fillMaxWidth(),
                   verticalAlignment = Alignment.CenterVertically,
@@ -532,34 +604,22 @@ fun ProfessionalLawyerCard(
                           color = MaterialTheme.colorScheme.onSurfaceVariant
                       )
                   }
+              }
 
-                  Row(
-                      horizontalArrangement = Arrangement.spacedBy(6.dp),
-                      verticalAlignment = Alignment.CenterVertically
-                  ) {
-                      if (!lawyer.onlineAvailable) {
-                          CompactBadge(
-                              text = "Currently Unavailable",
-                              containerColor = MaterialTheme.colorScheme.errorContainer,
-                              contentColor = MaterialTheme.colorScheme.onErrorContainer
-                          )
-                      } else {
-                          if (lawyer.onlineAvailable) {
-                              CompactBadge(
-                                  text = "Online",
-                                  containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                  contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                              )
-                          }
-                          if (lawyer.inPersonAvailable) {
-                              CompactBadge(
-                                  text = "In-Person",
-                                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                              )
-                          }
-                      }
-                  }
+              // Availability Badges Row
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.spacedBy(8.dp),
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  AvailabilityBadge(
+                      text = "📱 Video Call: ${if (lawyer.onlineAvailable) "ON" else "OFF"}",
+                      isActive = lawyer.onlineAvailable
+                  )
+                  AvailabilityBadge(
+                      text = "🏢 In-Person: ${if (lawyer.inPersonAvailable) "ON" else "OFF"}",
+                      isActive = lawyer.inPersonAvailable
+                  )
               }
 
               // Buttons
@@ -593,10 +653,10 @@ fun ProfessionalLawyerCard(
                       shape = RoundedCornerShape(8.dp),
                       colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                       contentPadding = PaddingValues(horizontal = 4.dp),
-                      enabled = lawyer.onlineAvailable
+                      enabled = lawyer.onlineAvailable || lawyer.inPersonAvailable
                   ) {
                       Text(
-                          text = if (lawyer.onlineAvailable) "Book Consultation" else "Unavailable",
+                          text = if (lawyer.onlineAvailable || lawyer.inPersonAvailable) "Book Consultation" else "Unavailable",
                           fontWeight = FontWeight.Bold,
                           fontSize = 13.sp,
                           maxLines = 1,

@@ -24,10 +24,146 @@ import {
   ShieldCheck 
 } from 'lucide-react';
 
+function getAppointmentDateTime(c) {
+  if (c.appointmentDateTime) {
+    if (c.appointmentDateTime.toDate) {
+      return c.appointmentDateTime.toDate();
+    }
+    if (c.appointmentDateTime.seconds) {
+      return new Date(c.appointmentDateTime.seconds * 1000);
+    }
+  }
+
+  if (!c.date && !c.dateTime) return null;
+  const dateStr = c.date || c.dateTime;
+  const cleanDateStr = dateStr.trim();
+  
+  let parsedDate = null;
+  if (cleanDateStr.toLowerCase() === 'today') {
+    parsedDate = new Date();
+    parsedDate.setHours(0, 0, 0, 0);
+  } else if (cleanDateStr.toLowerCase() === 'tomorrow') {
+    parsedDate = new Date();
+    parsedDate.setDate(parsedDate.getDate() + 1);
+    parsedDate.setHours(0, 0, 0, 0);
+  } else {
+    let datePart = cleanDateStr;
+    if (cleanDateStr.includes(',')) {
+      datePart = cleanDateStr.split(',')[0].trim();
+    } else if (cleanDateStr.toLowerCase().includes(' at ')) {
+      datePart = cleanDateStr.split(/\s+at\s+/i)[0].trim();
+    }
+    
+    const parts = datePart.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        parsedDate = new Date(year, month, day, 0, 0, 0, 0);
+      }
+    } else {
+      const partsDash = datePart.split('-');
+      if (partsDash.length === 3) {
+        const year = parseInt(partsDash[0], 10);
+        const month = parseInt(partsDash[1], 10) - 1;
+        const day = parseInt(partsDash[2], 10);
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+          parsedDate = new Date(year, month, day, 0, 0, 0, 0);
+        }
+      }
+    }
+    
+    if (!parsedDate) {
+      const ts = Date.parse(datePart);
+      if (!isNaN(ts)) {
+        parsedDate = new Date(ts);
+        parsedDate.setHours(0, 0, 0, 0);
+      }
+    }
+  }
+  
+  if (!parsedDate) return null;
+  
+  if (c.time) {
+    const cleanTime = c.time.trim();
+    const match = cleanTime.match(/^(\d+):(\d+)\s*(AM|PM)?$/i);
+    if (match) {
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const ampm = match[3];
+      
+      if (ampm) {
+        if (ampm.toUpperCase() === 'PM' && hours < 12) hours += 12;
+        if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+      }
+      parsedDate.setHours(hours, minutes, 0, 0);
+      return parsedDate;
+    }
+  }
+  
+  parsedDate.setHours(23, 59, 0, 0);
+  return parsedDate;
+}
+
+async function checkAndExpireConsultations(docs) {
+  const now = new Date();
+  const promises = [];
+  
+  for (const c of docs) {
+    const safeStatus = (c.status || 'PENDING').toUpperCase();
+    const apptTime = getAppointmentDateTime(c);
+    
+    console.log(`CONSULTATION_COMPLETION:`);
+    console.log(`Consultation ID = ${c.consultationId || c.id}`);
+    console.log(`Status = ${safeStatus}`);
+    console.log(`Appointment Date = ${c.date || c.dateTime || c.appointmentDate || ''}`);
+    console.log(`Appointment Time = ${c.time || c.appointmentTime || ''}`);
+    console.log(`Parsed Appointment DateTime = ${apptTime ? apptTime.toISOString() : 'null'}`);
+    console.log(`Current DateTime = ${now.toISOString()}`);
+    
+    if (safeStatus === 'PENDING') {
+      if (apptTime && apptTime < now) {
+        console.log(`Eligible for completion = false`);
+        const docRef = doc(db, 'consultations', c.id);
+        const updates = {
+          status: 'EXPIRED',
+          autoRejected: true,
+          expiredAt: new Date(),
+          expiryReason: "Lawyer did not respond before the scheduled appointment time"
+        };
+        promises.push(updateDoc(docRef, updates).catch(err => console.error("Error auto-expiring:", err)));
+      } else {
+        console.log(`Eligible for completion = false`);
+      }
+    } else if (safeStatus === 'ACCEPTED') {
+      if (apptTime && now >= apptTime) {
+        console.log(`Eligible for completion = true`);
+        const docRef = doc(db, 'consultations', c.id);
+        const updates = {
+          status: 'COMPLETED',
+          completedAt: new Date()
+        };
+        promises.push(updateDoc(docRef, updates).catch(err => console.error("Error completing consultation:", err)));
+      } else {
+        console.log(`Eligible for completion = false`);
+      }
+    } else {
+      console.log(`Eligible for completion = false`);
+    }
+  }
+  
+  if (promises.length > 0) {
+    await Promise.all(promises);
+  }
+}
+
 export default function LawyerDashboard({ user, onNavigate }) {
   const [profile, setProfile] = useState(null);
   const [consultations, setConsultations] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
+  const [isInPersonOnline, setIsInPersonOnline] = useState(true);
+  const [localInPersonAvailableOverride, setLocalInPersonAvailableOverride] = useState(null);
   const [selectedTab, setSelectedTab] = useState('Pending');
   const [loading, setLoading] = useState(true);
   
@@ -39,26 +175,39 @@ export default function LawyerDashboard({ user, onNavigate }) {
 
     async function loadLawyerData() {
       try {
-        // Load lawyer profile details in real-time
+        console.log(`LAWYER_AVAILABILITY: Dashboard opened`);
+        console.log(`LAWYER_AVAILABILITY: Lawyer ID = ${user.uid}`);
         unsubscribeProfile = onSnapshot(doc(db, 'lawyers', user.uid), (docSnapshot) => {
           if (docSnapshot.exists()) {
             const profileData = docSnapshot.data();
             setProfile(profileData);
-            setIsOnline(profileData.onlineAvailable !== false);
+            const isAvail = profileData.isAvailable !== false && profileData.onlineAvailable !== false;
+            console.log(`LAWYER_AVAILABILITY: Listener received = ${isAvail}`);
+            console.log(`LAWYER_AVAILABILITY: Loaded status = ${isAvail}`);
+            setIsOnline(isAvail);
+
+            const isInPersonAvail = profileData.isInPersonAvailable !== false;
+            console.log(`IN_PERSON_AVAILABILITY: Loaded = ${isInPersonAvail}`);
+            setIsInPersonOnline(isInPersonAvail);
           }
         }, (error) => {
-          console.error('Error listening to lawyer profile', error);
+          console.error(`LAWYER_AVAILABILITY ERROR:`, error);
         });
 
-        // Setup real-time consultations listener
         const consultationsRef = collection(db, 'consultations');
         const q = query(consultationsRef, where('lawyerId', '==', user.uid));
         
-        unsubscribeConsultations = onSnapshot(q, (querySnapshot) => {
+        console.log("CONSULTATION_SYNC: Firestore listener attached");
+        unsubscribeConsultations = onSnapshot(q, async (querySnapshot) => {
+          console.log("CONSULTATION_SYNC: Snapshot update received");
+          console.log(`CONSULTATION_SYNC: Total consultations = ${querySnapshot.size}`);
           const docs = [];
           querySnapshot.forEach(docSnapshot => {
             docs.push({ id: docSnapshot.id, ...docSnapshot.data() });
           });
+
+          await checkAndExpireConsultations(docs);
+
           setConsultations(docs);
           setLoading(false);
         }, (error) => {
@@ -81,11 +230,34 @@ export default function LawyerDashboard({ user, onNavigate }) {
   const handleUpdateStatus = async (consultationId, newStatus) => {
     try {
       const docRef = doc(db, 'consultations', consultationId);
-      await updateDoc(docRef, { status: newStatus });
+      const docSnap = await getDoc(docRef);
+      let existingBookingId = '';
+      if (docSnap.exists()) {
+        const currentStatus = docSnap.data().status || 'PENDING';
+        if (currentStatus.toUpperCase() === 'EXPIRED') {
+          alert('Cannot update status of expired consultation.');
+          return;
+        }
+        existingBookingId = docSnap.data().bookingId || '';
+      }
+
+      const updates = { 
+        status: newStatus,
+        updatedAt: new Date()
+      };
+
+      if (newStatus.toUpperCase() === 'ACCEPTED') {
+        const bookingId = existingBookingId || `NYA-2026-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+        updates.bookingId = bookingId;
+        updates.acceptedAt = new Date();
+      } else if (newStatus.toUpperCase() === 'REJECTED') {
+        updates.rejectedAt = new Date();
+      }
+
+      await updateDoc(docRef, updates);
       
-      // Update locally
       setConsultations(prev => 
-        prev.map(c => c.id === consultationId ? { ...c, status: newStatus } : c)
+        prev.map(c => c.id === consultationId ? { ...c, ...updates } : c)
       );
     } catch (e) {
       alert('Error updating consultation status: ' + e.message);
@@ -94,26 +266,59 @@ export default function LawyerDashboard({ user, onNavigate }) {
 
   const handleToggleOnline = async () => {
     if (!user || !user.uid) return;
+    const previous = isOnline;
+    const newStatus = !isOnline;
+    console.log(`LAWYER_AVAILABILITY: Toggle changed by user = ${newStatus}`);
+    setIsOnline(newStatus);
     try {
-      const newStatus = !isOnline;
-      await updateDoc(doc(db, 'lawyers', user.uid), { onlineAvailable: newStatus });
-      await updateDoc(doc(db, 'users', user.uid), { onlineAvailable: newStatus });
-      setIsOnline(newStatus);
+      const updates = {
+        isAvailable: newStatus,
+        onlineAvailable: newStatus,
+        availabilityUpdatedAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log(`LAWYER_AVAILABILITY: Writing to Firestore = ${newStatus}`);
+      await updateDoc(doc(db, 'lawyers', user.uid), updates);
+      await updateDoc(doc(db, 'users', user.uid), updates);
+      console.log(`LAWYER_AVAILABILITY: Firestore update successful = ${newStatus}`);
     } catch (e) {
+      console.error(`LAWYER_AVAILABILITY ERROR:`, e);
+      setIsOnline(previous);
       alert('Error updating status: ' + e.message);
     }
   };
 
-  // Helper date matching (today vs upcoming)
-  const getTodayDateStr = () => {
-    const d = new Date();
-    const month = d.toLocaleString('default', { month: 'short' });
-    const date = String(d.getDate()).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${date} ${month} ${year}`;
+  const handleToggleInPerson = async () => {
+    if (!user || !user.uid) return;
+    const currentStatus = localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline;
+    const newStatus = !currentStatus;
+    console.log(`IN_PERSON_AVAILABILITY: Lawyer changed status = ${newStatus}`);
+    setLocalInPersonAvailableOverride(newStatus);
+    try {
+      const updates = {
+        isInPersonAvailable: newStatus,
+        inPersonAvailabilityUpdatedAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log(`IN_PERSON_AVAILABILITY: Updating Firestore`);
+      await updateDoc(doc(db, 'lawyers', user.uid), updates);
+      await updateDoc(doc(db, 'users', user.uid), updates);
+      console.log(`IN_PERSON_AVAILABILITY: Update successful`);
+      setLocalInPersonAvailableOverride(null);
+    } catch (e) {
+      console.error(`IN_PERSON_AVAILABILITY ERROR:`, e);
+      setLocalInPersonAvailableOverride(null);
+      alert('Error updating in-person availability: ' + e.message);
+    }
   };
 
-  const todayStr = getTodayDateStr();
+  const isSameCalendarDate = (date1, date2) => {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  };
+
+  const now = new Date();
 
   const pendingRequests = consultations.filter(c => c.status?.toUpperCase() === 'PENDING');
   const acceptedRequests = consultations.filter(c => c.status?.toUpperCase() === 'ACCEPTED');
@@ -125,11 +330,16 @@ export default function LawyerDashboard({ user, onNavigate }) {
     .reduce((acc, c) => acc + (parseFloat(c.fee) || 0), 0);
 
   const todayAppointments = acceptedRequests.filter(c => {
-    const dateVal = c.date || '';
-    return dateVal.toLowerCase().includes('today') || dateVal.includes(todayStr);
+    const apptTime = getAppointmentDateTime(c);
+    if (!apptTime) return false;
+    return isSameCalendarDate(apptTime, now) && apptTime > now;
   });
 
-  const upcomingAppointments = acceptedRequests.filter(c => !todayAppointments.includes(c));
+  const upcomingAppointments = acceptedRequests.filter(c => {
+    const apptTime = getAppointmentDateTime(c);
+    if (!apptTime) return false;
+    return apptTime > now && !isSameCalendarDate(apptTime, now);
+  });
 
   const getFilteredList = () => {
     switch (selectedTab) {
@@ -137,6 +347,7 @@ export default function LawyerDashboard({ user, onNavigate }) {
       case 'Accepted': return acceptedRequests;
       case 'Completed': return completedRequests;
       case 'Rejected': return rejectedRequests;
+      case 'Expired': return consultations.filter(c => c.status?.toUpperCase() === 'EXPIRED');
       default: return consultations;
     }
   };
@@ -157,17 +368,72 @@ export default function LawyerDashboard({ user, onNavigate }) {
           </div>
           <p style={styles.subtitle}>Manage your consultation slots, approve pending appointments, and view earning stats.</p>
         </div>
-        <div className="glass-panel" style={styles.statusToggle}>
-          <div style={{textAlign: 'right'}}>
-            <div style={styles.toggleLabel}>Availability Status</div>
-            <div style={{...styles.toggleState, color: isOnline ? 'var(--secondary)' : 'var(--error)'}}>
-              {isOnline ? 'Available / Accepting Clients' : 'Offline / Do Not Disturb'}
+        <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+          <div className="glass-panel" style={styles.statusToggle}>
+            <div style={{textAlign: 'right'}}>
+              <div style={styles.toggleLabel}>Availability Status</div>
+              <div style={{...styles.toggleState, color: isOnline ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 'bold'}}>
+                {isOnline ? '🟢 Online' : '⚫ Offline'}
+              </div>
+              <div style={{fontSize: '13px', color: 'var(--text-main)', marginTop: '2px'}}>
+                {isOnline ? 'Available for Consultations' : 'Currently Offline'}
+              </div>
+              <div style={{fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', maxWidth: '300px'}}>
+                When offline, you will not appear in Find Lawyer and users cannot send new consultation requests.
+              </div>
             </div>
+            <label style={styles.switch}>
+              <input 
+                type="checkbox" 
+                checked={isOnline} 
+                onChange={handleToggleOnline} 
+                style={styles.checkbox} 
+              />
+              <span style={{
+                ...styles.slider,
+                backgroundColor: isOnline ? 'var(--secondary)' : '#64748b',
+                boxShadow: isOnline ? '0 0 10px rgba(16, 185, 129, 0.4)' : 'none'
+              }}>
+                <span style={{
+                  ...styles.thumb,
+                  transform: isOnline ? 'translateX(28px)' : 'translateX(0)'
+                }} />
+              </span>
+            </label>
           </div>
-          <label style={styles.switch}>
-            <input type="checkbox" checked={isOnline} onChange={handleToggleOnline} />
-            <span style={styles.slider}></span>
-          </label>
+
+          <div className="glass-panel" style={styles.statusToggle}>
+            <div style={{textAlign: 'right'}}>
+              <div style={styles.toggleLabel}>In-Person Consultation Availability</div>
+              <div style={{...styles.toggleState, color: (localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 'bold'}}>
+                {(localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? '🟢 Available' : '⚫ Not Available'}
+              </div>
+              <div style={{fontSize: '13px', color: 'var(--text-main)', marginTop: '2px'}}>
+                {(localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? 'Available for Offline Meetings' : 'Not Available for Offline Meetings'}
+              </div>
+              <div style={{fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', maxWidth: '300px'}}>
+                When turned off, users can still book online consultations if your main availability status is enabled.
+              </div>
+            </div>
+            <label style={styles.switch}>
+              <input 
+                type="checkbox" 
+                checked={localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline} 
+                onChange={handleToggleInPerson} 
+                style={styles.checkbox} 
+              />
+              <span style={{
+                ...styles.slider,
+                backgroundColor: (localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? 'var(--secondary)' : '#64748b',
+                boxShadow: (localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? '0 0 10px rgba(16, 185, 129, 0.4)' : 'none'
+              }}>
+                <span style={{
+                  ...styles.thumb,
+                  transform: (localInPersonAvailableOverride !== null ? localInPersonAvailableOverride : isInPersonOnline) ? 'translateX(28px)' : 'translateX(0)'
+                }} />
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -277,7 +543,7 @@ export default function LawyerDashboard({ user, onNavigate }) {
       <div style={styles.headerRow}>
         <h3 style={styles.sectionHeader}>Consultation Requests & History</h3>
         <div style={styles.tabsRow}>
-          {['Pending', 'Accepted', 'Rejected', 'Completed', 'All'].map((tab) => (
+          {['Pending', 'Accepted', 'Rejected', 'Completed', 'Expired', 'All'].map((tab) => (
             <button 
               key={tab} 
               style={{
@@ -307,10 +573,12 @@ export default function LawyerDashboard({ user, onNavigate }) {
                   ...styles.statusLabel,
                   background: c.status?.toUpperCase() === 'ACCEPTED' ? 'rgba(16, 185, 129, 0.15)' :
                               c.status?.toUpperCase() === 'PENDING' ? 'rgba(245, 158, 11, 0.15)' :
-                              c.status?.toUpperCase() === 'COMPLETED' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                              c.status?.toUpperCase() === 'COMPLETED' ? 'rgba(99, 102, 241, 0.15)' :
+                              c.status?.toUpperCase() === 'EXPIRED' ? 'rgba(100, 116, 139, 0.15)' : 'rgba(239, 68, 68, 0.15)',
                   color: c.status?.toUpperCase() === 'ACCEPTED' ? 'var(--secondary)' :
                          c.status?.toUpperCase() === 'PENDING' ? 'var(--accent)' :
-                         c.status?.toUpperCase() === 'COMPLETED' ? 'var(--tertiary)' : 'var(--error)'
+                         c.status?.toUpperCase() === 'COMPLETED' ? 'var(--tertiary)' :
+                         c.status?.toUpperCase() === 'EXPIRED' ? 'var(--text-muted)' : 'var(--error)'
                 }}>
                   {c.status || 'PENDING'}
                 </span>
@@ -321,8 +589,29 @@ export default function LawyerDashboard({ user, onNavigate }) {
               <div style={styles.reqDetails}>
                 <div><strong>Schedule:</strong> {c.date} at {c.time}</div>
                 <div><strong>Type:</strong> {c.consultationType || 'Online'}</div>
-                <div><strong>Contact:</strong> {c.contactNumber || 'Not provided'}</div>
+                {c.status?.toUpperCase() === 'ACCEPTED' && (
+                  <>
+                    {c.bookingId && <div><strong>Booking ID:</strong> {c.bookingId}</div>}
+                    <div><strong>Contact:</strong> {c.userPhone || c.contactNumber || 'Not provided'}</div>
+                    {c.userEmail && <div><strong>Email:</strong> {c.userEmail}</div>}
+                  </>
+                )}
               </div>
+
+              {c.status?.toUpperCase() === 'EXPIRED' && (
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(100, 116, 139, 0.05)',
+                  borderRadius: '10px',
+                  border: '1px dashed var(--border)',
+                  color: 'var(--text-muted)',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  marginTop: '8px'
+                }}>
+                  Automatically expired because no response was given before the appointment time.
+                </div>
+              )}
 
               {c.status?.toUpperCase() === 'PENDING' && (
                 <div style={styles.actionsRow}>
@@ -361,14 +650,26 @@ function AppointmentCard({ c }) {
         </div>
         <div style={styles.appType}>{c.consultationType || 'Online'}</div>
       </div>
+      {c.bookingId && (
+        <div style={styles.appMeta}>
+          <ShieldCheck size={14} color="var(--secondary)" />
+          <span>Booking ID: {c.bookingId}</span>
+        </div>
+      )}
       <div style={styles.appMeta}>
         <Clock size={14} color="var(--primary)" />
         <span>Date: {c.date} | Time: {c.time}</span>
       </div>
-      {c.contactNumber && (
+      {(c.userPhone || c.contactNumber) && (
         <div style={styles.appMeta}>
           <Phone size={14} color="var(--primary)" />
-          <span>Phone: {c.contactNumber}</span>
+          <span>Phone: {c.userPhone || c.contactNumber}</span>
+        </div>
+      )}
+      {c.userEmail && (
+        <div style={styles.appMeta}>
+          <Mail size={14} color="var(--primary)" />
+          <span>Email: {c.userEmail}</span>
         </div>
       )}
     </div>
@@ -419,8 +720,11 @@ const styles = {
   statusToggle: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
-    padding: '16px 20px'
+    justifyContent: 'space-between',
+    gap: '24px',
+    padding: '16px 20px',
+    width: '100%',
+    minWidth: '320px'
   },
   toggleLabel: {
     fontSize: '12px',
@@ -434,16 +738,36 @@ const styles = {
   switch: {
     position: 'relative',
     display: 'inline-block',
-    width: '48px',
-    height: '24px'
+    width: '56px',
+    height: '28px',
+    cursor: 'pointer'
+  },
+  checkbox: {
+    opacity: 0,
+    width: 0,
+    height: 0,
+    position: 'absolute'
   },
   slider: {
     position: 'absolute',
-    cursor: 'pointer',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: '#334155',
-    transition: '.4s',
-    borderRadius: '24px'
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: '28px',
+    transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
+    border: '1px solid rgba(255, 255, 255, 0.15)'
+  },
+  thumb: {
+    position: 'absolute',
+    top: '3px',
+    left: '4px',
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    backgroundColor: '#ffffff',
+    transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.4)'
   },
   detailsCard: {
     padding: '24px'

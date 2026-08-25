@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nyayalegalai.database.ChatHistoryMessage
 import com.example.nyayalegalai.database.ChatSession
+import com.example.nyayalegalai.repository.ActivityStats
 import com.example.nyayalegalai.repository.ChatHistoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,8 @@ class HistoryViewModel(private val repository: ChatHistoryRepository) : ViewMode
         else repository.searchHistory(query)
     }
 
+    fun getActivityStats(uid: String): Flow<ActivityStats> = repository.getActivityStatsFlow(uid)
+
     fun getSessionsByType(type: String): Flow<List<ChatSession>> = repository.getSessionsByType(type)
 
     fun getMessagesForSession(sessionId: Long): Flow<List<ChatHistoryMessage>> =
@@ -36,6 +39,12 @@ class HistoryViewModel(private val repository: ChatHistoryRepository) : ViewMode
     fun deleteSession(sessionId: Long) {
         viewModelScope.launch {
             repository.deleteSession(sessionId)
+        }
+    }
+
+    fun deleteSessions(sessionIds: List<Long>) {
+        viewModelScope.launch {
+            repository.deleteSessions(sessionIds)
         }
     }
 

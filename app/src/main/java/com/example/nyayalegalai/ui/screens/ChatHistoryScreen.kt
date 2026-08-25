@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,15 +45,23 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
     val context = LocalContext.current
     val searchQuery by viewModel.searchQuery.collectAsState()
     
+    val selectedSessions = remember { mutableStateListOf<Long>() }
+    var isInSelectionMode by remember { mutableStateOf(false) }
+    var showDeleteSelectedDialog by remember { mutableStateOf(false) }
+    
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("AI Problem Assistant", "Legal Learning", "Lawyer Chat", "Encyclopedia")
-    val types = listOf("AI_ASSISTANT", "LEGAL_LEARNING", "CONSULTATION", "ENCYCLOPEDIA")
+    val tabs = listOf("AI Problem Assistant", "Legal Learning")
+    val types = listOf("AI_ASSISTANT", "LEGAL_LEARNING")
 
-    val sessions by (if (searchQuery.isEmpty()) {
+    val rawSessions by (if (searchQuery.isEmpty()) {
         viewModel.getSessionsByType(types[selectedTabIndex])
     } else {
         viewModel.allSessions
     }).collectAsState(initial = emptyList())
+
+    val sessions = remember(rawSessions, selectedTabIndex) {
+        rawSessions.filter { it.chatbotType == types[selectedTabIndex] }
+    }
 
     var sessionToDelete by remember { mutableStateOf<ChatSession?>(null) }
     var sessionToRename by remember { mutableStateOf<ChatSession?>(null) }
@@ -59,25 +69,69 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Chat History", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showDeleteAllDialog = true }) {
-                        Icon(Icons.Default.DeleteSweep, contentDescription = "Delete All")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+            if (isInSelectionMode) {
+                val allSelected = sessions.isNotEmpty() && selectedSessions.size == sessions.size
+                TopAppBar(
+                    title = { Text("${selectedSessions.size} selected", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            selectedSessions.clear()
+                            isInSelectionMode = false
+                        }) {
+                            Icon(Icons.Default.Close, contentDescription = "Cancel Selection")
+                        }
+                    },
+                    actions = {
+                        TextButton(onClick = {
+                            if (allSelected) {
+                                selectedSessions.clear()
+                            } else {
+                                selectedSessions.clear()
+                                selectedSessions.addAll(sessions.map { it.sessionId })
+                            }
+                        }) {
+                            Text(
+                                text = if (allSelected) "Deselect All" else "Select All",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        IconButton(onClick = {
+                            if (selectedSessions.isNotEmpty()) {
+                                showDeleteSelectedDialog = true
+                            }
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete Selected")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    )
                 )
-            )
+            } else {
+                TopAppBar(
+                    title = { Text("Chat History", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { showDeleteAllDialog = true }) {
+                            Icon(Icons.Default.DeleteSweep, contentDescription = "Delete All")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    )
+                )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -108,9 +162,8 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
 
             // Dynamic tab selector
             if (searchQuery.isEmpty()) {
-                ScrollableTabRow(
+                TabRow(
                     selectedTabIndex = selectedTabIndex,
-                    edgePadding = 16.dp,
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary,
                     indicator = { tabPositions ->
@@ -123,7 +176,11 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
                     tabs.forEachIndexed { index, title ->
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index },
+                            onClick = { 
+                                selectedTabIndex = index
+                                selectedSessions.clear()
+                                isInSelectionMode = false
+                            },
                             text = { Text(title, fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal) }
                         )
                     }
@@ -148,11 +205,41 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(items = sessions, key = { it.sessionId }) { session ->
+                        val isSelected = selectedSessions.contains(session.sessionId)
                         HistoryItem(
                             session = session,
                             viewModel = viewModel,
+                            isSelected = isSelected,
+                            isInSelectionMode = isInSelectionMode,
                             onChatClick = {
-                                navigateToChat(navController, session)
+                                if (isInSelectionMode) {
+                                    if (isSelected) {
+                                        selectedSessions.remove(session.sessionId)
+                                        if (selectedSessions.isEmpty()) {
+                                            isInSelectionMode = false
+                                        }
+                                    } else {
+                                        selectedSessions.add(session.sessionId)
+                                    }
+                                } else {
+                                    navigateToChat(navController, session)
+                                }
+                            },
+                            onLongClick = {
+                                if (!isInSelectionMode) {
+                                    isInSelectionMode = true
+                                    selectedSessions.clear()
+                                    selectedSessions.add(session.sessionId)
+                                } else {
+                                    if (isSelected) {
+                                        selectedSessions.remove(session.sessionId)
+                                        if (selectedSessions.isEmpty()) {
+                                            isInSelectionMode = false
+                                        }
+                                    } else {
+                                        selectedSessions.add(session.sessionId)
+                                    }
+                                }
                             },
                             onPinClick = { viewModel.togglePin(session.sessionId, !session.isPinned) },
                             onDeleteClick = { sessionToDelete = session },
@@ -168,11 +255,11 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
         if (showDeleteAllDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteAllDialog = false },
-                title = { Text("Clear All History?") },
-                text = { Text("This will permanently delete all chat history across all modules. This action cannot be undone.") },
+                title = { Text("Clear ${tabs[selectedTabIndex]} History?") },
+                text = { Text("This will permanently delete all history in ${tabs[selectedTabIndex]}. This action cannot be undone.") },
                 confirmButton = {
                     TextButton(onClick = {
-                        viewModel.deleteAllHistory()
+                        viewModel.deleteSessions(sessions.map { it.sessionId })
                         showDeleteAllDialog = false
                     }) {
                         Text("Delete All", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
@@ -201,6 +288,37 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
                 },
                 dismissButton = {
                     TextButton(onClick = { sessionToDelete = null }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        if (showDeleteSelectedDialog) {
+            val count = selectedSessions.size
+            val titleText = if (count == 1) "Delete this conversation?" else "Delete $count selected conversations?"
+            val messageText = if (count == 1) {
+                "This conversation will be deleted permanently. This action cannot be undone."
+            } else {
+                "These conversations will be deleted permanently. This action cannot be undone."
+            }
+            
+            AlertDialog(
+                onDismissRequest = { showDeleteSelectedDialog = false },
+                title = { Text(titleText) },
+                text = { Text(messageText) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.deleteSessions(selectedSessions.toList())
+                        selectedSessions.clear()
+                        isInSelectionMode = false
+                        showDeleteSelectedDialog = false
+                    }) {
+                        Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteSelectedDialog = false }) {
                         Text("Cancel")
                     }
                 }
@@ -240,11 +358,15 @@ fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel 
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HistoryItem(
     session: ChatSession,
     viewModel: HistoryViewModel,
+    isSelected: Boolean,
+    isInSelectionMode: Boolean,
     onChatClick: () -> Unit,
+    onLongClick: () -> Unit,
     onPinClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onRenameClick: () -> Unit,
@@ -256,7 +378,10 @@ fun HistoryItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onChatClick),
+            .combinedClickable(
+                onClick = onChatClick,
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = if (session.isPinned) 4.dp else 1.dp),
         colors = CardDefaults.cardColors(
@@ -275,25 +400,45 @@ fun HistoryItem(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Category Icon
-                Surface(
-                    modifier = Modifier.size(40.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = when (session.chatbotType) {
-                                "AI_ASSISTANT" -> Icons.AutoMirrored.Filled.Chat
-                                "LEGAL_LEARNING" -> Icons.Default.School
-                                "CONSULTATION" -> Icons.Default.PersonSearch
-                                "ENCYCLOPEDIA" -> Icons.AutoMirrored.Filled.MenuBook
-                                else -> Icons.Default.ChatBubbleOutline
-                            },
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
+                // Selection Indicator / Category Icon
+                if (isInSelectionMode) {
+                    Surface(
+                        modifier = Modifier.size(40.dp),
+                        shape = CircleShape,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        border = if (isSelected) null else BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Selected",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Surface(
+                        modifier = Modifier.size(40.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = when (session.chatbotType) {
+                                    "AI_ASSISTANT" -> Icons.AutoMirrored.Filled.Chat
+                                    "LEGAL_LEARNING" -> Icons.Default.School
+                                    "CONSULTATION" -> Icons.Default.PersonSearch
+                                    "ENCYCLOPEDIA" -> Icons.AutoMirrored.Filled.MenuBook
+                                    else -> Icons.Default.ChatBubbleOutline
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
                 

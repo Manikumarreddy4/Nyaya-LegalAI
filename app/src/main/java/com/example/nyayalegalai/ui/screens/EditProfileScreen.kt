@@ -21,13 +21,16 @@ import com.example.nyayalegalai.viewmodel.ProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
-    val currentName by viewModel.userName.collectAsState()
-    val currentRole by viewModel.userRole.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.loadUserInfo()
+    }
 
-    var name by remember { mutableStateOf(currentName) }
-    var selectedRole by remember { mutableStateOf(currentRole) }
-    val roles = listOf("Law Student", "Lawyer", "General User")
-    var expanded by remember { mutableStateOf(false) }
+    val currentName by viewModel.userName.collectAsState()
+    val currentEmail by viewModel.userEmail.collectAsState()
+    val currentPhone by viewModel.userPhone.collectAsState()
+
+    var name by remember(currentName) { mutableStateOf(currentName) }
+    var phone by remember(currentPhone) { mutableStateOf(currentPhone) }
 
     Scaffold(
         topBar = {
@@ -79,51 +82,60 @@ fun EditProfileScreen(navController: NavController, viewModel: ProfileViewModel)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedRole,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Category / Role") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp)
+                    OutlinedTextField(
+                        value = currentEmail,
+                        onValueChange = {},
+                        label = { Text("Email") },
+                        readOnly = true,
+                        enabled = false,
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            roles.forEach { role ->
-                                DropdownMenuItem(
-                                    text = { Text(role) },
-                                    onClick = {
-                                        selectedRole = role
-                                        expanded = false
-                                    }
-                                )
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val isPhoneValid = phone.isBlank() || android.util.Patterns.PHONE.matcher(phone).matches()
+
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Phone Number") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        isError = !isPhoneValid,
+                        supportingText = {
+                            if (!isPhoneValid) {
+                                Text("Please enter a valid phone number", color = MaterialTheme.colorScheme.error)
                             }
                         }
-                    }
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            val isPhoneValid = phone.isBlank() || android.util.Patterns.PHONE.matcher(phone).matches()
+            val isNameValid = name.isNotBlank()
+
             Button(
                 onClick = {
-                    viewModel.updateProfile(name, selectedRole)
-                    navController.popBackStack()
+                    if (isNameValid && isPhoneValid) {
+                        viewModel.updateProfile(name, phone)
+                        navController.popBackStack()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                enabled = name.isNotBlank()
+                enabled = isNameValid && isPhoneValid
             ) {
                 Icon(Icons.Default.Save, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))

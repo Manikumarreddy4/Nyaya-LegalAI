@@ -24,6 +24,19 @@ class ChatViewModel(
 
     private val TAG = "CHAT_DEBUG"
 
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            _currentSessionId.value = null
+            _isSending.value = false
+            _errorMessage.value = null
+        }
+    }
+
+    init {
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+    }
+
     private val _currentSessionId = MutableStateFlow<String?>(null)
     val currentSessionId: StateFlow<String?> = _currentSessionId.asStateFlow()
 
@@ -173,7 +186,8 @@ class ChatViewModel(
                 chatHistoryRepository.addMessage(sessionIdLong, "Bot", responseText)
 
             } catch (e: Throwable) {
-                Log.e(TAG, "Unexpected error: ${e.localizedMessage}")
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Log.e(TAG, "Unexpected error: ${e.localizedMessage}", e)
                 _errorMessage.value = e.localizedMessage ?: "Failed to send message"
             } finally {
                 _isSending.value = false
@@ -195,8 +209,19 @@ class ChatViewModel(
                     _currentSessionId.value = null
                 }
             } catch (e: Throwable) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Log.e(TAG, "Error deleting chat", e)
                 _errorMessage.value = "Failed to delete chat: ${e.localizedMessage}"
             }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error removing authStateListener onCleared", e)
         }
     }
 }

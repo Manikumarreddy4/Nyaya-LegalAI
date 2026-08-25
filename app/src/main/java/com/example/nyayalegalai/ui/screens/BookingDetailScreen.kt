@@ -80,9 +80,11 @@ fun BookingDetailScreen(
             }
         } else {
             val booking = consultation!!
-            val (statusLabel, statusBg, statusTextColor) = when (booking.status.uppercase()) {
+            val safeStatus = booking.status ?: "PENDING"
+            val (statusLabel, statusBg, statusTextColor) = when (safeStatus.uppercase()) {
                 "ACCEPTED" -> Triple("ACCEPTED", Color(0xFFE8F5E9), Color(0xFF2E7D32))
                 "REJECTED" -> Triple("REJECTED", Color(0xFFFFEBEE), Color(0xFFC62828))
+                "EXPIRED" -> Triple("EXPIRED", Color(0xFFF5F5F5), Color(0xFF616161))
                 "COMPLETED" -> Triple("COMPLETED", Color(0xFFE3F2FD), Color(0xFF1565C0))
                 "CANCELLED" -> Triple("CANCELLED", Color(0xFFF5F5F5), Color(0xFF616161))
                 else -> Triple("PENDING", Color(0xFFFFF3E0), Color(0xFFEF6C00))
@@ -104,27 +106,46 @@ fun BookingDetailScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Current Status",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Surface(
-                            color = statusBg,
-                            shape = RoundedCornerShape(8.dp)
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                             modifier = Modifier.fillMaxWidth(),
+                             horizontalArrangement = Arrangement.SpaceBetween,
+                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = statusLabel,
-                                color = statusTextColor,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.labelMedium,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                text = "Current Status",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
+                            Surface(
+                                color = statusBg,
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = statusLabel,
+                                    color = statusTextColor,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+
+                        if (safeStatus.uppercase() == "EXPIRED") {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Surface(
+                                color = Color(0xFFFFEBEE),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Your consultation request expired because the lawyer did not respond before the scheduled appointment time.",
+                                    color = Color(0xFFC62828),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(12.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -140,6 +161,7 @@ fun BookingDetailScreen(
                         Text("Case Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         HorizontalDivider()
                         
+                        BookingDetailRow("Client Name:", booking.clientName.ifBlank { booking.userName.ifBlank { "Client" } })
                         BookingDetailRow("Issue/Title:", booking.displayCaseTitle)
                         BookingDetailRow("Category/Type:", booking.issueType.ifBlank { "Legal Consultation" })
                         BookingDetailRow("Description:", booking.displayDescription.ifBlank { "No description provided." })
@@ -172,11 +194,21 @@ fun BookingDetailScreen(
                         Text("Booking Details", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         HorizontalDivider()
                         
-                        BookingDetailRow("Booking ID:", booking.consultationId)
+                        if (safeStatus.uppercase() == "ACCEPTED" && booking.bookingId.isNotBlank()) {
+                            BookingDetailRow("Booking ID:", booking.bookingId)
+                        }
                         BookingDetailRow("Type:", booking.consultationType)
-                        BookingDetailRow("Date:", booking.date.ifBlank { booking.dateTime })
-                        BookingDetailRow("Time:", booking.time.ifBlank { "Not scheduled" })
-                        BookingDetailRow("Callback Contact:", booking.contactNumber.ifBlank { "Not provided" })
+                        BookingDetailRow("Date:", booking.resolvedDate)
+                        BookingDetailRow("Time:", booking.resolvedTime)
+                        if (safeStatus.uppercase() == "ACCEPTED") {
+                            val phone = booking.userPhone.ifBlank { booking.contactNumber }
+                            if (phone.isNotBlank()) {
+                                BookingDetailRow("Callback Contact:", phone)
+                            }
+                            if (booking.userEmail.isNotBlank()) {
+                                BookingDetailRow("Client Email:", booking.userEmail)
+                            }
+                        }
                         BookingDetailRow("Preferred Language:", booking.preferredLanguage)
                         BookingDetailRow("Consultation Fee:", "₹${booking.fee.toInt()}")
                         if (booking.notes.isNotBlank()) {

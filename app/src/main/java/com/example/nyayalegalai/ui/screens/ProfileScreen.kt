@@ -19,10 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +48,8 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
     val email by viewModel.userEmail.collectAsState()
     val role by viewModel.userRole.collectAsState()
     val profilePhotoUrl by viewModel.profilePhotoUrl.collectAsState()
+
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
@@ -127,74 +126,6 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
                     )
                 }
             }
-
-            // My Activity Settings Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        text = "My Activity",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = primaryColor,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    if (role.equals("LAWYER", ignoreCase = true)) {
-                        SettingsItem(
-                            icon = Icons.Default.Dashboard,
-                            title = "Lawyer Dashboard",
-                            subtitle = "Manage consultation requests & earnings",
-                            primaryColor = primaryColor,
-                            onClick = { navController.navigate(Route.LawyerDashboard.route) }
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 12.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                        )
-                    }
-
-                    SettingsItem(
-                        icon = Icons.Default.History,
-                        title = "AI Chat History",
-                        subtitle = "View your previous conversations",
-                        primaryColor = primaryColor,
-                        onClick = { navController.navigate(Route.ChatHistory.route) }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                    )
-
-                    SettingsItem(
-                        icon = Icons.Default.School,
-                        title = "Learning History",
-                        subtitle = "Questions you asked for learning",
-                        primaryColor = primaryColor,
-                        onClick = { navController.navigate(Route.LearningHistory.route) }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                    )
-
-                    SettingsItem(
-                        icon = Icons.AutoMirrored.Filled.EventNote,
-                        title = "Consultation History",
-                        subtitle = "Your lawyer booking status",
-                        primaryColor = primaryColor,
-                        onClick = { navController.navigate(Route.LawyerHistory.route) }
-                    )
-                }
-            }
-
             // Support & Info Settings Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -258,9 +189,59 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
                     color = MaterialTheme.colorScheme.error
                 )
             }
+
+            // Delete Account Outlined Action Button
+            OutlinedButton(
+                onClick = { showDeleteAccountDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.4f))
+            ) {
+                Icon(Icons.Default.DeleteForever, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Delete Account",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
             
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAccountDialog = false },
+            title = { Text("Delete Account?") },
+            text = { Text("This will permanently delete your account and all associated profile data. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteAccountDialog = false
+                    viewModel.deleteAccount(
+                        onSuccess = {
+                            navController.navigate(Route.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        },
+                        onError = { errorMsg ->
+                            android.widget.Toast.makeText(context, errorMsg, android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    )
+                }) {
+                    Text("Delete Permanently", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAccountDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

@@ -8,8 +8,14 @@ import com.example.nyayalegalai.models.FirestoreChatSession
 import com.example.nyayalegalai.utils.SessionManager
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import java.util.Date
+
+data class ActivityStats(
+    val chatCount: Int = 0,
+    val learningCount: Int = 0,
+    val totalCount: Int = 0
+)
 
 class ChatHistoryRepository(
     private val unifiedHistoryDao: UnifiedHistoryDao,
@@ -18,6 +24,65 @@ class ChatHistoryRepository(
 ) {
 
     val allSessions: Flow<List<ChatSession>> = unifiedHistoryDao.getAllSessions()
+
+    fun getActivityStatsFlow(uid: String): Flow<ActivityStats> {
+        if (uid.isBlank()) return flowOf(ActivityStats())
+        
+        val chatSessionsFlow = firestoreRepo.getChatSessions(uid)
+        val problemHistoryFlow = firestoreRepo.getProblemHistoryFlow(uid)
+        val learningHistoryFlow = firestoreRepo.getLearningHistoryFlow(uid)
+        
+        return combine(chatSessionsFlow, problemHistoryFlow, learningHistoryFlow) { chatSessions, problemSessions, learningList ->
+            android.util.Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Firestore update received")
+            android.util.Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Current user ID = $uid")
+
+            val aiAssistantSessionIds = mutableSetOf<String>()
+            
+            chatSessions.forEach { s ->
+                if (s.chatbotType == "AI_ASSISTANT") {
+                    val titleText = s.title.trim()
+                    val isTitleEmptyOrDefault = titleText.isEmpty() || 
+                        titleText.startsWith("New Legal Query") || 
+                        titleText.startsWith("New Chat") || 
+                        titleText.startsWith("Untitled")
+                    if (!isTitleEmptyOrDefault) {
+                        aiAssistantSessionIds.add(s.sessionId)
+                    }
+                }
+            }
+            
+            problemSessions.forEach { s ->
+                val titleText = s.title.trim()
+                val isTitleEmptyOrDefault = titleText.isEmpty() || 
+                    titleText.startsWith("New Legal Query") || 
+                    titleText.startsWith("New Chat") || 
+                    titleText.startsWith("Untitled")
+                if (!isTitleEmptyOrDefault) {
+                    aiAssistantSessionIds.add(s.sessionId)
+                }
+            }
+            
+            val aiHelpCount = aiAssistantSessionIds.size
+            
+            val learningCount = learningList.count {
+                val questionText = it.question.trim()
+                questionText.isNotEmpty() && 
+                    !questionText.startsWith("New Search") && 
+                    !questionText.startsWith("Untitled")
+            }
+            
+            val totalChats = aiHelpCount + learningCount
+            android.util.Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: AI Help count = $aiHelpCount")
+            android.util.Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Legal Learning count = $learningCount")
+            android.util.Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Total Chats = $totalChats")
+
+            ActivityStats(
+                chatCount = aiHelpCount,
+                learningCount = learningCount,
+                totalCount = totalChats
+            )
+        }
+    }
 
     fun getSessionsByType(type: String): Flow<List<ChatSession>> = unifiedHistoryDao.getSessionsByType(type)
 
@@ -87,6 +152,24 @@ class ChatHistoryRepository(
                     firestoreRepo.deleteRoomChatSession(uid, sessionId)
                 } catch (e: Exception) {
                     android.util.Log.e("SYNC_DEBUG", "Error syncing delete to Firestore", e)
+                }
+            }
+        }
+    }
+
+    suspend fun deleteSessions(sessionIds: List<Long>) {
+        val uid = getCurrentUid()
+        sessionIds.forEach { sessionId ->
+            val session = unifiedHistoryDao.getSessionById(sessionId)
+            if (session != null) {
+                unifiedHistoryDao.deleteSession(session)
+                unifiedHistoryDao.deleteMessagesForSession(sessionId)
+                if (!uid.isNullOrBlank()) {
+                    try {
+                        firestoreRepo.deleteRoomChatSession(uid, sessionId)
+                    } catch (e: Exception) {
+                        android.util.Log.e("SYNC_DEBUG", "Error syncing delete to Firestore for sessionId $sessionId", e)
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import Login from './pages/Login';
 import ClientDashboard from './pages/ClientDashboard';
 import LawyerDashboard from './pages/LawyerDashboard';
@@ -11,6 +11,8 @@ import LawEncyclopedia from './pages/LawEncyclopedia';
 import FindLawyer from './pages/FindLawyer';
 import MyBookings from './pages/MyBookings';
 import Profile from './pages/Profile';
+import ChatHistory from './pages/ChatHistory';
+import LawyerProfile from './pages/LawyerProfile';
 
 import { 
   Gavel, 
@@ -26,6 +28,95 @@ import {
   X 
 } from 'lucide-react';
 
+// Clean up empty/invalid chats and learning history from Firestore on startup
+async function cleanUpStoredData(uid) {
+  try {
+    console.log('[Cleanup] Starting startup database cleanup for user:', uid);
+
+    // 1. Clean up problemHistory
+    const problemHistoryRef = collection(db, 'users', uid, 'problemHistory');
+    const problemSnapshot = await getDocs(problemHistoryRef);
+    
+    for (const docSnapshot of problemSnapshot.docs) {
+      const sessionId = docSnapshot.id;
+      const sessionData = docSnapshot.data();
+      
+      // Fetch messages for this session
+      const messagesRef = collection(db, 'users', uid, 'problemHistory', sessionId, 'messages');
+      const messagesSnapshot = await getDocs(messagesRef);
+      const messages = messagesSnapshot.docs.map(d => d.data());
+      
+      const title = sessionData.title || '';
+      const isTitleEmptyOrDefault = !title.trim() || title.startsWith('New Legal Query');
+      
+      const hasNoValidMessages = messages.length === 0 || messages.every(m => {
+        const text = m.message || m.content;
+        return !text || !text.trim();
+      });
+      
+      if (isTitleEmptyOrDefault && hasNoValidMessages) {
+        console.log(`[Cleanup] Deleting empty problemHistory session: ${sessionId}`);
+        // Delete messages in subcollection first
+        for (const msgDoc of messagesSnapshot.docs) {
+          await deleteDoc(msgDoc.ref);
+        }
+        // Delete session doc
+        await deleteDoc(docSnapshot.ref);
+      }
+    }
+
+    // 2. Clean up chatSessions
+    const chatSessionsRef = collection(db, 'users', uid, 'chatSessions');
+    const chatSnapshot = await getDocs(chatSessionsRef);
+    
+    for (const docSnapshot of chatSnapshot.docs) {
+      const sessionId = docSnapshot.id;
+      const sessionData = docSnapshot.data();
+      
+      // Fetch messages for this session
+      const messagesRef = collection(db, 'users', uid, 'chatSessions', sessionId, 'messages');
+      const messagesSnapshot = await getDocs(messagesRef);
+      const messages = messagesSnapshot.docs.map(d => d.data());
+      
+      const title = sessionData.title || '';
+      const isTitleEmptyOrDefault = !title.trim() || title.startsWith('New Legal Query');
+      
+      const hasNoValidMessages = messages.length === 0 || messages.every(m => {
+        const text = m.message || m.content;
+        return !text || !text.trim();
+      });
+      
+      if (isTitleEmptyOrDefault && hasNoValidMessages) {
+        console.log(`[Cleanup] Deleting empty chatSessions session: ${sessionId}`);
+        // Delete messages in subcollection first
+        for (const msgDoc of messagesSnapshot.docs) {
+          await deleteDoc(msgDoc.ref);
+        }
+        // Delete session doc
+        await deleteDoc(docSnapshot.ref);
+      }
+    }
+
+    // 3. Clean up learningHistory
+    const learningHistoryRef = collection(db, 'users', uid, 'learningHistory');
+    const learningSnapshot = await getDocs(learningHistoryRef);
+    
+    for (const docSnapshot of learningSnapshot.docs) {
+      const data = docSnapshot.data();
+      const queryText = data.query || data.question || '';
+      
+      if (!queryText.trim()) {
+        console.log(`[Cleanup] Deleting empty learningHistory entry: ${docSnapshot.id}`);
+        await deleteDoc(docSnapshot.ref);
+      }
+    }
+
+    console.log('[Cleanup] Startup database cleanup completed.');
+  } catch (e) {
+    console.error('[Cleanup] Error during startup database cleanup:', e);
+  }
+}
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
@@ -39,6 +130,7 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setAuthLoading(true);
       if (firebaseUser) {
+        cleanUpStoredData(firebaseUser.uid);
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
@@ -98,6 +190,10 @@ export default function App() {
   };
 
   const handleNavigate = (route, extra = null) => {
+    if (route === 'find-lawyer') {
+      console.log('FIND_LAWYER: Button clicked');
+      console.log('FIND_LAWYER: Navigation started');
+    }
     setNavExtra(extra);
     setCurrentRoute(route);
     setMobileMenuOpen(false);
@@ -119,11 +215,15 @@ export default function App() {
       case 'law-search':
         return <LawEncyclopedia />;
       case 'find-lawyer':
-        return <FindLawyer user={user} onNavigate={handleNavigate} />;
+        return <FindLawyer user={user} onNavigate={handleNavigate} navExtra={navExtra} />;
+      case 'lawyer-profile':
+        return <LawyerProfile user={user} lawyerId={navExtra?.lawyerId} onNavigate={handleNavigate} />;
       case 'my-bookings':
         return <MyBookings user={user} initialFilter={navExtra?.filter} />;
       case 'profile':
         return <Profile user={user} onProfileUpdate={(updatedUser) => setUser(updatedUser)} />;
+      case 'chat-history':
+        return <ChatHistory user={user} onNavigate={handleNavigate} />;
       default:
         return <ClientDashboard user={user} onNavigate={handleNavigate} />;
     }
