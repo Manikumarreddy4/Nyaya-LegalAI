@@ -27,3 +27,8 @@ secrets.properties
 # OS files
 .DS_Store
 Thumbs.db
+
+# Python caches
+__pycache__/
+*.pyc
+

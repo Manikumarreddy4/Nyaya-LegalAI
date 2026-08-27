@@ -1,3 +1,5 @@
+🌐 [📊 CLICK HERE TO OPEN COMPLETE INTERACTIVE TEST REPORT ON GITHUB PAGES](https://Manikumarreddy4.github.io/Nyaya-LegalAI/report.html)
+
 # Nyaya Legal AI ⚖️🤖
 
 Nyaya Legal AI is a comprehensive legal assistant and learning platform designed to make Indian law accessible, clear, and action-oriented. Powered by advanced AI models, it bridges the gap between complex legal jargon and daily legal rights.
