@@ -5,9 +5,9 @@
     "passes": 1,
     "pending": 0,
     "failures": 4,
-    "start": "2026-08-27T16:44:28.785Z",
-    "end": "2026-08-27T16:46:05.667Z",
-    "duration": 96882,
+    "start": "2026-08-27T17:26:34.654Z",
+    "end": "2026-08-27T17:28:07.673Z",
+    "duration": 93019,
     "testsRegistered": 5,
     "passPercent": 20,
     "pendingPercent": 0,
@@ -18,7 +18,7 @@
   },
   "results": [
     {
-      "uuid": "2d14eeb7-fd82-4a25-8de3-200cd4f657b9",
+      "uuid": "23e6952a-a84b-4530-9efe-13f1ff39e5cc",
       "title": "",
       "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/tests/e2e-tests.spec.js",
       "file": "/tests/e2e-tests.spec.js",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "c1a94280-9ca4-43e9-a8b5-ade978fce172",
+          "uuid": "f2a81616-36a4-43ae-8754-3e5d54d28869",
           "title": "Nyaya Legal AI - Selenium Web E2E Automation",
           "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/tests/e2e-tests.spec.js",
           "file": "/tests/e2e-tests.spec.js",
@@ -36,7 +36,7 @@
               "title": "\"before all\" hook in \"Nyaya Legal AI - Selenium Web E2E Automation\"",
               "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation \"before all\" hook in \"Nyaya Legal AI - Selenium Web E2E Automation\"",
               "timedOut": false,
-              "duration": 11924,
+              "duration": 7812,
               "state": null,
               "speed": null,
               "pass": false,
@@ -45,8 +45,8 @@
               "context": null,
               "code": "logger.info('Initializing Selenium Web Driver spec run...');\ntry {\n  const options = new chrome.Options();\n  if (seleniumConfig.headless) {\n    options.addArguments('--headless=new');\n  }\n  options.addArguments('--no-sandbox');\n  options.addArguments('--disable-dev-shm-usage');\n  options.addArguments('--disable-gpu');\n  driver = await new Builder()\n    .forBrowser(seleniumConfig.browser)\n    .setChromeOptions(options)\n    .build();\n  await driver.manage().setTimeouts({ implicit: seleniumConfig.implicitWaitMs });\n  await driver.manage().window().setSize(seleniumConfig.windowWidth, seleniumConfig.windowHeight);\n  logger.info('Selenium WebDriver browser session started.');\n} catch (err) {\n  logger.warn(`Failed to initialize Selenium WebDriver: ${err.message}. Entering Simulation Mode...`);\n  driver = null;\n}\nloginPage = new LoginPage(driver);\ndashboardPage = new DashboardPage(driver);",
               "err": {},
-              "uuid": "4c79e0e4-f592-414a-b09c-341fb11ef4ff",
-              "parentUUID": "c1a94280-9ca4-43e9-a8b5-ade978fce172",
+              "uuid": "85fdec19-d118-404e-9ac3-f66646724575",
+              "parentUUID": "f2a81616-36a4-43ae-8754-3e5d54d28869",
               "isHook": true,
               "skipped": false
             }
@@ -65,8 +65,8 @@
               "context": null,
               "code": "if (driver) {\n  try {\n    await driver.quit();\n    logger.info('Selenium WebDriver browser session closed successfully.');\n  } catch (err) {\n    logger.error(`Error tearing down browser: ${err.message}`);\n  }\n}",
               "err": {},
-              "uuid": "ac4fa639-bb83-4dbf-b416-22345533774b",
-              "parentUUID": "c1a94280-9ca4-43e9-a8b5-ade978fce172",
+              "uuid": "d2deb5f1-0b18-46ea-9ebb-aeb49844288d",
+              "parentUUID": "f2a81616-36a4-43ae-8754-3e5d54d28869",
               "isHook": true,
               "skipped": false
             }
@@ -74,7 +74,7 @@
           "tests": [],
           "suites": [
             {
-              "uuid": "a1e85d3e-029e-4217-882a-062d570787ca",
+              "uuid": "5b8b51ef-f738-42d3-a8bf-ca3e1d9612e0",
               "title": "1. Web Authentication Flow",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -85,7 +85,7 @@
                   "title": "should validate form blocks empty credentials sign in",
                   "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation 1. Web Authentication Flow should validate form blocks empty credentials sign in",
                   "timedOut": false,
-                  "duration": 21864,
+                  "duration": 21929,
                   "state": "failed",
                   "speed": null,
                   "pass": false,
@@ -94,12 +94,12 @@
                   "context": null,
                   "code": "logger.info('[Test] Verifying empty credentials input');\ntry {\n  await loginPage.getUrl(seleniumConfig.baseUrl);\n  await loginPage.login('', '');\n  const validation = await loginPage.getValidationText();\n  expect(validation).to.be.a('string');\n} catch (err) {\n  await loginPage.captureFailure('Web_Auth_Empty', err);\n  throw err;\n}",
                   "err": {
-                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10924ms",
-                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10924ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10942ms",
+                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10942ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
                     "diff": null
                   },
-                  "uuid": "1e13c6c7-c0ee-4588-bdbb-5e2ac4d182ee",
-                  "parentUUID": "a1e85d3e-029e-4217-882a-062d570787ca",
+                  "uuid": "818482e7-883a-4e63-91a9-941e65a3bca1",
+                  "parentUUID": "5b8b51ef-f738-42d3-a8bf-ca3e1d9612e0",
                   "isHook": false,
                   "skipped": false
                 },
@@ -107,7 +107,7 @@
                   "title": "should reject invalid credentials with error dialog overlay",
                   "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation 1. Web Authentication Flow should reject invalid credentials with error dialog overlay",
                   "timedOut": false,
-                  "duration": 21018,
+                  "duration": 21087,
                   "state": "failed",
                   "speed": null,
                   "pass": false,
@@ -116,12 +116,12 @@
                   "context": null,
                   "code": "logger.info('[Test] Verifying invalid logins');\ntry {\n  await loginPage.login('unknown_advocate@company.com', 'BadPass123!');\n  const error = await loginPage.getValidationText();\n  expect(error).to.be.a('string');\n} catch (err) {\n  await loginPage.captureFailure('Web_Auth_Invalid', err);\n  throw err;\n}",
                   "err": {
-                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10866ms",
-                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10866ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10937ms",
+                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10937ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
                     "diff": null
                   },
-                  "uuid": "ed195246-2abf-49d3-888d-23f2534cd0fd",
-                  "parentUUID": "a1e85d3e-029e-4217-882a-062d570787ca",
+                  "uuid": "e685b992-7b81-4f8c-a396-7d8857caa41f",
+                  "parentUUID": "5b8b51ef-f738-42d3-a8bf-ca3e1d9612e0",
                   "isHook": false,
                   "skipped": false
                 },
@@ -129,7 +129,7 @@
                   "title": "should log in user successfully and load active role dashboard",
                   "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation 1. Web Authentication Flow should log in user successfully and load active role dashboard",
                   "timedOut": false,
-                  "duration": 21003,
+                  "duration": 21062,
                   "state": "failed",
                   "speed": null,
                   "pass": false,
@@ -138,12 +138,12 @@
                   "context": null,
                   "code": "logger.info('[Test] Executing valid advocate authentication');\ntry {\n  await loginPage.login('lawyer@example.com', 'LawyerPass123!');\n  const headerText = await dashboardPage.waitForDisplayed(dashboardPage.welcomeHeader);\n  expect(headerText).to.be.true;\n} catch (err) {\n  await loginPage.captureFailure('Web_Auth_Valid_Login', err);\n  throw err;\n}",
                   "err": {
-                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10843ms",
-                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10843ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+                    "message": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10914ms",
+                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10914ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
                     "diff": null
                   },
-                  "uuid": "81d7b1c1-3dfb-4c26-b321-62444232ad84",
-                  "parentUUID": "a1e85d3e-029e-4217-882a-062d570787ca",
+                  "uuid": "828c93d6-8b18-4614-a213-ad695bf2aafb",
+                  "parentUUID": "5b8b51ef-f738-42d3-a8bf-ca3e1d9612e0",
                   "isHook": false,
                   "skipped": false
                 }
@@ -151,19 +151,19 @@
               "suites": [],
               "passes": [],
               "failures": [
-                "1e13c6c7-c0ee-4588-bdbb-5e2ac4d182ee",
-                "ed195246-2abf-49d3-888d-23f2534cd0fd",
-                "81d7b1c1-3dfb-4c26-b321-62444232ad84"
+                "818482e7-883a-4e63-91a9-941e65a3bca1",
+                "e685b992-7b81-4f8c-a396-7d8857caa41f",
+                "828c93d6-8b18-4614-a213-ad695bf2aafb"
               ],
               "pending": [],
               "skipped": [],
-              "duration": 63885,
+              "duration": 64078,
               "root": false,
               "rootEmpty": false,
               "_timeout": 60000
             },
             {
-              "uuid": "75763c88-09e1-40bd-b20d-2934a9dd2a10",
+              "uuid": "ceb8568a-6706-4983-9992-e4863f968d08",
               "title": "2. Form Inputs & Constraints Validations",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -174,7 +174,7 @@
                   "title": "should check telephone field format rejects non-10 digit sequences",
                   "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation 2. Form Inputs & Constraints Validations should check telephone field format rejects non-10 digit sequences",
                   "timedOut": false,
-                  "duration": 21011,
+                  "duration": 21066,
                   "state": "failed",
                   "speed": null,
                   "pass": false,
@@ -183,12 +183,12 @@
                   "context": null,
                   "code": "logger.info('[Test] Checking phone number validations');\ntry {\n  await loginPage.register('New Advocate', 'advocate@example.com', '987', 'Pass123!');\n  const text = await loginPage.getValidationText();\n  expect(text).to.contain('digits');\n} catch (err) {\n  await loginPage.captureFailure('Web_Form_Phone_Format', err);\n  throw err;\n}",
                   "err": {
-                    "message": "TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)\nWait timed out after 10847ms",
-                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)\nWait timed out after 10847ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+                    "message": "TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)\nWait timed out after 10918ms",
+                    "estack": "TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)\nWait timed out after 10918ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
                     "diff": null
                   },
-                  "uuid": "00b7d52c-cb47-4cbd-91be-5c623af72cd6",
-                  "parentUUID": "75763c88-09e1-40bd-b20d-2934a9dd2a10",
+                  "uuid": "d6642654-e853-4481-80d2-672f5781d174",
+                  "parentUUID": "ceb8568a-6706-4983-9992-e4863f968d08",
                   "isHook": false,
                   "skipped": false
                 }
@@ -196,17 +196,17 @@
               "suites": [],
               "passes": [],
               "failures": [
-                "00b7d52c-cb47-4cbd-91be-5c623af72cd6"
+                "d6642654-e853-4481-80d2-672f5781d174"
               ],
               "pending": [],
               "skipped": [],
-              "duration": 21011,
+              "duration": 21066,
               "root": false,
               "rootEmpty": false,
               "_timeout": 60000
             },
             {
-              "uuid": "5d50d4d2-14b5-45e6-aa44-472a9f365702",
+              "uuid": "30b68b75-cd55-4eea-b8f6-6098b18d96aa",
               "title": "3. Dynamic React Routes Discovery & Assertions Engine",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -217,7 +217,7 @@
                   "title": "should automatically extract routing endpoints and execute dynamic specifications",
                   "fullTitle": "Nyaya Legal AI - Selenium Web E2E Automation 3. Dynamic React Routes Discovery & Assertions Engine should automatically extract routing endpoints and execute dynamic specifications",
                   "timedOut": false,
-                  "duration": 3,
+                  "duration": 2,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -226,20 +226,20 @@
                   "context": null,
                   "code": "logger.info('[Test] Running dynamic test suite loader');\nconst dynamicCases = DynamicTestGenerator.discoverRoutesAndValidation();\nexpect(dynamicCases).to.be.an('array');\nexpect(dynamicCases.length).to.be.greaterThan(0);\n\ndynamicCases.forEach(tc => {\n  logger.info(`[Dynamic Execution] Dispatched dynamic case: ${tc.id} - ${tc.scenarioName}`);\n});",
                   "err": {},
-                  "uuid": "766b3434-7861-4628-8545-84b95716f1b2",
-                  "parentUUID": "5d50d4d2-14b5-45e6-aa44-472a9f365702",
+                  "uuid": "1e5ce1c2-7e10-4540-83c3-a66986c44b1f",
+                  "parentUUID": "30b68b75-cd55-4eea-b8f6-6098b18d96aa",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "766b3434-7861-4628-8545-84b95716f1b2"
+                "1e5ce1c2-7e10-4540-83c3-a66986c44b1f"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 3,
+              "duration": 2,
               "root": false,
               "rootEmpty": false,
               "_timeout": 60000

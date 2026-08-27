@@ -1,5 +1,0 @@
-{
-  "currentUrl": "http://localhost:5173/",
-  "browserLogs": [],
-  "errorStack": "TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)\nWait timed out after 10847ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
-}

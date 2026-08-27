@@ -1,0 +1,12 @@
+{
+  "currentUrl": "http://localhost:5173/",
+  "browserLogs": [
+    {
+      "level": "SEVERE",
+      "message": "http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=71868112 1803:174 \"Unsupported style property %s. Did you mean %s?\" \"@media (max-width: 768px)\" \"@media (maxWidth: 768px)\"",
+      "timestamp": 1787851603323,
+      "type": ""
+    }
+  ],
+  "errorStack": "TimeoutError: Waiting for element to be located By(css selector, #email-input)\nWait timed out after 10942ms\n    at /home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/SeleniumTesting/node_modules/selenium-webdriver/lib/webdriver.js:929:22\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+}
