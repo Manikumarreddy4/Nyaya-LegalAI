@@ -85,13 +85,14 @@ def main():
                 suite_results = run_mobile_tests(definitions["Mobile Frontend"])
             elif args.suite == "web":
                 suite_results = run_web_tests(definitions["Web Frontend"])
-            elif args.suite == "api":
+            elif args.suite in ["api", "security", "performance"]:
                 backend_proc = start_backend()
-                suite_results = run_api_tests(definitions["Backend API"])
-            elif args.suite == "security":
-                suite_results = run_security_tests(definitions["Security Audit"])
-            elif args.suite == "performance":
-                suite_results = run_performance_tests(definitions["Performance Load"])
+                if args.suite == "api":
+                    suite_results = run_api_tests(definitions["Backend API"])
+                elif args.suite == "security":
+                    suite_results = run_security_tests(definitions["Security Audit"])
+                elif args.suite == "performance":
+                    suite_results = run_performance_tests(definitions["Performance Load"])
         finally:
             if backend_proc:
                 stop_backend(backend_proc)

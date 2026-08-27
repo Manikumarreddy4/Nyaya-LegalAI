@@ -4,7 +4,14 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
+
+concurrency:
+  group: enterprise-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -125,6 +132,9 @@ jobs:
           ./gradlew assembleDebug
           mkdir -p app/build/outputs/apk/release
           cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Install Appium Dependencies
         run: |
@@ -217,8 +227,13 @@ jobs:
             sleep 1
           done
           cd ../LoadTesting
-          k6 run --summary-export=summary.json load-test.js
-          npm run parse
+          if [ -f load-test.js ]; then
+            k6 run --summary-export=summary.json load-test.js
+            npm run parse
+          else
+            echo "Error: load-test.js configuration missing!"
+            exit 1
+          fi
         env:
           BACKEND_URL: "http://localhost:5000"
 
@@ -240,8 +255,8 @@ jobs:
           name: results-performance
           path: PythonTesting/reports/results_performance.json
 
-  security-tests:
-    name: Security Tests
+  dast-security-tests:
+    name: DAST Security Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -310,7 +325,7 @@ jobs:
       - selenium-web-tests
       - appium-mobile-tests
       - load-tests
-      - security-tests
+      - dast-security-tests
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -391,6 +406,21 @@ jobs:
         run: |
           python PythonTesting/run_all_tests.py --suite bundle
 
+      - name: Create Combined HTML Summary
+        run: |
+          echo "<html><head><title>Enterprise Test Reports Dashboard</title>" > CombinedReports/index.html
+          echo "<style>body{font-family:'Segoe UI',sans-serif;background-color:#0f172a;color:#f8fafc;padding:40px;}" >> CombinedReports/index.html
+          echo "h1{color:#38bdf8;}a{color:#60a5fa;text-decoration:none;}a:hover{text-decoration:underline;}</style></head>" >> CombinedReports/index.html
+          echo "<body><h1>Nyaya Legal AI - Combined Enterprise Reports</h1>" >> CombinedReports/index.html
+          echo "<p>Execution Date: $(date)</p><ul>" >> CombinedReports/index.html
+          echo "<li><a href='./report.html'>Interactive Master Dashboard</a></li>" >> CombinedReports/index.html
+          echo "<li><a href='./dashboard.html'>HTML Dashboard Stats</a></li>" >> CombinedReports/index.html
+          echo "<li><a href='./trends.html'>HTML Execution Trends</a></li>" >> CombinedReports/index.html
+          echo "<li><a href='./Selenium/index.html'>Selenium Web Test Details</a></li>" >> CombinedReports/index.html
+          echo "<li><a href='./Appium/index.html'>Appium Mobile Test Details</a></li>" >> CombinedReports/index.html
+          echo "<li><a href='./LoadTesting/load-test-report.html'>k6 Performance Test Details</a></li>" >> CombinedReports/index.html
+          echo "</ul></body></html>" >> CombinedReports/index.html
+
       - name: Create markdown summary
         run: |
           echo "# Nyaya Legal AI Consolidated Test Report Summary" > CombinedReports/summary.md
@@ -415,7 +445,7 @@ jobs:
       - name: Upload Combined Reports Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: combined-test-reports
+          name: enterprise-test-reports
           path: CombinedReports/
 
   deploy:
@@ -442,16 +472,21 @@ jobs:
       - name: Download Combined Reports
         uses: actions/download-artifact@v4
         with:
-          name: combined-test-reports
+          name: enterprise-test-reports
           path: CombinedReports/
 
       - name: Copy Reports to Webapp Dist
         run: |
+          cp CombinedReports/index.html webapp/dist/index.html || true
           cp CombinedReports/report.html webapp/dist/report.html || true
           cp CombinedReports/dashboard.html webapp/dist/dashboard.html || true
           cp CombinedReports/trends.html webapp/dist/trends.html || true
           cp CombinedReports/execution-report.html webapp/dist/execution-report.html || true
           cp CombinedReports/*.xlsx webapp/dist/ || true
+          cp -r CombinedReports/Selenium webapp/dist/Selenium || true
+          cp -r CombinedReports/Appium webapp/dist/Appium || true
+          cp -r CombinedReports/LoadTesting webapp/dist/LoadTesting || true
+          cp -r CombinedReports/Security webapp/dist/Security || true
           ls -la webapp/dist/
 
       - name: Deploy to GitHub Pages
