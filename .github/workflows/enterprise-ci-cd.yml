@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: enterprise-ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: enterprise-ci-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
