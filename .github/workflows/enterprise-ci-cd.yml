@@ -130,9 +130,6 @@ jobs:
           ./gradlew assembleDebug
           mkdir -p app/build/outputs/apk/release
           cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Install Appium Dependencies
         run: |
