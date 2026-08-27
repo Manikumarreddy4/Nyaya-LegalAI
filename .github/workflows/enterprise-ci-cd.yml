@@ -9,6 +9,8 @@ on:
       - main
   workflow_dispatch:
 
+# Concurrency completely disabled to prevent job cancellation conflicts
+
 permissions:
   contents: write
   pages: write
