@@ -20,6 +20,8 @@ jobs:
   selenium-web-tests:
     name: Selenium Web Tests
     runs-on: ubuntu-latest
+    outputs:
+      selenium_reports_url: ${{ steps.upload-selenium-reports.outputs.artifact-url }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -77,6 +79,7 @@ jobs:
           python PythonTesting/run_all_tests.py --suite web
 
       - name: Upload Node Selenium Reports
+        id: upload-selenium-reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -93,6 +96,8 @@ jobs:
   appium-mobile-tests:
     name: Appium Mobile Tests
     runs-on: ubuntu-latest
+    outputs:
+      appium_reports_url: ${{ steps.upload-appium-reports.outputs.artifact-url }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -199,6 +204,7 @@ jobs:
           python PythonTesting/run_all_tests.py --suite mobile
 
       - name: Upload Node Appium Reports
+        id: upload-appium-reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -215,6 +221,8 @@ jobs:
   load-tests:
     name: Load Tests
     runs-on: ubuntu-latest
+    outputs:
+      load_reports_url: ${{ steps.upload-load-reports.outputs.artifact-url }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -272,6 +280,7 @@ jobs:
           python PythonTesting/run_all_tests.py --suite performance
 
       - name: Upload k6 Load Reports
+        id: upload-load-reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -288,6 +297,8 @@ jobs:
   dast-security-tests:
     name: DAST Security Tests
     runs-on: ubuntu-latest
+    outputs:
+      security_reports_url: ${{ steps.upload-security-reports.outputs.artifact-url }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -325,6 +336,7 @@ jobs:
           python PythonTesting/run_all_tests.py --suite api
 
       - name: Upload Python Security Reports
+        id: upload-security-reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -357,6 +369,8 @@ jobs:
       - appium-mobile-tests
       - load-tests
       - dast-security-tests
+    outputs:
+      combined_reports_url: ${{ steps.upload-combined-reports.outputs.artifact-url }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -458,11 +472,11 @@ jobs:
           echo "# Nyaya Legal AI Consolidated Test Report Summary" > CombinedReports/summary.md
           echo "Generated at: $(date)" >> CombinedReports/summary.md
           echo "" >> CombinedReports/summary.md
-          echo "## Included Test Domain Reports:" >> CombinedReports/summary.md
-          echo "* **Selenium Web E2E:** \`CombinedReports/Selenium/\`" >> CombinedReports/summary.md
-          echo "* **Appium Mobile E2E:** \`CombinedReports/Appium/\`" >> CombinedReports/summary.md
-          echo "* **API Load Performance:** \`CombinedReports/LoadTesting/\`" >> CombinedReports/summary.md
-          echo "* **OWASP Top 10 Security Audit:** \`CombinedReports/Security/\`" >> CombinedReports/summary.md
+          echo "## Included Test Domain Reports (Click to Download):" >> CombinedReports/summary.md
+          echo "* **Selenium Web E2E Reports:** [Download Artifact](${{ needs.selenium-web-tests.outputs.selenium_reports_url }})" >> CombinedReports/summary.md
+          echo "* **Appium Mobile E2E Reports:** [Download Artifact](${{ needs.appium-mobile-tests.outputs.appium_reports_url }})" >> CombinedReports/summary.md
+          echo "* **API Load Performance Reports:** [Download Artifact](${{ needs.load-tests.outputs.load_reports_url }})" >> CombinedReports/summary.md
+          echo "* **OWASP Top 10 Security Audit Reports:** [Download Artifact](${{ needs.dast-security-tests.outputs.security_reports_url }})" >> CombinedReports/summary.md
           echo "" >> CombinedReports/summary.md
           cat PythonTesting/reports/summary.md >> CombinedReports/summary.md || true
 
@@ -475,6 +489,7 @@ jobs:
           cp PythonTesting/reports/*.xlsx CombinedReports/ || true
 
       - name: Upload Combined Reports Artifact
+        id: upload-combined-reports
         uses: actions/upload-artifact@v4
         with:
           name: enterprise-test-reports
@@ -483,7 +498,12 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: bundle-reports
+    needs:
+      - bundle-reports
+      - selenium-web-tests
+      - appium-mobile-tests
+      - load-tests
+      - dast-security-tests
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -529,4 +549,8 @@ jobs:
 
       - name: Publish Markdown Summary
         run: |
-          cat CombinedReports/summary.md >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Clickable Download Reports" > summary_with_bundle.md
+          echo "* **Consolidated Enterprise Reports Bundle:** [Download Bundle ZIP](${{ needs.bundle-reports.outputs.combined_reports_url }})" >> summary_with_bundle.md
+          echo "" >> summary_with_bundle.md
+          cat CombinedReports/summary.md >> summary_with_bundle.md
+          cat summary_with_bundle.md >> $GITHUB_STEP_SUMMARY
