@@ -116,6 +116,14 @@ jobs:
             ~/.android/adb/*
           key: avd-30
 
+      - name: Cache Android System Image
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/system-images
+          key: android-system-images-30
+          restore-keys: |
+            android-system-images-
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -149,10 +157,21 @@ jobs:
           cd AppiumTesting
           npm install
 
+      - name: Cache Appium Drivers
+        uses: actions/cache@v4
+        id: appium-cache
+        with:
+          path: ~/.appium
+          key: appium-drivers-v1
+
       - name: Install Appium & Drivers
         run: |
           npm install -g appium
-          appium driver install uiautomator2
+          if [ ! -d ~/.appium/node_modules/appium-uiautomator2-driver ]; then
+            appium driver install uiautomator2
+          else
+            echo "Appium driver restored from cache."
+          fi
 
       - name: Run Appium Tests inside Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
