@@ -1,0 +1,29 @@
+                 NYAYA LEGALAI
+                  RAG SHOWCASE
+
+        Legal Dataset / Documents
+                    │
+                    ▼
+             Document Loader
+                    │
+                    ▼
+               Text Chunking
+                    │
+                    ▼
+                Embeddings
+                    │
+                    ▼
+             Vector Database
+                    │
+                    ▲
+                    │
+User Question ──► Question Embedding
+                    │
+                    ▼
+             Similarity Search
+                    │
+                    ▼
+           Relevant Legal Context
+                    │
+                    ▼
+          RAG Demonstration Response
