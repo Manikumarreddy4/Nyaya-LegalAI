@@ -1,14 +1,6 @@
 name: Web & Mobile E2E Testing
 
 on:
-  push:
-    paths:
-      - 'webapp/**'
-      - '.github/workflows/e2e-test.yml'
-  pull_request:
-    paths:
-      - 'webapp/**'
-      - '.github/workflows/e2e-test.yml'
   workflow_dispatch:
 
 jobs:

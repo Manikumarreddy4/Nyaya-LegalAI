@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   unified-pipeline:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       # Stage 1: Checkout Repository
       - name: Checkout Code
@@ -54,13 +54,11 @@ jobs:
           mkdir -p app
           cp app/build/outputs/apk/debug/app-debug.apk app/app-release.apk
 
-      # Stage 6: Configure KVM Hardware Acceleration
-      - name: Configure KVM Acceleration
+      # Stage 6: Environment info
+      - name: Environment Diagnostics
         run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-          sudo adduser $USER kvm
-          sudo adduser $USER libvirt
+          echo "Running on host: $(uname -a)"
+          sysctl -a | grep machdep.cpu.features || true
 
       # Stage 7: Verify Appium & Emulator Readiness (Mocked in CI/CD)
       - name: Verify Appium and Emulator Setup
