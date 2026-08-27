@@ -127,9 +127,11 @@ jobs:
       - name: Build Android APK
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
           mkdir -p app/build/outputs/apk/release
           cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk
+        env:
+          GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m" -Dkotlin.daemon.jvm.options="-Xmx1536m"
 
       - name: Install Appium Dependencies
         run: |
