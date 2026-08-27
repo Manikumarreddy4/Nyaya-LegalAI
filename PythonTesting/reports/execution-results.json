@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-08-27 11:19:19",
+    "timestamp": "2026-08-27 13:36:57",
     "total": 2020,
     "passed": 1942,
     "failed": 78,
@@ -13115,7 +13115,7 @@
             "component": "Connection Pool",
             "name": "Probe 023: Verify database connection pool behavior under heavy concurrency",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1555ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1947ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-024",
@@ -13299,7 +13299,7 @@
             "component": "Error Rate SLA",
             "name": "Probe 046: Validate failure rate checks return under 5% errors",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1933ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1688ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-047",
@@ -13483,7 +13483,7 @@
             "component": "Latency SLA Peak",
             "name": "Probe 069: Validate P99 response time is strictly under 3000ms",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1645ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1790ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-070",
@@ -13667,7 +13667,7 @@
             "component": "Latency SLA Test",
             "name": "Probe 092: Validate P95 response time is strictly under 1500ms",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1739ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1756ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-093",
@@ -13851,7 +13851,7 @@
             "component": "Spike Load Test",
             "name": "Probe 115: Simulate short burst connection rates to auth/chat routers",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1794ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1939ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-116",
@@ -14035,7 +14035,7 @@
             "component": "Stress load Test",
             "name": "Probe 138: Simulate 200/500 VU load limits on booking endpoints",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1713ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1706ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-139",
@@ -14219,7 +14219,7 @@
             "component": "Baseline Load Test",
             "name": "Probe 161: Simulate baseline 100 Virtual Users (VU) request rate",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1922ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1784ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-162",
@@ -14403,7 +14403,7 @@
             "component": "Throughput rate",
             "name": "Probe 184: Verify transactions per second (TPS) throughput levels",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1631ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1621ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-185",
@@ -14587,7 +14587,7 @@
             "component": "Connection Pool",
             "name": "Probe 207: Verify database connection pool behavior under heavy concurrency",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1766ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1874ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-208",
@@ -14771,7 +14771,7 @@
             "component": "Error Rate SLA",
             "name": "Probe 230: Validate failure rate checks return under 5% errors",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1725ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1901ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-231",
@@ -14955,7 +14955,7 @@
             "component": "Latency SLA Peak",
             "name": "Probe 253: Validate P99 response time is strictly under 3000ms",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1944ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1785ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-254",
@@ -15139,7 +15139,7 @@
             "component": "Latency SLA Test",
             "name": "Probe 276: Validate P95 response time is strictly under 1500ms",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1705ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1933ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-277",
@@ -15323,7 +15323,7 @@
             "component": "Spike Load Test",
             "name": "Probe 299: Simulate short burst connection rates to auth/chat routers",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1669ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1749ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-300",
@@ -15507,7 +15507,7 @@
             "component": "Stress load Test",
             "name": "Probe 322: Simulate 200/500 VU load limits on booking endpoints",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1803ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1667ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-323",
@@ -15691,7 +15691,7 @@
             "component": "Baseline Load Test",
             "name": "Probe 345: Simulate baseline 100 Virtual Users (VU) request rate",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1789ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1821ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-346",
@@ -15875,7 +15875,7 @@
             "component": "Throughput rate",
             "name": "Probe 368: Verify transactions per second (TPS) throughput levels",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1561ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1859ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-369",
@@ -16059,7 +16059,7 @@
             "component": "Connection Pool",
             "name": "Probe 391: Verify database connection pool behavior under heavy concurrency",
             "status": "Failed",
-            "error": "Latency SLA Violation: P95 Response latency of 1586ms exceeded target threshold of 1500ms under 100 VU concurrent load."
+            "error": "Latency SLA Violation: P95 Response latency of 1939ms exceeded target threshold of 1500ms under 100 VU concurrent load."
         },
         {
             "id": "PERF-LD-392",
