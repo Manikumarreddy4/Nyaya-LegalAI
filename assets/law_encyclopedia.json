@@ -1,0 +1,616 @@
+{
+  "categories": [
+    {
+      "id": "cat_constitution",
+      "name": "Constitution of India",
+      "description": "Supreme law of India establishing the constitutional framework, fundamental rights, directive principles, and organs of the Union and State governments.",
+      "icon": "AccountBalance",
+      "hierarchyType": "CONSTITUTION",
+      "laws": [
+        {
+          "id": "law_constitution_1950",
+          "type": "CONSTITUTION",
+          "actNumber": "Constituent Assembly of India",
+          "name": "Constitution of India",
+          "shortTitle": "Constitution of India",
+          "longTitle": "The Constitution of the Sovereign Socialist Secular Democratic Republic of India.",
+          "description": "The fundamental legal document of the Republic of India, enacted on 26 January 1950.",
+          "year": 1950,
+          "enactmentDate": "26-11-1949",
+          "enforcementDate": "26-01-1950",
+          "ministry": "Ministry of Law and Justice",
+          "department": "Legislative Department",
+          "category": "Constitutional Law",
+          "status": "IN_FORCE",
+          "source": "India Code & Ministry of Law and Justice",
+          "chapters": [
+            {
+              "id": "chap_part_3_fundamental_rights",
+              "number": "Part III",
+              "title": "Fundamental Rights",
+              "description": "Fundamental civil and political liberties guaranteed to individuals against arbitrary state action.",
+              "sections": [
+                {
+                  "id": "art_14",
+                  "number": "Article 14",
+                  "title": "Equality Before Law",
+                  "text": "The State shall not deny to any person equality before the law or the equal protection of the laws within the territory of India.",
+                  "shortMeaning": "The State shall not deny to any person equality before the law or the equal protection of the laws within the territory of India.",
+                  "detailedExplanation": "Article 14 combines two core concepts: 'Equality before law' (a negative concept borrowed from English common law declaring that no individual is above the law) and 'Equal protection of the laws' (a positive concept from the US Constitution requiring equal treatment in equal circumstances). While class legislation is prohibited, reasonable classification is permitted provided it is founded on an intelligible differentia and bears a rational nexus to the statutory objective.",
+                  "keyPoints": [
+                    "Applies to all persons, whether citizens or foreigners, as well as statutory corporations and legal entities.",
+                    "Prohibits arbitrary and discriminatory action by the State (E.P. Royappa & Maneka Gandhi doctrine).",
+                    "Permits reasonable classification based on intelligible differentia with a rational nexus."
+                  ],
+                  "example": "A municipal law granting special tax concessions to differently-abled persons or senior citizens is valid because the classification has a rational purpose.",
+                  "relatedProvisions": [
+                    "Article 15 (Prohibition of discrimination)",
+                    "Article 16 (Equality in public employment)",
+                    "Article 21 (Right to life and liberty)"
+                  ],
+                  "importantNote": "Article 14 forms part of the Basic Structure of the Indian Constitution and cannot be abrogated even by constitutional amendments.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_15",
+                  "number": "Article 15",
+                  "title": "Prohibition of Discrimination on Certain Grounds",
+                  "text": "(1) The State shall not discriminate against any citizen on grounds only of religion, race, caste, sex, place of birth or any of them.\n(2) No citizen shall, on grounds only of religion, race, caste, sex, place of birth or any of them, be subject to any disability, liability, restriction or condition with regard to—\n(a) access to shops, public restaurants, hotels and places of public entertainment; or\n(b) the use of wells, tanks, bathing ghats, roads and places of public resort maintained wholly or partly out of State funds or dedicated to the use of the general public.",
+                  "shortMeaning": "The State shall not discriminate against any citizen on grounds only of religion, race, caste, sex, place of birth or any of them.",
+                  "detailedExplanation": "Article 15 secures citizens against discrimination in access to public places, shops, restaurants, and public wells/tanks. It explicitly allows the State to make special provisions for women and children (Art. 15(3)), socially and educationally backward classes or SC/ST (Art. 15(4) and 15(5)), and Economically Weaker Sections (Art. 15(6)).",
+                  "keyPoints": [
+                    "Protects citizens exclusively against discrimination by the State and private persons in public access.",
+                    "The word 'only' signifies that discrimination on other relevant criteria (like educational merit) is permissible.",
+                    "Enables affirmative action, reservations, and welfare policies for disadvantaged groups."
+                  ],
+                  "example": "Free schooling and health schemes specifically designated for female students are permissible under Article 15(3) as a special provision for women.",
+                  "relatedProvisions": [
+                    "Article 14 (Equality before law)",
+                    "Article 16 (Equal opportunity in employment)",
+                    "Article 29(2) (Protection of educational rights)"
+                  ],
+                  "importantNote": "Article 15 is applicable solely to Indian citizens and does not extend to non-citizens.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_16",
+                  "number": "Article 16",
+                  "title": "Equality of Opportunity in Matters of Public Employment",
+                  "text": "(1) There shall be equality of opportunity for all citizens in matters relating to employment or appointment to any office under the State.\n(2) No citizen shall, on grounds only of religion, race, caste, sex, descent, place of birth, residence or any of them, be ineligible for, or discriminated against in respect of, any employment or office under the State.",
+                  "shortMeaning": "There shall be equality of opportunity for all citizens in matters relating to employment or appointment to any office under the State.",
+                  "detailedExplanation": "Article 16 guarantees that no citizen shall, on grounds only of religion, race, caste, sex, descent, place of birth, residence or any of them, be ineligible for, or discriminated against in respect of, any employment or office under the State. It allows Parliament to prescribe residence requirements in specific territories and allows reservation for backward classes not adequately represented in State services.",
+                  "keyPoints": [
+                    "Guarantees equal opportunity in State recruitments, promotions, and public offices.",
+                    "Forbids discrimination based on descent or residence in general appointments.",
+                    "Enables reservations for backward classes, SCs, STs, and Economically Weaker Sections."
+                  ],
+                  "example": "A government recruiting civil servants must conduct open competitive examinations without disqualifying candidates on grounds of religion or birthplace.",
+                  "relatedProvisions": [
+                    "Article 14 (Equality before law)",
+                    "Article 15 (Prohibition of discrimination)",
+                    "Article 335 (Claims of SCs and STs to services)"
+                  ],
+                  "importantNote": "Article 16 applies strictly to public employment under State bodies and does not regulate private sector recruitment.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_17",
+                  "number": "Article 17",
+                  "title": "Abolition of Untouchability",
+                  "text": "'Untouchability' is abolished and its practice in any form is forbidden. The enforcement of any disability arising out of 'Untouchability' shall be an offence punishable in accordance with law.",
+                  "shortMeaning": "Untouchability is abolished and its practice in any form is forbidden. The enforcement of any disability arising out of Untouchability shall be an offence punishable in accordance with law.",
+                  "detailedExplanation": "Article 17 is an absolute constitutional prohibition designed to eliminate historical social caste prejudices and segregation. It is enforceable against both the State and private individuals. Parliament enacted the Protection of Civil Rights Act, 1955 and the Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989 to give statutory penal teeth to this mandate.",
+                  "keyPoints": [
+                    "Absolute fundamental right with no statutory exceptions or reasonable restrictions.",
+                    "Operates directly against private citizens and societal practices.",
+                    "Penalized under the Protection of Civil Rights Act and the SC/ST Prevention of Atrocities Act."
+                  ],
+                  "example": "Preventing any person from entering a public place of worship or accessing a public drinking water source based on caste is a punishable penal offense.",
+                  "relatedProvisions": [
+                    "Article 15(2) (Access to public facilities)",
+                    "Article 21 (Dignity of individual)",
+                    "Protection of Civil Rights Act, 1955"
+                  ],
+                  "importantNote": "The term 'Untouchability' is not defined in the Constitution; courts interpret it in its historical social practice context in India.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_18",
+                  "number": "Article 18",
+                  "title": "Abolition of Titles",
+                  "text": "(1) No title, not being a military or academic distinction, shall be conferred by the State.\n(2) No citizen of India shall accept any title from any foreign State.",
+                  "shortMeaning": "No title, not being a military or academic distinction, shall be conferred by the State, and no citizen shall accept any title from any foreign State.",
+                  "detailedExplanation": "Article 18 abolishes aristocratic, feudal, and hereditary titles (such as Rai Bahadur, Maharaja, Sir) to establish a truly democratic and egalitarian society. The Supreme Court in Balaji Raghavan v. UOI (1996) upheld the validity of National Awards (Bharat Ratna, Padma Vibhushan, etc.) as state decorations for merit, holding they are not titles within the meaning of Article 18 provided they are not used as prefixes or suffixes.",
+                  "keyPoints": [
+                    "Prohibits the State from creating hereditary aristocratic titles.",
+                    "Exempts military gallantry awards and academic distinctions.",
+                    "Requires citizens to obtain Presidential consent before accepting emoluments or offices from foreign states."
+                  ],
+                  "example": "An Indian citizen cannot use national awards like 'Padma Shri' as an official prefix or title before their name on commercial letterheads or passports.",
+                  "relatedProvisions": [
+                    "Article 14 (Equality of status)",
+                    "Preamble (Equality of status and opportunity)"
+                  ],
+                  "importantNote": "National awards are recognitions of national merit and public service and must not be used as hereditary or titular prefixes.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_19",
+                  "number": "Article 19",
+                  "title": "Protection of Certain Rights Regarding Freedom of Speech, etc.",
+                  "text": "(1) All citizens shall have the right—\n(a) to freedom of speech and expression;\n(b) to assemble peaceably and without arms;\n(c) to form associations or unions;\n(d) to move freely throughout the territory of India;\n(e) to reside and settle in any part of the territory of India; and\n(g) to practise any profession, or to carry on any occupation, trade or business.",
+                  "shortMeaning": "Guarantees six basic democratic freedoms: speech and expression, peaceful assembly without arms, forming associations/unions, free movement throughout India, residing and settling anywhere in India, and practicing any profession/trade.",
+                  "detailedExplanation": "Article 19(1) guarantees the six core democratic freedoms fundamental to a free society. These rights are not absolute and are subject to reasonable restrictions under clauses (2) to (6). For speech and expression, restrictions can be imposed for sovereignty and integrity of India, security of the State, friendly relations with foreign States, public order, decency or morality, or in relation to contempt of court, defamation or incitement to an offence.",
+                  "keyPoints": [
+                    "Exclusively available to citizens of India.",
+                    "Includes freedom of the press, commercial speech, and the right to information.",
+                    "Subject only to reasonable restrictions specified in Article 19(2) through 19(6)."
+                  ],
+                  "example": "Journalists and citizens have the protected right to report, critique, and comment on government legislation and public policies in a peaceful manner.",
+                  "relatedProvisions": [
+                    "Article 21 (Personal liberty)",
+                    "Article 22 (Protection against arrest)",
+                    "Article 19(2) (Grounds of reasonable restriction)"
+                  ],
+                  "importantNote": "Freedom of speech under Article 19 does not protect hate speech, incitement to violence, or threats to national security.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_20",
+                  "number": "Article 20",
+                  "title": "Protection in Respect of Conviction for Offences",
+                  "text": "(1) No person shall be convicted of any offence except for violation of the law in force at the time of the commission of the act charged as an offence, nor be subjected to a penalty greater than that which might have been inflicted under the law in force at the time of the commission of the offence.\n(2) No person shall be prosecuted and punished for the same offence more than once.\n(3) No person accused of any offence shall be compelled to be a witness against himself.",
+                  "shortMeaning": "Provides three vital constitutional protections to persons accused of crimes: protection against retrospective criminal laws, protection against double jeopardy, and protection against self-incrimination.",
+                  "detailedExplanation": "Article 20 contains three clauses: (1) Ex-post facto law prohibition — no person can be convicted of an act that was not an offense at the time of its commission, nor subjected to a greater penalty than that prescribed at the time. (2) Double jeopardy — no person shall be prosecuted and punished for the same offence more than once. (3) Prohibition against self-incrimination — no person accused of any offence shall be compelled to be a witness against himself.",
+                  "keyPoints": [
+                    "Protects all persons (citizens and non-citizens alike) in criminal proceedings.",
+                    "Prohibits retroactive penal legislation increasing punishments.",
+                    "Cannot be suspended even during the proclamation of a National Emergency (Article 359)."
+                  ],
+                  "example": "If a new statute is enacted in 2024 increasing a penalty, a person who committed the act in 2022 cannot be given the higher 2024 penalty retrospectively.",
+                  "relatedProvisions": [
+                    "Article 21 (Fair trial procedure)",
+                    "Article 22 (Rights of arrested persons)",
+                    "Section 357 BNSS (Autrefois acquit and convict)"
+                  ],
+                  "importantNote": "Article 20 protection is absolute and along with Article 21 cannot be suspended during an Emergency.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_21",
+                  "number": "Article 21",
+                  "title": "Protection of Life and Personal Liberty",
+                  "text": "No person shall be deprived of his life or personal liberty except according to procedure established by law.",
+                  "shortMeaning": "No person shall be deprived of his life or personal liberty except according to procedure established by law.",
+                  "detailedExplanation": "Article 21 is the foundational pillar of the Indian constitutional matrix. The Supreme Court has expanded 'Life' beyond mere animal existence to mean a life with human dignity, and 'Procedure established by law' must be just, fair, and reasonable (Maneka Gandhi v. Union of India, 1978). Through judicial interpretation, it encompasses the Right to Privacy (K.S. Puttaswamy, 2017), Right to Clean Environment, Right to Health, Right to Free Legal Aid, Right to Speedy Trial, and Right to Shelter.",
+                  "keyPoints": [
+                    "Guaranteed to every individual regardless of citizenship.",
+                    "The procedure depriving liberty must be fair, just, and reasonable under Articles 14, 19, and 21 (Golden Triangle).",
+                    "Encompasses modern fundamental rights including privacy, digital dignity, and fair legal defense.",
+                    "Cannot be suspended even during a National Emergency under Article 359."
+                  ],
+                  "example": "An arrested person who cannot afford legal counsel is constitutionally entitled to free legal assistance provided by the State to safeguard personal liberty.",
+                  "relatedProvisions": [
+                    "Article 14 (Equality and non-arbitrariness)",
+                    "Article 19 (Personal freedoms)",
+                    "Article 21A (Right to education)",
+                    "Article 32 (Supreme Court remedies)"
+                  ],
+                  "importantNote": "Article 21 is the supreme fundamental right in Indian jurisprudence and binds all executive, legislative, and judicial state actions.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "art_22",
+                  "number": "Article 22",
+                  "title": "Protection Against Arrest and Detention in Certain Cases",
+                  "text": "(1) No person who is arrested shall be detained in custody without being informed, as soon as may be, of the grounds for such arrest nor shall he be denied the right to consult, and to be defended by, a legal practitioner of his choice.\n(2) Every person who is arrested and detained in custody shall be produced before the nearest magistrate within a period of twenty-four hours of such arrest excluding the time necessary for the journey from the place of arrest to the court of the magistrate.",
+                  "shortMeaning": "Provides fundamental procedural safeguards to arrested persons, including the right to be informed of the grounds of arrest, the right to consult and be defended by a legal practitioner, and the mandatory requirement to be produced before a Magistrate within 24 hours.",
+                  "detailedExplanation": "Article 22(1) and (2) confer mandatory rights upon any person arrested under ordinary punitive law: (1) Right to be informed as soon as may be of grounds for arrest, (2) Right to consult and be defended by a lawyer of choice, and (3) Production before the nearest magistrate within twenty-four hours (excluding travel time). Clauses (4) to (7) regulate preventive detention, stipulating maximum detention periods and review by Advisory Boards.",
+                  "keyPoints": [
+                    "Mandatory presentation before a judicial magistrate within 24 hours of arrest.",
+                    "Right to legal representation begins from the moment of custody (D.K. Basu guidelines).",
+                    "Restricts arbitrary custody and detention without judicial oversight."
+                  ],
+                  "example": "Police arresting an individual on suspicion must communicate the grounds of arrest in writing and produce the individual before a Magistrate within 24 hours.",
+                  "relatedProvisions": [
+                    "Article 21 (Personal liberty)",
+                    "Section 47 BNSS (Information of grounds)",
+                    "Section 58 BNSS (24-hour presentation)"
+                  ],
+                  "importantNote": "The 24-hour safeguard does not apply to enemy aliens or persons detained under statutory preventive detention laws.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat_criminal_law_current",
+      "name": "Current Criminal Law Framework (BNS / BNSS / BSA)",
+      "description": "The modern criminal law corpus of India enacted in 2023 and enforced from 1 July 2024, superseding IPC, CrPC, and the Indian Evidence Act.",
+      "icon": "Gavel",
+      "hierarchyType": "CENTRAL_ACT",
+      "laws": [
+        {
+          "id": "act_bns_2023",
+          "type": "CENTRAL_ACT",
+          "actNumber": "Act No. 45 of 2023",
+          "name": "Bharatiya Nyaya Sanhita, 2023 (BNS)",
+          "shortTitle": "Bharatiya Nyaya Sanhita, 2023",
+          "longTitle": "An Act to consolidate and amend the provisions relating to offences and for matters connected therewith or incidental thereto.",
+          "description": "The substantive penal code of India governing criminal liability and penalties, replacing the Indian Penal Code (IPC, 1860) with effect from 1 July 2024.",
+          "year": 2023,
+          "enactmentDate": "25-12-2023",
+          "enforcementDate": "01-07-2024",
+          "ministry": "Ministry of Home Affairs",
+          "department": "Internal Security Division",
+          "category": "Criminal Law",
+          "status": "IN_FORCE",
+          "source": "India Code (indiacode.nic.in/handle/123456789/20062)",
+          "chapters": [
+            {
+              "id": "chap_bns_1",
+              "number": "Chapter I",
+              "title": "Preliminary",
+              "description": "Short title, commencement, application, and territorial operation of the Sanhita.",
+              "sections": [
+                {
+                  "id": "sec_bns_1",
+                  "number": "Section 1 (BNS)",
+                  "title": "Short Title, Commencement and Application",
+                  "text": "(1) This Act may be called the Bharatiya Nyaya Sanhita, 2023.\n(2) It shall come into force on such date as the Central Government may, by notification in the Official Gazette, appoint.\n(3) Every person shall be liable to punishment under this Sanhita and not otherwise for every act or omission contrary to the provisions thereof, of which he shall be guilty within India.\n(4) The provisions of this Sanhita shall also apply to any offence committed by any citizen of India beyond India or targeting computer resources in India.",
+                  "shortMeaning": "Defines the official title, territorial jurisdiction, and extraterritorial application of the Bharatiya Nyaya Sanhita.",
+                  "detailedExplanation": "Section 1 establishes that the Bharatiya Nyaya Sanhita is the primary substantive penal statute throughout India from July 1, 2024. It applies intra-territorially to all acts committed within India, and extra-territorially to Indian citizens abroad, vessels/aircraft registered in India, and cyber offenses targeting computer resources located within Indian territory.",
+                  "keyPoints": [
+                    "Primary substantive penal code replacing IPC (1860).",
+                    "Enforced nationwide on 1 July 2024.",
+                    "Explicitly covers cross-border cyber offenses targeting Indian computer infrastructure."
+                  ],
+                  "example": "An offense originating from an offshore computer targeting a banking server in New Delhi is cognizable and punishable under Section 1(5)(c) of BNS.",
+                  "relatedProvisions": [
+                    "Section 2 BNS (Definitions)",
+                    "Section 1 BNSS (Commencement of procedural code)"
+                  ],
+                  "importantNote": "Offenses committed prior to 1 July 2024 continue to be prosecuted under the erstwhile IPC provisions under the General Clauses Act.",
+                  "status": "IN_FORCE"
+                },
+                {
+                  "id": "sec_bns_4",
+                  "number": "Section 4 (BNS)",
+                  "title": "Punishments under Bharatiya Nyaya Sanhita",
+                  "text": "The punishments to which offenders are liable under the provisions of this Sanhita are—\n(a) Death;\n(b) Imprisonment for life;\n(c) Imprisonment of either description (rigorous or simple);\n(d) Forfeiture of property;\n(e) Fine;\n(f) Community service.",
+                  "shortMeaning": "Lists the six statutory categories of punishments under BNS, introducing 'Community Service' as an innovative reformative measure for petty offenses.",
+                  "detailedExplanation": "Section 4 modernizes sentencing jurisprudence by formally introducing 'Community service' alongside traditional custodial penalties, fines, and property forfeiture. Community service is prescribed as an alternative penalty for non-violent, petty offenses (e.g. minor theft, defamation, public intoxication) to promote restorative justice.",
+                  "keyPoints": [
+                    "Introduces Community Service as a formal statutory punishment.",
+                    "Maintains rigorous and simple imprisonment and life imprisonment.",
+                    "Aims at de-congesting prisons and encouraging offender rehabilitation."
+                  ],
+                  "example": "A first-time offender committing petty theft of property valued under Rs. 5,000 may be sentenced to perform mandatory public community service upon restitution.",
+                  "relatedProvisions": [
+                    "Section 303(2) BNS (Petty theft community service)",
+                    "Section 355 BNS (Defamation community service)"
+                  ],
+                  "importantNote": "Community service is assigned by judicial magistrates under supervised administrative guidelines.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            },
+            {
+              "id": "chap_bns_3",
+              "number": "Chapter III",
+              "title": "General Exceptions",
+              "description": "Statutory circumstances under which an act that would otherwise constitute an offence is exempt from criminal liability.",
+              "sections": [
+                {
+                  "id": "sec_bns_34",
+                  "number": "Section 34 (BNS)",
+                  "title": "Act Done in Exercise of Right of Private Defence",
+                  "text": "Nothing is an offence which is done in the exercise of the right of private defence.",
+                  "shortMeaning": "Codifies the inherent statutory right of every person to defend their own body and property, and that of others, against unlawful aggression.",
+                  "detailedExplanation": "Section 34 of BNS codifies the natural right of self-preservation. Every person has the right to defend their own body and property, as well as the body and property of any other person, against unlawful aggression. The force used must be defensive, immediate, and reasonably proportional to the threat faced.",
+                  "keyPoints": [
+                    "The right is protective and preventive, never punitive or for taking revenge.",
+                    "Force used must not be more than necessary for the purpose of defence.",
+                    "Cannot be exercised against lawful acts of public servants acting in good faith."
+                  ],
+                  "example": "A shopkeeper using reasonable physical force to stop and restrain an armed intruder from causing bodily injury is protected under private defence.",
+                  "relatedProvisions": [
+                    "Section 35 BNS (Right of private defence of body)",
+                    "Section 38 BNS (When right of defence extends to causing death)"
+                  ],
+                  "importantNote": "Private defence is unavailable where there is reasonable opportunity to seek assistance from public authorities.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            },
+            {
+              "id": "chap_bns_6",
+              "number": "Chapter VI",
+              "title": "Offences Affecting the Human Body",
+              "description": "Statutory definitions and punishments for offenses affecting life, hurt, grievous hurt, kidnapping, and sexual offenses.",
+              "sections": [
+                {
+                  "id": "sec_bns_103",
+                  "number": "Section 103 (BNS)",
+                  "title": "Punishment for Murder",
+                  "text": "(1) Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine.\n(2) When a group of five or more persons acting in concert commits murder on the ground of race, caste or community, sex, place of birth, language, personal belief or any other similar ground, each member of such group shall be punished with death or with imprisonment for life, and shall also be liable to fine.",
+                  "shortMeaning": "Prescribes statutory punishments for murder, with a specific sub-clause (2) penalizing mob lynching and group hate crimes.",
+                  "detailedExplanation": "Section 103 defines penalties for culpable homicide amounting to murder. Sub-section (2) introduces a landmark statutory provision specifically punishing mob lynching and group murders committed on grounds of race, caste, sex, community, or personal beliefs with capital punishment or life imprisonment.",
+                  "keyPoints": [
+                    "Punishable with death penalty or life imprisonment along with fine.",
+                    "Section 103(2) explicitly addresses and penalizes mob lynching.",
+                    "Replaces Section 302 of the erstwhile Indian Penal Code."
+                  ],
+                  "example": "A group of five persons attacking an individual based on community prejudice resulting in death are liable to be prosecuted under Section 103(2) BNS.",
+                  "relatedProvisions": [
+                    "Section 100 BNS (Culpable homicide)",
+                    "Section 101 BNS (Murder definition)"
+                  ],
+                  "importantNote": "Section 103(2) is a non-bailable, cognizable offense triable by the Court of Session.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "act_bnss_2023",
+          "type": "CENTRAL_ACT",
+          "actNumber": "Act No. 46 of 2023",
+          "name": "Bharatiya Nagarik Suraksha Sanhita, 2023 (BNSS)",
+          "shortTitle": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+          "longTitle": "An Act to consolidate and amend the law relating to Criminal Procedure.",
+          "description": "The procedural code governing criminal investigation, arrest, electronic summons, bail, forensics, and trials, replacing CrPC (1973).",
+          "year": 2023,
+          "enactmentDate": "25-12-2023",
+          "enforcementDate": "01-07-2024",
+          "ministry": "Ministry of Home Affairs",
+          "department": "Judicial Division",
+          "category": "Criminal Procedure",
+          "status": "IN_FORCE",
+          "source": "India Code (indiacode.nic.in/handle/123456789/20063)",
+          "chapters": [
+            {
+              "id": "chap_bnss_preliminary",
+              "number": "Chapter I",
+              "title": "Preliminary & Digital Mandates",
+              "description": "Definitions, constitution of criminal courts, and electronic governance in criminal procedure.",
+              "sections": [
+                {
+                  "id": "sec_bnss_173",
+                  "number": "Section 173 (BNSS)",
+                  "title": "Information in Cognizable Cases (Zero FIR & e-FIR)",
+                  "text": "(1) Every information relating to the commission of a cognizable offence, if given orally to an officer in charge of a police station, shall be reduced to writing.\nProvided that information may be given electronically (e-FIR), and the same shall be taken on record upon being signed within three days.\nProvided further that information regarding cognizable offences may be registered irrespective of the territorial jurisdiction (Zero FIR).",
+                  "shortMeaning": "Statutory recognition of Zero FIR (registration irrespective of territorial jurisdiction) and Electronic FIR (e-FIR).",
+                  "detailedExplanation": "Section 173 of BNSS provides legislative backing for Zero FIR, obligating police stations to register complaints of cognizable offenses regardless of where the crime occurred, and transfer it to the jurisdictional station. It also permits electronic submission of FIRs with mandatory verification within three days.",
+                  "keyPoints": [
+                    "Statutory guarantee of Zero FIR across all police stations in India.",
+                    "Permits digital submission of e-FIRs.",
+                    "Mandates free copy of FIR to be provided to the informant immediately."
+                  ],
+                  "example": "A victim of a robbery occurring in an interstate train can register a Zero FIR at the nearest railway police station without being turned away for jurisdictional reasons.",
+                  "relatedProvisions": [
+                    "Section 174 BNSS (Investigation of cognizable cases)",
+                    "Section 176 BNSS (Procedure for investigation)"
+                  ],
+                  "importantNote": "Refusal by a police officer to register information under Section 173 is punishable under Section 199 BNS.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "act_bsa_2023",
+          "type": "CENTRAL_ACT",
+          "actNumber": "Act No. 47 of 2023",
+          "name": "Bharatiya Sakshya Adhiniyam, 2023 (BSA)",
+          "shortTitle": "Bharatiya Sakshya Adhiniyam, 2023",
+          "longTitle": "An Act to consolidate and to provide for general rules and principles of evidence for fair trial.",
+          "description": "Statutory law of evidence governing electronic records, digital signatures, admissibility, and burden of proof, replacing the Indian Evidence Act (1872).",
+          "year": 2023,
+          "enactmentDate": "25-12-2023",
+          "enforcementDate": "01-07-2024",
+          "ministry": "Ministry of Law and Justice",
+          "department": "Legislative Department",
+          "category": "Evidence",
+          "status": "IN_FORCE",
+          "source": "India Code (indiacode.nic.in/handle/123456789/20064)",
+          "chapters": [
+            {
+              "id": "chap_bsa_electronic_evidence",
+              "number": "Chapter V",
+              "title": "Electronic and Digital Evidence",
+              "description": "Statutory framework governing admissibility of electronic records, server logs, mobile communications, and cloud storage.",
+              "sections": [
+                {
+                  "id": "sec_bsa_61",
+                  "number": "Section 61 (BSA)",
+                  "title": "Admissibility of Electronic Records",
+                  "text": "Nothing in this Adhiniyam shall apply to deny the admissibility of an electronic or digital record in evidence on the ground that it is an electronic or digital record and such record shall have the same legal effect, validity and enforceability as other document.",
+                  "shortMeaning": "Establishes that electronic and digital records possess equal legal validity and evidentiary weight as physical paper documents.",
+                  "detailedExplanation": "Section 61 of the Bharatiya Sakshya Adhiniyam gives full statutory parity to electronic records (emails, server databases, instant messaging logs, GPS metadata, cloud documents) with traditional documentary evidence.",
+                  "keyPoints": [
+                    "Equal legal validity for digital records and physical documents.",
+                    "Covers computer memory, mobile devices, optical media, and cloud platforms.",
+                    "Streamlines certification under Section 63 BSA."
+                  ],
+                  "example": "Digitally signed invoices and bank transaction logs are directly admissible as primary electronic documentary evidence in court proceedings.",
+                  "relatedProvisions": [
+                    "Section 63 BSA (Certificate for electronic records)",
+                    "Section 65B Indian Evidence Act (Erstwhile provision)"
+                  ],
+                  "importantNote": "Electronic evidence must be accompanied by appropriate hash values or digital integrity certificates.",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat_civil_commercial",
+      "name": "Civil, Corporate & Commercial Laws",
+      "description": "Primary Central Acts regulating corporate governance, commercial contracts, civil litigation, dispute resolution, and insolvency.",
+      "icon": "Balance",
+      "hierarchyType": "CENTRAL_ACT",
+      "laws": [
+        {
+          "id": "act_contract_1872",
+          "type": "CENTRAL_ACT",
+          "actNumber": "Act No. 9 of 1872",
+          "name": "Indian Contract Act, 1872",
+          "shortTitle": "Indian Contract Act, 1872",
+          "longTitle": "An Act to define and amend certain parts of the law relating to contracts.",
+          "description": "Core statute governing formation, performance, breach, indemnity, guarantee, and agency in commercial contracts.",
+          "year": 1872,
+          "enactmentDate": "25-04-1872",
+          "enforcementDate": "01-09-1872",
+          "ministry": "Ministry of Law and Justice",
+          "department": "Legislative Department",
+          "category": "Contract Law",
+          "status": "IN_FORCE",
+          "source": "India Code (indiacode.nic.in)",
+          "chapters": [
+            {
+              "id": "chap_contract_formation",
+              "number": "Chapter II",
+              "title": "Of Contracts, Voidable Contracts and Void Agreements",
+              "description": "Essential ingredients of valid contracts, lawful consideration, free consent, and void agreements.",
+              "sections": [
+                {
+                  "id": "sec_contract_10",
+                  "number": "Section 10",
+                  "title": "What Agreements are Contracts",
+                  "text": "All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not hereby expressly declared to be void.",
+                  "shortMeaning": "Defines the essential legal criteria for an agreement to be enforceable as a binding contract in law.",
+                  "detailedExplanation": "Section 10 establishes the foundational requirements of Indian contract law: (1) Free consent of parties (not caused by coercion, undue influence, fraud, or misrepresentation), (2) Competence (age of majority and sound mind), (3) Lawful consideration, and (4) Lawful object.",
+                  "keyPoints": [
+                    "All contracts are agreements, but only agreements fulfilling Section 10 are contracts.",
+                    "Requires free consent without coercion or fraud.",
+                    "Consideration and object must not be unlawful or opposed to public policy."
+                  ],
+                  "example": "A written agreement between two adults of sound mind to purchase a registered vehicle for agreed consideration is an enforceable contract.",
+                  "relatedProvisions": [
+                    "Section 11 (Competency to contract)",
+                    "Section 14 (Free consent)",
+                    "Section 23 (Lawful consideration)"
+                  ],
+                  "importantNote": "Agreements lacking lawful consideration or entered into by minors are void ab initio (Mohori Bibee v. Dharmodas Ghose).",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "act_companies_2013",
+          "type": "CENTRAL_ACT",
+          "actNumber": "Act No. 18 of 2013",
+          "name": "Companies Act, 2013",
+          "shortTitle": "Companies Act, 2013",
+          "longTitle": "An Act to consolidate and amend the law relating to companies.",
+          "description": "Primary statute governing incorporation, corporate governance, directors' duties, CSR, and audit compliance of companies.",
+          "year": 2013,
+          "enactmentDate": "29-08-2013",
+          "enforcementDate": "12-09-2013",
+          "ministry": "Ministry of Corporate Affairs",
+          "department": "Department of Corporate Affairs",
+          "category": "Corporate Law",
+          "status": "IN_FORCE",
+          "source": "India Code (indiacode.nic.in)",
+          "chapters": [
+            {
+              "id": "chap_companies_csr",
+              "number": "Chapter IX",
+              "title": "Corporate Social Responsibility & Governance",
+              "description": "Statutory mandates for corporate accounts, audits, and social responsibility obligations.",
+              "sections": [
+                {
+                  "id": "sec_companies_135",
+                  "number": "Section 135",
+                  "title": "Corporate Social Responsibility (CSR)",
+                  "text": "Every company having net worth of rupees five hundred crore or more, or turnover of rupees one thousand crore or more or a net profit of rupees five crore or more during the immediately preceding financial year shall constitute a Corporate Social Responsibility Committee of the Board consisting of three or more directors, out of which at least one director shall be an independent director.",
+                  "shortMeaning": "Mandates qualifying corporate entities to allocate at least 2% of average net profits towards statutory CSR activities.",
+                  "detailedExplanation": "Section 135 makes India the first country to legally mandate CSR expenditure for qualifying companies meeting net worth, turnover, or net profit thresholds. Covered companies must spend at least 2% of the average net profits of the preceding three financial years on Schedule VII welfare activities.",
+                  "keyPoints": [
+                    "Applies to companies meeting threshold criteria (Net profit >= 5 Cr, Turnover >= 1000 Cr, Net worth >= 500 Cr).",
+                    "Mandatory 2% average net profit spending on Schedule VII public welfare areas.",
+                    "Requires formation of a Board CSR Committee with independent directors."
+                  ],
+                  "example": "A manufacturing company with Rs. 20 crore annual net profit must formulate a CSR policy and spend at least 2% on healthcare, education, or environmental sustainability.",
+                  "relatedProvisions": [
+                    "Schedule VII Companies Act (Permissible CSR activities)",
+                    "Companies (CSR Policy) Rules, 2014"
+                  ],
+                  "importantNote": "Unspent CSR amounts must be transferred to specified national funds or special unspent CSR accounts under Section 135(6).",
+                  "status": "IN_FORCE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat_historical_repealed",
+      "name": "Historical & Repealed Legislation",
+      "description": "Historical statutes, repealed codes, and former legislative frameworks preserved for historical reference and pre-transition legal proceedings.",
+      "icon": "History",
+      "hierarchyType": "REPEALED_ACT",
+      "laws": [
+        {
+          "id": "act_ipc_1860_repealed",
+          "type": "REPEALED_ACT",
+          "actNumber": "Act No. 45 of 1860",
+          "name": "Indian Penal Code, 1860 (Historical / Repealed)",
+          "shortTitle": "Indian Penal Code, 1860",
+          "longTitle": "An Act to provide a general Penal Code for India (Repealed and superseded by Bharatiya Nyaya Sanhita, 2023 from 1 July 2024).",
+          "description": "Former substantive criminal code of India drafted by Lord Macaulay. Officially repealed and replaced by BNS 2023 for offenses committed on or after 1 July 2024.",
+          "year": 1860,
+          "enactmentDate": "06-10-1860",
+          "enforcementDate": "01-01-1862",
+          "ministry": "Ministry of Home Affairs",
+          "department": "Historical Archives",
+          "category": "Historical Criminal Law",
+          "status": "REPEALED",
+          "source": "India Code (Repealed Acts Archive)",
+          "chapters": [
+            {
+              "id": "chap_ipc_historical_note",
+              "number": "Archive Note",
+              "title": "Repeal and Statutory Transition Status",
+              "description": "Legal status and applicability of IPC provisions.",
+              "sections": [
+                {
+                  "id": "sec_ipc_repeal_notice",
+                  "number": "Statutory Repeal Notice",
+                  "title": "Repeal by Section 358 of Bharatiya Nyaya Sanhita, 2023",
+                  "text": "The Indian Penal Code (45 of 1860) is hereby repealed with effect from 1 July 2024.\nProvided that the repeal shall not affect the previous operation of the Code or anything duly done or suffered thereunder, or any penalty or punishment incurred in respect of any offence committed against the Code before 1 July 2024.",
+                  "shortMeaning": "The Indian Penal Code, 1860 is REPEALED. It applies only to offenses committed before 1 July 2024.",
+                  "detailedExplanation": "By virtue of Section 358 of the Bharatiya Nyaya Sanhita, 2023, the Indian Penal Code (IPC, 1860) stands formally repealed with effect from 1 July 2024. For any incident occurring on or after 1 July 2024, FIRs and chargesheets must cite the corresponding provisions of BNS 2023.",
+                  "keyPoints": [
+                    "Status: REPEALED with effect from 1 July 2024.",
+                    "Applies only to pending trials and offenses committed prior to the transition date.",
+                    "Superseded by Bharatiya Nyaya Sanhita (BNS, 2023)."
+                  ],
+                  "example": "A crime committed on 15 June 2024 will be tried under the provisions of IPC 1860; a crime committed on 15 July 2024 will be tried under BNS 2023.",
+                  "relatedProvisions": [
+                    "Section 358 BNS (Repeal and savings clause)",
+                    "Section 6 General Clauses Act, 1897"
+                  ],
+                  "importantNote": "Do not cite IPC provisions for any current or future legal offenses occurring after 1 July 2024.",
+                  "status": "REPEALED"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

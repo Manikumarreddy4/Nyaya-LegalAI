@@ -1,0 +1,117 @@
+[
+  {
+    "category": "Women Rights",
+    "description": "Legal protections and provisions ensuring the safety, dignity, and equality of women in India, covering domestic violence, harassment, and property rights.",
+    "related_articles": ["Article 14", "Article 15", "Article 16", "Article 23", "Article 39(a)", "Article 42"],
+    "related_sections": ["IPC 354", "IPC 376", "IPC 498A", "IPC 509", "BNS 74", "BNS 64"],
+    "important_acts": [
+      "The Protection of Women from Domestic Violence Act, 2005",
+      "The Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013",
+      "The Dowry Prohibition Act, 1961"
+    ]
+  },
+  {
+    "category": "Environmental Law",
+    "description": "Statutes and constitutional mandates aimed at protecting the natural environment and promoting sustainable development.",
+    "related_articles": ["Article 21", "Article 48A", "Article 51A(g)"],
+    "related_sections": ["IPC 268", "IPC 277", "IPC 278", "IPC 290", "BNS 270", "BNS 280"],
+    "important_acts": [
+      "The Environment (Protection) Act, 1986",
+      "The Water (Prevention and Control of Pollution) Act, 1974",
+      "The Air (Prevention and Control of Pollution) Act, 1981",
+      "The Wildlife Protection Act, 1972"
+    ]
+  },
+  {
+    "category": "Cyber Law",
+    "description": "Laws governing the use of computers, the internet, and digital communication, addressing cybercrimes and data protection.",
+    "related_articles": ["Article 19(1)(a)", "Article 21"],
+    "related_sections": ["IPC 420", "IPC 465", "IPC 468", "IPC 471", "BNS 318", "BNS 336"],
+    "important_acts": [
+      "Information Technology Act, 2000",
+      "Digital Personal Data Protection Act, 2023"
+    ]
+  },
+  {
+    "category": "Consumer Rights",
+    "description": "Legal safeguards provided to consumers against unfair trade practices, defective goods, and deficient services.",
+    "related_articles": ["Article 14", "Article 21", "Article 38", "Article 39"],
+    "related_sections": ["IPC 272", "IPC 273", "IPC 415", "IPC 420", "BNS 274", "BNS 318"],
+    "important_acts": [
+      "Consumer Protection Act, 2019",
+      "Bureau of Indian Standards Act, 2016",
+      "Food Safety and Standards Act, 2006"
+    ]
+  },
+  {
+    "category": "Child Rights",
+    "description": "Legal provisions focused on the welfare, protection, and education of children, preventing exploitation and abuse.",
+    "related_articles": ["Article 21A", "Article 23", "Article 24", "Article 39(e)", "Article 45"],
+    "related_sections": ["IPC 361", "IPC 363", "IPC 366A", "IPC 372", "BNS 137", "BNS 98"],
+    "important_acts": [
+      "Protection of Children from Sexual Offences (POCSO) Act, 2012",
+      "The Juvenile Justice (Care and Protection of Children) Act, 2015",
+      "Child Labour (Prohibition and Regulation) Act, 1986"
+    ]
+  },
+  {
+    "category": "Human Rights",
+    "description": "Inherent rights available to all human beings, protected by the Constitution and statutory bodies in India.",
+    "related_articles": ["Article 14", "Article 19", "Article 21", "Article 22", "Article 32"],
+    "related_sections": ["IPC 302", "IPC 307", "IPC 339", "IPC 340", "BNS 103", "BNS 109", "BNS 126"],
+    "important_acts": [
+      "Protection of Human Rights Act, 1993"
+    ]
+  },
+  {
+    "category": "Labour Law",
+    "description": "Legislation regulating the relationship between employers, employees, and trade unions, ensuring fair wages and working conditions.",
+    "related_articles": ["Article 14", "Article 19(1)(c)", "Article 23", "Article 24", "Article 41", "Article 43A"],
+    "related_sections": ["IPC 120B", "IPC 374", "BNS 61", "BNS 146"],
+    "important_acts": [
+      "The Code on Wages, 2019",
+      "The Industrial Relations Code, 2020",
+      "Factories Act, 1948",
+      "Employees' Provident Funds and Miscellaneous Provisions Act, 1952"
+    ]
+  },
+  {
+    "category": "Property Law",
+    "description": "Rules governing the transfer, ownership, and protection of movable and immovable property in India.",
+    "related_articles": ["Article 300A"],
+    "related_sections": ["IPC 378", "IPC 383", "IPC 405", "IPC 425", "IPC 441", "BNS 303", "BNS 308", "BNS 316", "BNS 324", "BNS 329"],
+    "important_acts": [
+      "Transfer of Property Act, 1882",
+      "The Registration Act, 1908",
+      "The Real Estate (Regulation and Development) Act, 2016 (RERA)"
+    ]
+  },
+  {
+    "category": "Criminal Law",
+    "description": "The body of law that defines offenses against the state and prescribes punishments for various crimes.",
+    "related_articles": ["Article 20", "Article 21", "Article 22"],
+    "related_sections": ["IPC 1", "IPC 300", "IPC 378", "IPC 405", "IPC 420", "BNS 1", "BNS 101", "BNS 303", "BNS 316", "BNS 318"],
+    "important_acts": [
+      "Indian Penal Code, 1860",
+      "Bharatiya Nyaya Sanhita, 2023",
+      "Code of Criminal Procedure, 1973",
+      "Bharatiya Nagarik Suraksha Sanhita, 2023",
+      "Indian Evidence Act, 1872",
+      "Bharatiya Sakshya Adhiniyam, 2023"
+    ]
+  },
+  {
+    "category": "Fundamental Rights",
+    "description": "The basic human rights of all citizens of India, enshrined in Part III of the Constitution, which are enforceable by the courts.",
+    "related_articles": [
+      "Article 14", "Article 15", "Article 16", "Article 17", "Article 18",
+      "Article 19", "Article 20", "Article 21", "Article 21A", "Article 22",
+      "Article 23", "Article 24", "Article 25", "Article 26", "Article 27",
+      "Article 28", "Article 29", "Article 30", "Article 32"
+    ],
+    "related_sections": [],
+    "important_acts": [
+      "The Constitution of India"
+    ]
+  }
+]

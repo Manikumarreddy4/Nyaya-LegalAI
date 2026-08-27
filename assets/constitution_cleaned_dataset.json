@@ -1,0 +1,1850 @@
+[
+  {
+    "id": "ARTICLE_1",
+    "type": "CONSTITUTION",
+    "number": "1",
+    "title": "Name and territory of the Union",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes that India, also known as Bharat, is a Union of States. It defines the territory of India as comprising the territories of the States, the Union territories, and any other territories that may be acquired.",
+    "example": "When a new state like Telangana is formed, its territory becomes a part of the Union under this article.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "India",
+      "Bharat",
+      "Union",
+      "State",
+      "Territory",
+      "First Schedule"
+    ]
+  },
+  {
+    "id": "ARTICLE_2",
+    "type": "CONSTITUTION",
+    "number": "2",
+    "title": "Admission or establishment of new States",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Empowers Parliament to admit new states into the Union of India or establish new states on terms and conditions it deems fit.",
+    "example": "The admission of Pondicherry (Puducherry) into the Union of India as a territory.",
+    "exceptions": "Does not apply to internal reorganization of existing states (which is covered under Article 3).",
+    "punishment": "No punishment",
+    "keywords": [
+      "New States",
+      "Admission",
+      "Establishment",
+      "Parliament",
+      "Union"
+    ]
+  },
+  {
+    "id": "ARTICLE_3",
+    "type": "CONSTITUTION",
+    "number": "3",
+    "title": "Formation of new States and alteration of areas, boundaries or names of existing States",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Allows Parliament to form a new state by separation, union, or alteration of the territory, area, boundaries, or names of existing states, provided the President refers the proposal to the concerned state legislature for its views.",
+    "example": "The reorganization of Andhra Pradesh to form the state of Telangana in 2014.",
+    "exceptions": "The views of the state legislature are advisory and not binding on Parliament.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Reorganization",
+      "Boundaries",
+      "State Name",
+      "Alteration",
+      "Telangana",
+      "Parliament"
+    ]
+  },
+  {
+    "id": "ARTICLE_4",
+    "type": "CONSTITUTION",
+    "number": "4",
+    "title": "Laws made under articles 2 and 3 to provide for the amendment of the First and the Fourth Schedules and supplemental, incidental and consequential matters",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates that any reorganization or admission laws made under Articles 2 and 3 must include provisions to amend the First Schedule (list of states) and Fourth Schedule (allocation of Rajya Sabha seats) without requiring a constitutional amendment under Article 368.",
+    "example": "When Jharkhand was created, the First and Fourth Schedules were automatically updated via the reorganization act.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Schedules",
+      "First Schedule",
+      "Fourth Schedule",
+      "Amendment",
+      "Article 368"
+    ]
+  },
+  {
+    "id": "ARTICLE_5",
+    "type": "CONSTITUTION",
+    "number": "5",
+    "title": "Citizenship at the commencement of the Constitution",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants citizenship at the launch of the Constitution to any person domiciled in India who was born in India, had a parent born in India, or had been ordinarily resident in India for at least five years preceding the commencement.",
+    "example": "A person living in Delhi since 1944 became an Indian citizen automatically on January 26, 1950.",
+    "exceptions": "Requires a clear intention of permanent residence (domicile) in India.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Citizenship",
+      "Commencement",
+      "Domicile",
+      "Birth",
+      "Resident",
+      "Constitution"
+    ]
+  },
+  {
+    "id": "ARTICLE_6",
+    "type": "CONSTITUTION",
+    "number": "6",
+    "title": "Rights of citizenship of certain persons who have migrated to India from Pakistan",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Provides citizenship rights to persons who migrated from Pakistan to India prior to the start of the Constitution, establishing a permit and cutoff date system of July 19, 1948.",
+    "example": "Refugees who crossed the Pakistan-India border in September 1947 and lived in India became citizens under this provision.",
+    "exceptions": "Migrants arriving after July 19, 1948, had to register and reside in India for at least six months prior to applying.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Migration",
+      "Pakistan",
+      "Refugee",
+      "Cutoff Date",
+      "Registration"
+    ]
+  },
+  {
+    "id": "ARTICLE_7",
+    "type": "CONSTITUTION",
+    "number": "7",
+    "title": "Rights of citizenship of certain migrants to Pakistan",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Overrules Articles 5 and 6, stating that persons who migrated from India to Pakistan after March 1, 1947, lose their Indian citizenship unless they returned under a valid resettlement permit.",
+    "example": "A person who moved to Lahore in April 1947 but returned to India under a permanent resettlement permit in 1949 remains an Indian citizen.",
+    "exceptions": "Does not apply if the person returned with a lawful resettlement or permanent return permit.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Pakistan Migration",
+      "Loss of Citizenship",
+      "Resettlement Permit",
+      "Returnee"
+    ]
+  },
+  {
+    "id": "ARTICLE_8",
+    "type": "CONSTITUTION",
+    "number": "8",
+    "title": "Rights of citizenship of certain persons of Indian origin residing outside India",
+    "act_name": "Constitution of India",
+    "applicability": "Outside India",
+    "explanation": "Secures citizenship for persons of Indian origin residing outside India (such as diplomats or ex-pats), provided they register with the diplomatic/consular representative of India in that country.",
+    "example": "An Indian origin merchant living in London who registers at the Indian High Commission in London.",
+    "exceptions": "Limited to those who, or whose parents/grandparents, were born in undivided India.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Persons of Indian Origin",
+      "PIO",
+      "Embassy Registration",
+      "Diplomatic",
+      "Expatriate"
+    ]
+  },
+  {
+    "id": "ARTICLE_9",
+    "type": "CONSTITUTION",
+    "number": "9",
+    "title": "Persons voluntarily acquiring citizenship of a foreign State not to be citizens",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Strictly prohibits dual citizenship; any Indian citizen who voluntarily acquires foreign state citizenship automatically loses their Indian citizenship.",
+    "example": "An Indian citizen obtaining United States citizenship in 2020 automatically forfeits their Indian passport and citizenship.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Single Citizenship",
+      "Dual Citizenship Prohibited",
+      "Loss of Citizenship",
+      "Foreign State"
+    ]
+  },
+  {
+    "id": "ARTICLE_10",
+    "type": "CONSTITUTION",
+    "number": "10",
+    "title": "Continuance of the rights of citizenship",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Guarantees that every person deemed to be a citizen of India under this Part continues to be a citizen, subject to any law made by Parliament.",
+    "example": "Indian citizens have a persistent status that cannot be arbitrarily stripped except by standard parliamentary legislation.",
+    "exceptions": "Subject to the provisions of any law made by Parliament.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Citizenship Rights",
+      "Parliamentary Regulation",
+      "Continuance"
+    ]
+  },
+  {
+    "id": "ARTICLE_11",
+    "type": "CONSTITUTION",
+    "number": "11",
+    "title": "Parliament to regulate the right of citizenship by law",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants plenary power to Parliament to legislate on the acquisition and termination of citizenship, and all other related matters.",
+    "example": "The enactment of the Citizenship Act, 1955, and its subsequent amendments like the CAA.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Citizenship Act",
+      "Plenary Power",
+      "Parliament",
+      "Legislation"
+    ]
+  },
+  {
+    "id": "ARTICLE_12",
+    "type": "CONSTITUTION",
+    "number": "12",
+    "title": "Definition of State",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Defines 'the State' for Part III (Fundamental Rights) to include the Government and Parliament of India, state governments and legislatures, and all local or other authorities.",
+    "example": "Municipal corporations, LIC, ONGC, and nationalized banks are considered 'the State' under this definition.",
+    "exceptions": "Judiciary has been held to not fall under the definition of 'State' when performing judicial functions.",
+    "punishment": "No punishment",
+    "keywords": [
+      "State",
+      "Fundamental Rights",
+      "Local Authorities",
+      "Definition"
+    ]
+  },
+  {
+    "id": "ARTICLE_13",
+    "type": "CONSTITUTION",
+    "number": "13",
+    "title": "Laws inconsistent with or in derogation of the fundamental rights",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Provides for judicial review by declaring that any pre-existing or post-constitutional laws that violate or abridge fundamental rights shall be null and void to the extent of their inconsistency.",
+    "example": "A law passed by a state state banning free speech without reasonable grounds would be declared void under this article.",
+    "exceptions": "Constitutional amendments under Article 368 are excluded as per Article 13(4), subject to the Basic Structure Doctrine.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Judicial Review",
+      "Void Laws",
+      "Inconsistent Laws",
+      "Basic Structure"
+    ]
+  },
+  {
+    "id": "ARTICLE_14",
+    "type": "CONSTITUTION",
+    "number": "14",
+    "title": "Equality before law",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Guarantees that the State shall not deny to any person equality before the law or the equal protection of the laws within the territory of India, prohibiting arbitrary class legislation.",
+    "example": "Rich and poor people are tried in the same criminal justice system for committing the same offense.",
+    "exceptions": "Reasonable classification is allowed if based on an intelligible differentia with a rational nexus to the objective.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Equality",
+      "Equal Protection",
+      "Intelligible Differentia",
+      "Arbitrary Law"
+    ]
+  },
+  {
+    "id": "ARTICLE_15",
+    "type": "CONSTITUTION",
+    "number": "15",
+    "title": "Prohibition of discrimination on grounds of religion, race, caste, sex or place of birth",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Prohibits the State and citizens from discriminating against any citizen on grounds of religion, race, caste, sex, or place of birth regarding access to public places, wells, and hotels.",
+    "example": "A public restaurant cannot deny entry to a person based on their caste or gender.",
+    "exceptions": "The State can make special provisions for women, children, socially/educationally backward classes, SCs, STs, and economically weaker sections (EWS).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Anti-Discrimination",
+      "Public Places",
+      "Gender Equality",
+      "Caste Barrier",
+      "Affirmative Action"
+    ]
+  },
+  {
+    "id": "ARTICLE_16",
+    "type": "CONSTITUTION",
+    "number": "16",
+    "title": "Equality of opportunity in matters of public employment",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Ensures equal opportunity for all citizens in employment or appointment to offices under the State, prohibiting discrimination.",
+    "example": "In a civil services exam, candidates are evaluated based on merit and cannot be excluded merely because of their state of origin.",
+    "exceptions": "Allows reservations for backward classes, Scheduled Castes, Scheduled Tribes, and Economically Weaker Sections.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Public Employment",
+      "Equal Opportunity",
+      "Reservations",
+      "SC ST Reservation"
+    ]
+  },
+  {
+    "id": "ARTICLE_17",
+    "type": "CONSTITUTION",
+    "number": "17",
+    "title": "Abolition of Untouchability",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Abolishes the practice of 'Untouchability' in any form and declares the enforcement of any disability arising from it to be an offense punishable by law.",
+    "example": "Preventing a person from entering a temple or drawing water from a public well based on untouchability is forbidden and highly illegal.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment directly in Constitution, but enforced via the Protection of Civil Rights Act and SC/ST Act, which contain punishments.",
+    "keywords": [
+      "Untouchability",
+      "Abolition",
+      "SC ST Protection",
+      "Equality",
+      "Offense"
+    ]
+  },
+  {
+    "id": "ARTICLE_18",
+    "type": "CONSTITUTION",
+    "number": "18",
+    "title": "Abolition of titles",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Prohibits the State from conferring any title (except military or academic distinctions) and prevents Indian citizens from accepting titles from foreign states.",
+    "example": "An Indian citizen cannot use royal titles like 'Sir', 'Maharaja', or 'Rai Bahadur' given by a government.",
+    "exceptions": "Does not apply to academic or military honors like 'Doctor', 'Colonel', or national awards like Bharat Ratna (which are not titles to be used as prefixes/suffixes).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Titles",
+      "Abolition",
+      "Equal Status",
+      "National Awards"
+    ]
+  },
+  {
+    "id": "ARTICLE_19",
+    "type": "CONSTITUTION",
+    "number": "19",
+    "title": "Protection of certain rights regarding freedom of speech, etc.",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Guarantees six essential freedoms to all citizens: speech and expression, peaceful assembly, forming associations/unions, free movement, residence, and practicing any profession/trade.",
+    "example": "Protesting peacefully without arms or starting a business venture/startup anywhere in India.",
+    "exceptions": "Subject to reasonable restrictions imposed by the State under clauses (2) to (6) for sovereignty, security, public order, and morality.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Freedom of Speech",
+      "Peaceful Assembly",
+      "Association",
+      "Movement",
+      "Profession",
+      "Reasonable Restrictions"
+    ]
+  },
+  {
+    "id": "ARTICLE_20",
+    "type": "CONSTITUTION",
+    "number": "20",
+    "title": "Protection in respect of conviction for offences",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Provides three critical protections to accused persons: protection against ex-post facto laws (no retroactive criminal laws), double jeopardy (cannot be punished twice for the same offense), and self-incrimination (cannot be forced to witness against oneself).",
+    "example": "Police cannot use a confession extracted under physical torture as the sole basis of conviction in a court trial.",
+    "exceptions": "Does not apply to civil liabilities or preventive detention.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Double Jeopardy",
+      "Self-Incrimination",
+      "Ex-Post Facto",
+      "Accused Rights",
+      "Fair Trial"
+    ]
+  },
+  {
+    "id": "ARTICLE_21",
+    "type": "CONSTITUTION",
+    "number": "21",
+    "title": "Protection of life and personal liberty",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Declares that no person shall be deprived of their life or personal liberty except according to procedure established by law. This has been expanded to include rights to privacy, clean air, livelihood, and medical care.",
+    "example": "A person cannot face capital punishment or state detention without a comprehensive and fair judicial process.",
+    "exceptions": "Subject to a valid, just, fair, and reasonable procedure established by any positive law enacted by the state.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Personal Liberty",
+      "Right to Life",
+      "Privacy",
+      "Due Process",
+      "Human Rights"
+    ]
+  },
+  {
+    "id": "ARTICLE_21A",
+    "type": "CONSTITUTION",
+    "number": "21A",
+    "title": "Right to education",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates the State to provide free and compulsory education to all children of the age of six to fourteen years in a manner determined by state law.",
+    "example": "The execution of the Right to Education (RTE) Act of 2009, enabling children from poor backgrounds to attend primary schools.",
+    "exceptions": "Limited to children between ages 6 and 14.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Right to Education",
+      "RTE",
+      "Free Education",
+      "Children Rights",
+      "Schooling"
+    ]
+  },
+  {
+    "id": "ARTICLE_22",
+    "type": "CONSTITUTION",
+    "number": "22",
+    "title": "Protection against arrest and detention in certain cases",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Provides procedural safeguards for arrested persons, including the right to know grounds of arrest, consult a lawyer of choice, and be produced before a magistrate within 24 hours.",
+    "example": "When a suspect is arrested, police must present them to the nearest local magistrate court within one full day of custody.",
+    "exceptions": "Does not apply to enemy aliens or those detained under preventive detention laws (which can authorize detention without trial for up to 3 months).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Custody",
+      "Arrest Safeguards",
+      "Magistrate",
+      "Detention",
+      "Preventive Detention"
+    ]
+  },
+  {
+    "id": "ARTICLE_23",
+    "type": "CONSTITUTION",
+    "number": "23",
+    "title": "Prohibition of traffic in human beings and forced labour",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Strictly prohibits human trafficking, 'begar' (forced labor without payment), and other similar forms of compelled labor, making violations punishable offences.",
+    "example": "Bonded laborers forced to work in brick kilns to repay ancestral debts are liberated under this constitutional mandate.",
+    "exceptions": "The State can impose compulsory service for public purposes (like military conscription or social work) without any religious or class discrimination.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Forced Labour",
+      "Human Trafficking",
+      "Begar",
+      "Bonded Labour",
+      "Human Dignity"
+    ]
+  },
+  {
+    "id": "ARTICLE_24",
+    "type": "CONSTITUTION",
+    "number": "24",
+    "title": "Prohibition of employment of children in factories, etc.",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Explicitly bans children under the age of fourteen years from being employed to work in any factory, mine, or other hazardous industries.",
+    "example": "Employing a twelve-year-old child to work inside a firecracker factory is a severe violation.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Child Labour",
+      "Hazardous Work",
+      "Factories Act",
+      "Protection of Children"
+    ]
+  },
+  {
+    "id": "ARTICLE_25",
+    "type": "CONSTITUTION",
+    "number": "25",
+    "title": "Freedom of conscience and free profession, practice and propagation of religion",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Guarantees to all persons freedom of conscience and the right to freely profess, practice, and propagate their chosen religion, subject to public order, morality, and health.",
+    "example": "A person organizing a religious discourse or wearing a religious symbol (such as sikhs carrying a kirpan) is fully protected.",
+    "exceptions": "The state can regulate commercial, financial, or political activities associated with religion, and promote social welfare/reforms (like opening public Hindu temples to all Hindu classes).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Freedom of Religion",
+      "Propagate",
+      "Conscience",
+      "Practice",
+      "Sikh Kirpan"
+    ]
+  },
+  {
+    "id": "ARTICLE_26",
+    "type": "CONSTITUTION",
+    "number": "26",
+    "title": "Freedom to manage religious affairs",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants religious denominations or sections the right to establish and maintain institutions for religious/charitable purposes, manage their own religious affairs, and own/administer property in accordance with law.",
+    "example": "A religious trust running temple assets, managing festivals, and maintaining dharamshalas legally.",
+    "exceptions": "Subject to public order, morality, and public health.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Religious Sect",
+      "Charitable Trusts",
+      "Religious Institutions",
+      "Administer Property"
+    ]
+  },
+  {
+    "id": "ARTICLE_27",
+    "type": "CONSTITUTION",
+    "number": "27",
+    "title": "Freedom as to payment of taxes for promotion of any particular religion",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Prohibits the State from compelling any person to pay taxes if the proceeds are specifically used to promote or maintain any particular religion or religious denomination.",
+    "example": "Government tax funds cannot be exclusively allocated to build a shrine or mosque of one specific sect.",
+    "exceptions": "The State may charge fee for services (such as security fees from pilgrims) as long as it has no exclusive religious preference.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Religious Taxes",
+      "Secular State",
+      "Pilgrimage Fee",
+      "Funding Religion"
+    ]
+  },
+  {
+    "id": "ARTICLE_28",
+    "type": "CONSTITUTION",
+    "number": "28",
+    "title": "Freedom as to attendance at religious instruction or religious worship in certain educational institutions",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Bans religious instructions in educational institutions wholly maintained out of State funds. It allows religious instructions in institutions administered by State but established under a trust, while making attendance optional for state-recognized/aided schools.",
+    "example": "A government-run primary school cannot mandate catechism or religious prayers of a single faith for its students.",
+    "exceptions": "Does not apply to institutions established under an endowment or trust requiring religious instructions, even if administered by the State.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Educational Institutions",
+      "Religious Instruction",
+      "State Aided",
+      "Optional Attendance",
+      "Schools"
+    ]
+  },
+  {
+    "id": "ARTICLE_29",
+    "type": "CONSTITUTION",
+    "number": "29",
+    "title": "Protection of interests of minorities",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Protects the cultural and language rights of minorities, stating any section of Indian citizens having a distinct language, script, or culture has the right to conserve it, and bars state-aided institutions from denying entry based on religion, race, or caste.",
+    "example": "Groups seeking to preserve traditional dialects like Santhali or tribal scripts are constitutionally protected.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Cultural Rights",
+      "Minority Protection",
+      "Admission",
+      "Distinct Script",
+      "Conservation"
+    ]
+  },
+  {
+    "id": "ARTICLE_30",
+    "type": "CONSTITUTION",
+    "number": "30",
+    "title": "Right of minorities to establish and administer educational institutions",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants all religious and linguistic minorities the fundamental right to establish and administer educational institutions of their choice, protecting them from state discrimination in granting monetary aid.",
+    "example": "Christian, Sikh, or Muslim minority trusts running collegiate institutions with reserved seat systems for their communities.",
+    "exceptions": "The state can regulate standard curriculum, sanitation, or teacher qualifications to maintain academic excellence.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Minority Schools",
+      "Linguistic Minorities",
+      "Institutional Aid",
+      "Self-Administration"
+    ]
+  },
+  {
+    "id": "ARTICLE_31A",
+    "type": "CONSTITUTION",
+    "number": "31A",
+    "title": "Saving of laws providing for acquisition of estates, etc.",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Saves state acquisition laws (like agrarian land land reform laws) from being declared void under Article 14 or 19 to simplify economic reforms.",
+    "example": "State land acquisition acts taking over agricultural estates to redistribute them to landless peasants.",
+    "exceptions": "State laws require the assent of the President of India to enjoy this constitutional immunity.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Land Acquisition",
+      "Estate Rights",
+      "Agrarian Reforms",
+      "President Assent"
+    ]
+  },
+  {
+    "id": "ARTICLE_31B",
+    "type": "CONSTITUTION",
+    "number": "31B",
+    "title": "Validation of certain Acts and Regulations",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Protects laws placed in the Ninth Schedule of the Constitution from being declared void for violating fundamental rights, subject to judicial review of the basic structure.",
+    "example": "Placing certain agrarian land tenure laws under the Ninth Schedule to prevent judicial challenges.",
+    "exceptions": "Under the landmark I.R. Coelho case, any law added to Ninth Schedule after April 24, 1973, is open to challenge if it violates the basic structure.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Ninth Schedule",
+      "Validation of Acts",
+      "Immunity",
+      "I.R. Coelho Case",
+      "Judicial Verification"
+    ]
+  },
+  {
+    "id": "ARTICLE_31C",
+    "type": "CONSTITUTION",
+    "number": "31C",
+    "title": "Saving of laws giving effect to certain directive principles",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Protects laws giving effect to certain Directive Principles (Articles 39(b) and (c)) from being declared null and void on the grounds of violating Articles 14 or 19.",
+    "example": "Nationalizing key natural mineral wealth to share resources equitably among citizens.",
+    "exceptions": "State assembly laws require presidential assent to be deemed immune.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Directive Principles",
+      "Socialist Law",
+      "Natural Wealth",
+      "Presidential Assent"
+    ]
+  },
+  {
+    "id": "ARTICLE_32",
+    "type": "CONSTITUTION",
+    "number": "32",
+    "title": "Remedies for enforcement of rights conferred by this Part",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants the right to move the Supreme Court directly for the enforcement of fundamental rights. It also empowers the Supreme Court to issue highly functional writs like Habeas Corpus, Mandamus, Prohibition, Quo Warranto, and Certiorari.",
+    "example": "Filing a public interest litigation (PIL) or writ petition when an individual is unlawfully detained by police.",
+    "exceptions": "Can only be suspended during a formally declared national emergency as per the provisions of Article 359.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Writs",
+      "Habeas Corpus",
+      "Supreme Court",
+      "Enforcement",
+      "Heart of Constitution"
+    ]
+  },
+  {
+    "id": "ARTICLE_33",
+    "type": "CONSTITUTION",
+    "number": "33",
+    "title": "Power of Parliament to modify the rights conferred by this Part in their application to Forces, etc.",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Authorizes Parliament to limit or abrogate the fundamental rights of members of the Armed Forces, paramilitary forces, police, and intelligence agencies to ensure discipline and proper discharge of duty.",
+    "example": "Limiting soldiers of the Indian Army from forming political unions or addressing media without permission.",
+    "exceptions": "Only Parliament has the authority to make such laws, not state state legislatures.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Armed Forces",
+      "Abrogating Rights",
+      "discipline",
+      "Army",
+      "Paramilitary",
+      "Parliament Law"
+    ]
+  },
+  {
+    "id": "ARTICLE_34",
+    "type": "CONSTITUTION",
+    "number": "34",
+    "title": "Restriction on rights conferred by this Part while martial law is in force in any area",
+    "act_name": "Constitution of India",
+    "applicability": "Affected martial law areas",
+    "explanation": "Enables Parliament to restrict fundamental rights in any area where martial law (military rule) is actively in force and indemnify any state officer for actions taken to restore order.",
+    "example": "Indemnifying soldiers acting to maintain peace in an active territory placed under coordinate military control.",
+    "exceptions": "Only applies in local areas under active martial rule.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Martial Law",
+      "Indemnity",
+      "Military Control",
+      "Restoring Order"
+    ]
+  },
+  {
+    "id": "ARTICLE_35",
+    "type": "CONSTITUTION",
+    "number": "35",
+    "title": "Legislation to give effect to the provisions of this Part",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Confers exclusive legislative power to Parliament, to the exclusion of state legislatures, to make laws implementing fundamental rights and prescribing punishments for violations.",
+    "example": "Only Parliament could enact the SC/ST (Prevention of Atrocities) Act or laws defining residence requirements.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "parliamentary supremacy",
+      "Implementation Laws",
+      "Fundamental Right Enforcement"
+    ]
+  },
+  {
+    "id": "ARTICLE_36",
+    "type": "CONSTITUTION",
+    "number": "36",
+    "title": "Definition of State in Part IV",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Provides that the term 'the State' under Part IV (Directive Principles of State Policy) has the exact same definition as found in Part III (Article 12).",
+    "example": "Local municipal councils are also bound to follow Directive Principles when crafting local developmental schemes.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "State Definition",
+      "Directive Principles",
+      "Social Policy"
+    ]
+  },
+  {
+    "id": "ARTICLE_37",
+    "type": "CONSTITUTION",
+    "number": "37",
+    "title": "Application of the principles contained in this Part",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Declares that the Directive Principles of State Policy are not enforceable by any court, but they are fundamental in the governance of the nation and must guide policymaking.",
+    "example": "A citizen cannot sue the government in court because a village does not have a local employment scheme, as it is non-justiciable.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Non-Justiciable",
+      "Governance Guide",
+      "State Policy",
+      "Directive Principles"
+    ]
+  },
+  {
+    "id": "ARTICLE_38",
+    "type": "CONSTITUTION",
+    "number": "38",
+    "title": "State to secure a social order for the promotion of welfare of the people",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to promote the welfare of people by securing a social order characterized by social, economic, and political justice, and specifically striving to minimize inequalities in income and opportunities.",
+    "example": "The introduction of schemes like affordable housing, subsidies, and free healthcare to reduce economic inequality.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Social Justice",
+      "Minimize Inequality",
+      "Public Welfare",
+      "Social Order"
+    ]
+  },
+  {
+    "id": "ARTICLE_39",
+    "type": "CONSTITUTION",
+    "number": "39",
+    "title": "Certain principles of policy to be followed by the State",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Instructs the State to optimize its policies to secure adequate means of livelihood, equitable distribution of resources, equal pay for equal work for both men and women, and protection of child health.",
+    "example": "Crafting maternity leave benefits and legislative acts securing equal wage distribution for casual laborers.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Equal Pay",
+      "Livelihood",
+      "Resource Allocation",
+      "Welfare Policy"
+    ]
+  },
+  {
+    "id": "ARTICLE_39A",
+    "type": "CONSTITUTION",
+    "number": "39A",
+    "title": "Equal justice and free legal aid",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires the State to ensure that the legal system promotes justice on a basis of equal opportunity and to provide free legal aid by schemes or legislation to backward or disabled citizens.",
+    "example": "The creation of Legal Services Authorities (like NALSA) to provide free legal consultations to vulnerable accused individuals.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Free Legal Aid",
+      "Equal Justice",
+      "NALSA",
+      "Legal Empowerment"
+    ]
+  },
+  {
+    "id": "ARTICLE_40",
+    "type": "CONSTITUTION",
+    "number": "40",
+    "title": "Organisation of village Panchayats",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to organize village panchayat structures and endow them with necessary power and authority to act as decentralized units of self-government.",
+    "example": "This led historically to the 73rd Constitutional Amendment Act legalizing rural local bodies across India.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Village Panchayats",
+      "Local Governance",
+      "Decentralization",
+      "Gram Panchayat"
+    ]
+  },
+  {
+    "id": "ARTICLE_41",
+    "type": "CONSTITUTION",
+    "number": "41",
+    "title": "Right to work, to education and to public assistance in certain cases",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State within its economic capacity limits to make effective provisions securing the right to work, education, and public assistance in cases of unemployment, old age, and sickness.",
+    "example": "The launch of the MGNREGA scheme securing 100 days of guaranteed work for rural households.",
+    "exceptions": "Directly bounded by the financial and economic capacity limits of the state.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Right to Work",
+      "MGNREGA",
+      "Old Age Pension",
+      "Unemployment Pension"
+    ]
+  },
+  {
+    "id": "ARTICLE_42",
+    "type": "CONSTITUTION",
+    "number": "42",
+    "title": "Provision for just and humane conditions of work and maternity relief",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to secure just and humane work environments for employees and provide comprehensive maternity relief schemes.",
+    "example": "The enactment of the Maternity Benefit Act of 1961 providing dynamic paid leave for working women.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Maternity Leave",
+      "Workplace Safety",
+      "Humane Conditions",
+      "Labor Laws"
+    ]
+  },
+  {
+    "id": "ARTICLE_43",
+    "type": "CONSTITUTION",
+    "number": "43",
+    "title": "Living wage, etc., for workers",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Strives to provide a living wage, standard work environments, leisure opportunities, and promotion of cottage industries on individual or cooperative bases in rural areas.",
+    "example": "Establishing cottage industry boards like Khadi and Village Industries Commission.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Living Wage",
+      "Cottage Industries",
+      "Cooperative base",
+      "Labor Welfare"
+    ]
+  },
+  {
+    "id": "ARTICLE_43A",
+    "type": "CONSTITUTION",
+    "number": "43A",
+    "title": "Participation of workers in management of industries",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to take steps by suitable legislation to secure the participation of workers in the management of industrial undertakings and organizations.",
+    "example": "Creating works committees or employee board seats in nationalized manufacturing public undertakings.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Industrial Democracy",
+      "Workers Board",
+      "Management Participation",
+      "Labor Relations"
+    ]
+  },
+  {
+    "id": "ARTICLE_43B",
+    "type": "CONSTITUTION",
+    "number": "43B",
+    "title": "Promotion of co-operative societies",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Urges the State to encourage voluntary formation, autonomous operations, democratic controls, and professional management of co-operative societies.",
+    "example": "Supporting the formation and growth of Amul dairy cooperative structures.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Cooperative Societies",
+      "Democratic Control",
+      "Amul",
+      "Local Enterprises"
+    ]
+  },
+  {
+    "id": "ARTICLE_44",
+    "type": "CONSTITUTION",
+    "number": "44",
+    "title": "Uniform civil code for the citizens",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to endeavour to secure for all citizens a Uniform Civil Code (UCC) regarding personal laws like marriage, divorce, and succession throughout India.",
+    "example": "Goa has a Uniform Civil Code, which is historically derived, and discussions continue regarding national implementation.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Uniform Civil Code",
+      "Personal Laws",
+      "Marriage Laws",
+      "UCC",
+      "Secularism"
+    ]
+  },
+  {
+    "id": "ARTICLE_45",
+    "type": "CONSTITUTION",
+    "number": "45",
+    "title": "Provision for early childhood care and education to children below the age of six years",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Instructs the State to prioritize extending early childhood care and education to all children until they complete six years of age.",
+    "example": "The functioning of Anganwadi centers under the Integrated Child Development Services (ICDS) scheme.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Early Childhood Care",
+      "ICDS",
+      "Anganwadi",
+      "Preschool Education"
+    ]
+  },
+  {
+    "id": "ARTICLE_46",
+    "type": "CONSTITUTION",
+    "number": "46",
+    "title": "Promotion of educational and economic interests of Scheduled Castes, Scheduled Tribes and other weaker sections",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to promote with special care the educational and economic prospects of the weaker sections of people, particularly SCs and STs, protecting them from exploitation.",
+    "example": "Extending special education scholarships or coaching grants to SC and ST students.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Scheduled Castes",
+      "Scheduled Tribes",
+      "Economic Interests",
+      "Scholarships",
+      "Social Harmony"
+    ]
+  },
+  {
+    "id": "ARTICLE_47",
+    "type": "CONSTITUTION",
+    "number": "47",
+    "title": "Duty of the State to raise the level of nutrition and the standard of living and to improve public health",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to elevate the level of nutrition and standard of living of its people, treat public health as a primary duty, and bring about prohibition of injurious drinks and drugs.",
+    "example": "Banning dangerous narcotics or state governments choosing to implement total liquor bans (like in Bihar or Gujarat).",
+    "exceptions": "Excludes medical uses of intoxicating substances.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Public Health",
+      "Nutrition",
+      "Liquor Prohibition",
+      "Drug Ban"
+    ]
+  },
+  {
+    "id": "ARTICLE_48",
+    "type": "CONSTITUTION",
+    "number": "48",
+    "title": "Organisation of agriculture and animal husbandry",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to organize agriculture and animal husbandry on modern, scientific lines, improve breeds, and take steps to prohibit the slaughter of cows, calves, and draught cattle.",
+    "example": "Drafting cattle preservation laws across various states banning the slaughter of cows and calves.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Agriculture",
+      "Animal Husbandry",
+      "Cattle Protection",
+      "Cow Slaughter Ban",
+      "Scientific Farming"
+    ]
+  },
+  {
+    "id": "ARTICLE_48A",
+    "type": "CONSTITUTION",
+    "number": "48A",
+    "title": "Protection and improvement of environment and safeguarding of forests and wild life",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to endeavour to protect and improve the natural environment and safeguard the forest ecosystems and wildlife of the nation.",
+    "example": "The direct enactment of the Wildlife Protection Act, 1972, and establishing Reserved National Forests.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Forest Safeguard",
+      "Wildlife Protection",
+      "Environment Conservation",
+      "Pollution Control"
+    ]
+  },
+  {
+    "id": "ARTICLE_49",
+    "type": "CONSTITUTION",
+    "number": "49",
+    "title": "Protection of monuments and places and objects of national importance",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Places a strict constitutional obligation on the State to protect artistic or historic monuments declared of national importance from spoliation, destruction, export, or disfigurement.",
+    "example": "The Archaelogical Survey of India (ASI) managing and restoring the Taj Mahal or Red Fort.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Historical Landmarks",
+      "ASI",
+      "National Monuments",
+      "Taj Mahal",
+      "Heritage Conservation"
+    ]
+  },
+  {
+    "id": "ARTICLE_50",
+    "type": "CONSTITUTION",
+    "number": "50",
+    "title": "Separation of judiciary from executive",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs the State to take active steps to separate the judicial branch from the executive offices in the public services to ensure judicial independence.",
+    "example": "District magistrates do not conduct judicial trials; this is handled solely by judicial magistrates belonging to independent legal cadres.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Separation of Powers",
+      "Judiciary Independence",
+      "Executive Branch",
+      "Judicial Officer"
+    ]
+  },
+  {
+    "id": "ARTICLE_51",
+    "type": "CONSTITUTION",
+    "number": "51",
+    "title": "Promotion of international peace and security",
+    "act_name": "Constitution of India",
+    "applicability": "External Affairs",
+    "explanation": "Directs the State to promote international peace and security, maintain honourable relations between nations, foster respect for international laws, and encourage settling international disputes by arbitration.",
+    "example": "India participating in United Nations peace missions or solving bilateral boundary disputes peacefully via arbitration tribunals.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Foreign Policy",
+      "UN Peacekeeping",
+      "International Law",
+      "Arbitration",
+      "Peace"
+    ]
+  },
+  {
+    "id": "ARTICLE_51A",
+    "type": "CONSTITUTION",
+    "number": "51A",
+    "title": "Fundamental duties",
+    "act_name": "Constitution of India",
+    "applicability": "All Citizens of India",
+    "explanation": "Provides a comprehensive list of eleven fundamental duties of every Indian citizen, including respecting the Constitution, defending the nation, preserving environmental systems, and providing educational opportunities to wards aged 6-14.",
+    "example": "Standing up in respect during the national anthem or keeping public monuments free from litter.",
+    "exceptions": "Fundamental duties are legally non-enforceable unless codified via standard criminal or civil acts.",
+    "punishment": "No punishment directly, but several statutes like prevention of insults to national honor act carry punishments.",
+    "keywords": [
+      "Fundamental Duties",
+      "National Flag",
+      "National Anthem",
+      "Scientific Temper",
+      "Citizen Obligation"
+    ]
+  },
+  {
+    "id": "ARTICLE_52",
+    "type": "CONSTITUTION",
+    "number": "52",
+    "title": "The President of India",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes the executive office of the President, declaring, 'There shall be a President of India'.",
+    "example": "The President acts as the nominal titular head of state, executing official deeds.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "President",
+      "Titular Head",
+      "Executive Officer"
+    ]
+  },
+  {
+    "id": "ARTICLE_53",
+    "type": "CONSTITUTION",
+    "number": "53",
+    "title": "Executive power of the Union",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Vests the supreme executive power of the Union in the President, to be exercised directly or through subordinate officers. It also vests the supreme command of defense forces in the President.",
+    "example": "All official executive orders of the central government are formally executed in the President's name.",
+    "exceptions": "The supreme command of defense forces must be regulated by law.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Executive Power",
+      "Defense Forces",
+      "nominal Authority",
+      "Subordinate Officers"
+    ]
+  },
+  {
+    "id": "ARTICLE_54",
+    "type": "CONSTITUTION",
+    "number": "54",
+    "title": "Election of President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates that the President of India shall be elected by an electoral college consisting of the elected members of both Houses of Parliament and the Legislative Assemblies of the States.",
+    "example": "A nominated Rajya Sabha member cannot vote in the election of the President, only elected members are eligible.",
+    "exceptions": "Nominated members are excluded from the electoral college.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Electoral College",
+      "Representative",
+      "Presidential Election",
+      "State Assembly",
+      "Rajya Sabha"
+    ]
+  },
+  {
+    "id": "ARTICLE_55",
+    "type": "CONSTITUTION",
+    "number": "55",
+    "title": "Manner of election of President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Lays down the formula for the presidential election, following the system of proportional representation with a single transferable vote via secret ballot to ensure uniformity.",
+    "example": "Applying value calculations for votes cast by MLAs and MPs during the official tally.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Proportional Representation",
+      "Single Transferable Vote",
+      "MLAs and MPs Vote Value",
+      "Secret Ballot"
+    ]
+  },
+  {
+    "id": "ARTICLE_56",
+    "type": "CONSTITUTION",
+    "number": "56",
+    "title": "Term of office of President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes a 5-year tenure for the President from the date they enter office. Lays down standard resignation processes and impeachment references under Article 61.",
+    "example": "A President may submit a hand-written resignation to the Vice-President of India.",
+    "exceptions": "The President continues to hold office, even after expiration, until their successor takes charge.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Resignation",
+      "Tenure",
+      "Five Years",
+      "Successor",
+      "Vice-President"
+    ]
+  },
+  {
+    "id": "ARTICLE_57",
+    "type": "CONSTITUTION",
+    "number": "57",
+    "title": "Eligibility for re-election",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Declares that a person who holds or has held the office of the President is eligible for re-election to that office, with no ceiling on terms.",
+    "example": "Dr. Rajendra Prasad was re-elected as President, fully permitted by this article.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Re-election",
+      "Eligibility",
+      "Presidential Terms"
+    ]
+  },
+  {
+    "id": "ARTICLE_58",
+    "type": "CONSTITUTION",
+    "number": "58",
+    "title": "Qualifications for election as President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires any presidential candidate to be an Indian citizen, aged at least thirty-five years, qualified for election as a member of the House of the People, and not hold any office of profit.",
+    "example": "A 32-year old citizen cannot stand for presidential elections as they do not meet the age requirement.",
+    "exceptions": "Serving ministers or state governors are not deemed to hold an office of profit under this section.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Age Limit",
+      "Citizenship",
+      "Office of Profit",
+      "Lok Sabha Qualifications"
+    ]
+  },
+  {
+    "id": "ARTICLE_59",
+    "type": "CONSTITUTION",
+    "number": "59",
+    "title": "Conditions of President's office",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "States the President cannot be a member of either House of Parliament or a State Legislature. If elected, they vacate their legislative seat. They are entitled to rent-free official residences, and their emoluments cannot be diminished during their term.",
+    "example": "The President's salary and usage of Rashtrapati Bhavan cannot be abridged or cut mid-tenure.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Rashtrapati Bhavan",
+      "Emoluments Protection",
+      "Conditions of Office",
+      "Parliament member"
+    ]
+  },
+  {
+    "id": "ARTICLE_60",
+    "type": "CONSTITUTION",
+    "number": "60",
+    "title": "Oath or affirmation by the President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires the President to make and subscribe an oath or affirmation before the Chief Justice of India, promising to preserve, protect, and defend the Constitution.",
+    "example": "The formal oath-taking ceremony on Rashtrapati Bhavan lawns in the presence of the CJI.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Presidential Oath",
+      "CJI",
+      "Preserve",
+      "Protect",
+      "Defend"
+    ]
+  },
+  {
+    "id": "ARTICLE_61",
+    "type": "CONSTITUTION",
+    "number": "61",
+    "title": "Procedure for impeachment of the President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Delineates the rigorous procedure for removing the President by impeachment for 'violation of the Constitution', requiring resolutions initiated by a 1/4th notice and passed by a 2/3rd majority of either house.",
+    "example": "If a President actively violates constitutional commands, Parliament moves an impeachment resolution.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment directly, but results in removal from office.",
+    "keywords": [
+      "Impeachment",
+      "Violation of Constitution",
+      "Two-Thirds Majority",
+      "Removal",
+      "Parliamentary Procedure"
+    ]
+  },
+  {
+    "id": "ARTICLE_62",
+    "type": "CONSTITUTION",
+    "number": "62",
+    "title": "Time of holding election to fill vacancy in the office of President and the term of office of person elected to fill casual vacancy",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates that an election to fill a vacancy caused by the expiration of the term of President must be completed before the term expires, and casual vacancies (death, resignation) must be filled within six months.",
+    "example": "If a president resigns, a fresh election is legally mandated to be conducted within six months.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Presidential Vacancy",
+      "Casual Vacancy",
+      "Election Timeline",
+      "Six Months"
+    ]
+  },
+  {
+    "id": "ARTICLE_63",
+    "type": "CONSTITUTION",
+    "number": "63",
+    "title": "The Vice-President of India",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes the permanent office of the Vice-President, stating, 'There shall be a Vice-President of India'.",
+    "example": "The Vice-President acts as the second-highest constitutional officer.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Vice-President",
+      "Establishment",
+      "Constitutional Office"
+    ]
+  },
+  {
+    "id": "ARTICLE_64",
+    "type": "CONSTITUTION",
+    "number": "64",
+    "title": "The Vice-President to be ex officio Chairman of the Council of States",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires the Vice-President of India to perform the duties of the ex-officio Chairman of the Rajya Sabha (Council of States), prohibiting them from holding any other office of profit.",
+    "example": "The Vice-President presiding over debates and votes in the Rajya Sabha chamber.",
+    "exceptions": "When acting as President under Article 65, they do not perform Rajya Sabha chairperson duties and do not receive Rajya Sabha salaries.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Rajya Sabha",
+      "Ex-Officio Chairman",
+      "Presiding Officer",
+      "Vice-President Duties"
+    ]
+  },
+  {
+    "id": "ARTICLE_65",
+    "type": "CONSTITUTION",
+    "number": "65",
+    "title": "The Vice-President to act as President or to discharge his functions during casual vacancies in the office, or during the absence, of President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Empowers the Vice-President to fulfill the duties or act as the President in case of death, resignation, illness, or absence of the President, enjoying all presidential immunities and salaries.",
+    "example": "If the President goes abroad or falls ill, the Vice-President formally assumes acting duties.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Acting President",
+      "casual vacancy",
+      "Vice-President",
+      "Functions"
+    ]
+  },
+  {
+    "id": "ARTICLE_66",
+    "type": "CONSTITUTION",
+    "number": "66",
+    "title": "Election of Vice-President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes that the Vice-President shall be elected by members of an electoral college consisting of members of both Houses of Parliament, utilizing proportional representation.",
+    "example": "The Lok Sabha and Rajya Sabha members voting via secret secret ballot for Vice-President.",
+    "exceptions": "No state MLAs are present in this electoral college.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Vice-President Election",
+      "Proportional Representation",
+      "Electoral College",
+      "Secret Ballot"
+    ]
+  },
+  {
+    "id": "ARTICLE_67",
+    "type": "CONSTITUTION",
+    "number": "67",
+    "title": "Term of office of Vice-President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Assigns a 5-year tenure to the Vice-President. Outlines resignation paths and removal through a simple majority resolution passed in the Rajya Sabha and agreed to by the Lok Sabha.",
+    "example": "The Rajya Sabha initiates a removal resolution after providing a mandatory fourteen days' notice.",
+    "exceptions": "Continues to hold office until their successor takes charge.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Removal",
+      "Tenure",
+      "Five Years",
+      "Vice-President Term"
+    ]
+  },
+  {
+    "id": "ARTICLE_68",
+    "type": "CONSTITUTION",
+    "number": "68",
+    "title": "Time of holding election to fill vacancy in the office of Vice-President and the term of office of person elected to fill casual vacancy",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Declares that elections to fill a regular vacancy in the office of Vice-President must be completed before their tenure ends, and casual vacancies must be filled as soon as possible.",
+    "example": "Conducting elections when a Vice-President is reaching the end of their five-year term.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Vacancy",
+      "Vice-President Vacancy",
+      "Election Timing"
+    ]
+  },
+  {
+    "id": "ARTICLE_69",
+    "type": "CONSTITUTION",
+    "number": "69",
+    "title": "Oath or affirmation by the Vice-President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires every Vice-President to make an oath or affirmation before the President of India to bear true faith and allegiance to the Constitution of India.",
+    "example": "The President administering the oath of office in the Durbar Hall.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Vice-President Oath",
+      "President of India",
+      "Oath of Allegiance"
+    ]
+  },
+  {
+    "id": "ARTICLE_70",
+    "type": "CONSTITUTION",
+    "number": "70",
+    "title": "Discharge of President's functions in other contingencies",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Allows Parliament to make any statutory provisions it deems fit to discharge presidential functions in unforeseen contingencies not explicitly covered in the Constitution.",
+    "example": "Enacting the President (Discharge of Functions) Act, 1969, enabling the Chief Justice of India to act as President.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Contingency Powers",
+      "CJI as President",
+      "Parliamentary Provision"
+    ]
+  },
+  {
+    "id": "ARTICLE_71",
+    "type": "CONSTITUTION",
+    "number": "71",
+    "title": "Matters relating to, or connected with, the election of a President or Vice-President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Vests exclusive jurisdiction in the Supreme Court to inquire and decide on all doubts and disputes regarding the election of the President or Vice-President, making its rulings final.",
+    "example": "A challenge to the election process of a President is adjudicated directly by the Supreme Court.",
+    "exceptions": "Even if the election is declared void, previous actions taken by them as President remain valid.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Electoral Dispute",
+      "Supreme Court",
+      "Invalidated Election",
+      "Presidential Dispute"
+    ]
+  },
+  {
+    "id": "ARTICLE_72",
+    "type": "CONSTITUTION",
+    "number": "72",
+    "title": "Power of President to grant pardons, etc., and to suspend, remit or commute sentences in certain cases",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Confers sovereign power on the President to grant pardons, reprieves, respites, or remissions of punishment, or to suspend, remit, or commute sentences in cases of military court martial, Union subjects, or death sentences.",
+    "example": "Commuting a death sentence given in a murder trial into rigorous life imprisonment.",
+    "exceptions": "Governors retain corresponding powers under state jurisdictions (Article 161).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Pardoning Power",
+      "Death Sentence Commutation",
+      "Reprieve",
+      "Remission",
+      "Mercy Petition"
+    ]
+  },
+  {
+    "id": "ARTICLE_73",
+    "type": "CONSTITUTION",
+    "number": "73",
+    "title": "Extent of executive power of the Union",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes that the executive power of the Union extends to all matters on which Parliament is competent to pass legislation and to the exercise of rights under international treaties.",
+    "example": "The central government carrying out national highways maintenance or signing foreign commercial treaties.",
+    "exceptions": "Does not extend to matters within state concurrent state legislative powers unless explicitly provided.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Executive Reach",
+      "Union power",
+      "Treaties",
+      "Concurrent List limit"
+    ]
+  },
+  {
+    "id": "ARTICLE_74",
+    "type": "CONSTITUTION",
+    "number": "74",
+    "title": "Council of Ministers to aid and advise President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes a Council of Ministers with the Prime Minister at the head to aid and advise the President, who shall act in accordance with such advice. It protects the advice from judicial inquiry.",
+    "example": "The President must sign bills and issue declarations as advised by the Prime Minister in Cabinet meetings.",
+    "exceptions": "The President may require the Council to reconsider its advice once, but must sign upon reconsideration.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Cabinet Advice",
+      "Prime Minister",
+      "Reconsideration",
+      "Titular Executive",
+      "Council of Ministers"
+    ]
+  },
+  {
+    "id": "ARTICLE_75",
+    "type": "CONSTITUTION",
+    "number": "75",
+    "title": "Other provisions as to Ministers",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Directs that the Prime Minister is appointed by the President, other ministers are appointed on the PM's advice, the Cabinet is collectively responsible to the Lok Sabha, and restricts their total count to 15% of Lok Sabha seats.",
+    "example": "An MP loses minister status if they fail to win a seat in either house within six consecutive months.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Minister Appointments",
+      "Collective Responsibility",
+      "15 Percent Rule",
+      "Office of Profit"
+    ]
+  },
+  {
+    "id": "ARTICLE_76",
+    "type": "CONSTITUTION",
+    "number": "76",
+    "title": "Attorney-General for India",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India / Courts",
+    "explanation": "Directs the President to appoint a person qualified to be a Judge of the Supreme Court as the Attorney-General for India, acting as the chief legal advisor to the government.",
+    "example": "The Attorney-General presenting arguments in court on behalf of the central government during challenging litigation.",
+    "exceptions": "Has the right of audience in all courts of India, but cannot vote in voting proceedings of Parliament.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Attorney-General",
+      "Government Advocate",
+      "Supreme Court Judge qualification",
+      "Legal Advisor"
+    ]
+  },
+  {
+    "id": "ARTICLE_77",
+    "type": "CONSTITUTION",
+    "number": "77",
+    "title": "Conduct of business of the Government of India",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires all executive actions of the central government to be expressed in the name of the President, and authorizes rules for allocating business among ministers.",
+    "example": "Signing of an international commercial agreement by the government as 'in the name of the President'.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Allocation of Portfolios",
+      "Conduct of Business",
+      "Presidential Name",
+      "Official Orders"
+    ]
+  },
+  {
+    "id": "ARTICLE_78",
+    "type": "CONSTITUTION",
+    "number": "78",
+    "title": "Duties of Prime Minister as respects the furnishing of information to the President, etc.",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates that the Prime Minister must communicate all decisions of the Cabinet regarding Union administration and legislative proposals to the President, and submit items pin-pointed by the President.",
+    "example": "The Prime Minister regularly briefs the President on security matters and planned acts.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Briefing President",
+      "Prime Minister Duties",
+      "Cabinet Decisions",
+      "Administration Updates"
+    ]
+  },
+  {
+    "id": "ARTICLE_79",
+    "type": "CONSTITUTION",
+    "number": "79",
+    "title": "Constitution of Parliament",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Establishes Parliament for the Union, consisting of the President and two Houses to be known as the Council of States (Rajya Sabha) and the House of the People (Lok Sabha).",
+    "example": "The passing of national legislation requires the consent of Lok Sabha, Rajya Sabha, and the President.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Parliament",
+      "Lok Sabha",
+      "Rajya Sabha",
+      "Bicameral",
+      "Legislature"
+    ]
+  },
+  {
+    "id": "ARTICLE_80",
+    "type": "CONSTITUTION",
+    "number": "80",
+    "title": "Composition of the Council of States",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Defines the composition of the Rajya Sabha to consist of not more than 250 members, including 12 members nominated by the President for excellence in literature, science, art, or social service, and representatives of states.",
+    "example": "Nominating a renowned scientist or artist to a Rajya Sabha seat.",
+    "exceptions": "No voting system or representation formula for union territories except as prescribed by Parliament.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Rajya Sabha",
+      "President Nominees",
+      "Council of States",
+      "Art Literature Science",
+      "250 Members"
+    ]
+  },
+  {
+    "id": "ARTICLE_81",
+    "type": "CONSTITUTION",
+    "number": "81",
+    "title": "Composition of the House of the People",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Defines the composition of the Lok Sabha, consisting of not more than 530 members chosen by direct election from territorial constituencies in the States, and up to 20 representing Union territories.",
+    "example": "Conducting direct voting in a local constituency during national Lok Sabha elections.",
+    "exceptions": "Does not apply directly to states with population less than six million regarding seat ratios.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Lok Sabha",
+      "Direct Election",
+      "Territorial Constituencies",
+      "530 Members",
+      "House of the People"
+    ]
+  },
+  {
+    "id": "ARTICLE_82",
+    "type": "CONSTITUTION",
+    "number": "82",
+    "title": "Readjustment after each census",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Mandates the delimitation and reallocation of seats in the Lok Sabha among states and divisions after every official census report is published.",
+    "example": "Updating constituency bound lines after census numbers are completed.",
+    "exceptions": "Subject to constitutional freezes (like the freeze till 2026 based on 1971 census).",
+    "punishment": "No punishment",
+    "keywords": [
+      "Delimitation Commission",
+      "Constuency Boundary",
+      "Census Tally",
+      "Freeze till 2026"
+    ]
+  },
+  {
+    "id": "ARTICLE_83",
+    "type": "CONSTITUTION",
+    "number": "83",
+    "title": "Duration of Houses of Parliament",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Declares Rajya Sabha is a permanent body not subject to dissolution (with 1/3rd retiring every two years) and Lok Sabha has a 5-year tenure unless dissolved earlier.",
+    "example": "When a national emergency is in force, Parliament can extend the Lok Sabha's term by up to 1 year at a time.",
+    "exceptions": "Lok Sabha tenure can be extended by Parliament during a Proclamation of Emergency.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Rajya Sabha Permanent",
+      "Lok Sabha Term",
+      "Emergency Extension",
+      "Retirement ratio"
+    ]
+  },
+  {
+    "id": "ARTICLE_84",
+    "type": "CONSTITUTION",
+    "number": "84",
+    "title": "Qualification for membership of Parliament",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Prescribes candidate requirements to sit in Parliament: citizen of India, must take official oath, at least age thirty for Rajya Sabha, and at least age twenty-five for Lok Sabha.",
+    "example": "A 26-year-old citizen is constitutionally qualified to run as a candidate for the Lok Sabha.",
+    "exceptions": "Subject to other disqualifications imposed under specific statutes like Representation of the People Act.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Parliament Candidates",
+      "Age Limit",
+      "Citizenship",
+      "Oath",
+      "Lok Sabha Age",
+      "Rajya Sabha Age"
+    ]
+  },
+  {
+    "id": "ARTICLE_85",
+    "type": "CONSTITUTION",
+    "number": "85",
+    "title": "Sessions of Parliament, prorogation and dissolution",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Authorizes the President to summon either House of Parliament, provided that more than six months do not intervene between sessions. It also allows the President to prorogue or dissolve Lok Sabha.",
+    "example": "Summoning of Winter or Budget Sessions by the President.",
+    "exceptions": "Rajya Sabha cannot be dissolved.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Summon Parliament",
+      "Dissolve Lok Sabha",
+      "Prorogue session",
+      "Six Months gap"
+    ]
+  },
+  {
+    "id": "ARTICLE_86",
+    "type": "CONSTITUTION",
+    "number": "86",
+    "title": "Right of President to address and send messages to Houses",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Grants the President the authority to address either House of Parliament or send messages regarding any pending bills.",
+    "example": "The President sending a crucial message regarding an urgent national administrative matter.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "President Address",
+      "Pending Bill message",
+      "Joint session"
+    ]
+  },
+  {
+    "id": "ARTICLE_87",
+    "type": "CONSTITUTION",
+    "number": "87",
+    "title": "Special address by the President",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Requires the President to address both Houses assembled together at the commencement of the first session after each general election and at the first session of each year.",
+    "example": "The President's annual speech detailing government plans at the start of the budget session.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Annual Address",
+      "General Election Address",
+      "Joint session speech"
+    ]
+  },
+  {
+    "id": "ARTICLE_88",
+    "type": "CONSTITUTION",
+    "number": "88",
+    "title": "Rights of Ministers and Attorney-General as respects Houses",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Entitles every minister and the Attorney-General of India to speak and participate in the proceedings of either House or joint sittings, without any right to vote.",
+    "example": "The Attorney-General speaking in the Lok Sabha relative to challenging legal concepts.",
+    "exceptions": "They represent and discuss but are strictly barred from voting if they are not members of that House.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Right to Speak",
+      "No Voting Right",
+      "Attorney-General in Parliament",
+      "Ministers in Parliament"
+    ]
+  },
+  {
+    "id": "ARTICLE_89",
+    "type": "CONSTITUTION",
+    "number": "89",
+    "title": "The Chairman and Deputy Chairman of the Council of States",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Reiterates the Vice-President is ex officio Chairman of Rajya Sabha, and mandates Rajya Sabha to choose a member as Deputy Chairman.",
+    "example": "The election of a deputy chairman to manage Rajya Sabha sessions.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "Rajya Sabha",
+      "Chairman",
+      "Deputy Chairman",
+      "Presiding officers"
+    ]
+  },
+  {
+    "id": "ARTICLE_90",
+    "type": "CONSTITUTION",
+    "number": "90",
+    "title": "Vacation and resignation of, and removal from, the office of Deputy Chairman",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Outlines conditions under which the Rajya Sabha Deputy Chairman vacates office, resigns, or is removed by a simple majority resolution.",
+    "example": "Sumbiting a resignation letter addressed to the Rajya Sabha Chairman.",
+    "exceptions": "A fourteen days' notice is mandatory to move any removal resolution.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Resignation",
+      "Removal",
+      "Deputy Chairman vacancy"
+    ]
+  },
+  {
+    "id": "ARTICLE_91",
+    "type": "CONSTITUTION",
+    "number": "91",
+    "title": "Power of the Deputy Chairman or other person to perform the duties of the office of, or to act as, Chairman",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Empowers the Deputy Chairman or nominee to perform duties of the Chairman of Rajya Sabha if the Chairman's office is vacant or they are acting as President.",
+    "example": "The Deputy Chairman managing sessions when the Vice-President is sick.",
+    "exceptions": "No specific exception",
+    "punishment": "No punishment",
+    "keywords": [
+      "acting Chairman",
+      "Rajya Sabha Session",
+      "Presiding substitute"
+    ]
+  },
+  {
+    "id": "ARTICLE_92",
+    "type": "CONSTITUTION",
+    "number": "92",
+    "title": "The Chairman or the Deputy Chairman not to preside while a resolution for his removal from office is under consideration",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Bars the Chairman or Deputy Chairman of Rajya Sabha from presiding over sessions when a resolution for their removal is active.",
+    "example": "Another chosen member presides while Rajya Sabha debates removing the Deputy Chairman.",
+    "exceptions": "The Chairman has the right to speak but cannot vote at all on their removal resolution.",
+    "punishment": "No punishment",
+    "keywords": [
+      "No Presiding",
+      "Removal resolution",
+      "Conflict of Interest",
+      "Speaker Rights"
+    ]
+  },
+  {
+    "id": "ARTICLE_395",
+    "type": "CONSTITUTION",
+    "number": "395",
+    "title": "Repeals",
+    "act_name": "Constitution of India",
+    "applicability": "Whole of India",
+    "explanation": "Formally repeals the Indian Independence Act, 1947, and the Government of India Act, 1935, on the commencement of the Constitution.",
+    "example": "This marked the complete formal release of sovereign India from colonial-era constitutional frameworks.",
+    "exceptions": "Does not repeal the Abolition of Privy Council Jurisdiction Act, 1949.",
+    "punishment": "No punishment",
+    "keywords": [
+      "Repeal",
+      "Colonial Laws",
+      "Indian Independence Act",
+      "Sovereignty"
+    ]
+  }
+]

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Selenium E2E Test Report</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #4f46e5;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --border: #334155;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(to right, #818cf8, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .meta-info {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .passed { color: var(--success); }
+    .failed { color: var(--error); }
+    .skipped { color: var(--warning); }
+    
+    .sections-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .sections-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #818cf8;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
+    }
+    
+    .group-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .group-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .group-stats {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .group-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .badge-pass { background-color: rgba(99, 102, 241, 0.15); color: #818cf8; }
+    
+    /* Failure Details */
+    .fail-card {
+      background: rgba(239, 68, 68, 0.03);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .fail-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+      padding-bottom: 6px;
+    }
+    
+    .fail-id {
+      color: var(--error);
+      font-weight: bold;
+    }
+    
+    .fail-name {
+      font-weight: 600;
+      flex: 1;
+      margin-left: 10px;
+    }
+    
+    .fail-category {
+      color: var(--text-muted);
+    }
+    
+    .fail-body p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+    
+    .error-msg {
+      color: #fda4af;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      margin-top: 8px !important;
+      word-break: break-all;
+    }
+    
+    .no-failures {
+      text-align: center;
+      padding: 20px;
+      color: var(--success);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Web Selenium E2E Report</h1>
+        <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">React Web Application E2E execution summary</p>
+      </div>
+      <div class="meta-info">
+        <div>Date: 27/8/2026</div>
+        <div>Time: 9:55:05 am</div>
+        <div>Target Env: http://localhost:5173</div>
+      </div>
+    </header>
+
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--primary);">1200</div>
+        <div class="stat-lbl">Total Tests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val passed">1146</div>
+        <div class="stat-lbl">Passed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val failed">21</div>
+        <div class="stat-lbl">Failed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val skipped">33</div>
+        <div class="stat-lbl">Skipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color: #c084fc;">95.50%</div>
+        <div class="stat-lbl">Pass Percentage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#2dd4bf;">18.65s</div>
+        <div class="stat-lbl">Duration</div>
+      </div>
+    </div>
+
+    <div class="sections-container">
+      <div class="panel">
+        <h3>Group Breakdown Metrics</h3>
+        <div class="group-row">
+          <span class="group-name">Group 1 Functional</span>
+          <div class="group-stats">
+            <span>372/400 Passed</span>
+            <span class="group-badge badge-pass">93.0%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Group 2 UI & Integration</span>
+          <div class="group-stats">
+            <span>387/400 Passed</span>
+            <span class="group-badge badge-pass">96.8%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Group 3 Security & Regression</span>
+          <div class="group-stats">
+            <span>387/400 Passed</span>
+            <span class="group-badge badge-pass">96.8%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="max-height: 400px; overflow-y: auto;">
+        <h3>Execution Logs & Errors</h3>
+        
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F001</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 001</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F002</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 002</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F003</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 003</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F004</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 004</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F005</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 005</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F006</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 006</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F007</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 007</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F008</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 008</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F009</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 009</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F010</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 010</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F011</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 011</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F012</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 012</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F013</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 013</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F014</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 014</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F015</span>
+          <span class="fail-name">Verify base routing checks on application load - Case 015</span>
+          <span class="fail-category">Launch & Base Routes</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open Chrome browser.
+2. Navigate to base URL.
+3. Verify page loading status.</p>
+          <p><strong>Expected:</strong> Redirects to login page or dashboard successfully.</p>
+          <p><strong>Actual:</strong> Wait timeout after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> SeleniumException: Target element was not located in DOM within timeout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F181</span>
+          <span class="fail-name">Verify consultation input validations - Case 181</span>
+          <span class="fail-category">Form Validation</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Enter text fields with character constraints.
+2. Verify validate status.
+3. Validate form submission blocker.</p>
+          <p><strong>Expected:</strong> Blocks submission and highlights field when invalid characters or bounds are entered.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-F361</span>
+          <span class="fail-name">Verify client requests filtering - Case 361</span>
+          <span class="fail-category">Search & Filter Results</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Select filter tab.
+2. Inspect listing elements.
+3. Verify only matching records are returned.</p>
+          <p><strong>Expected:</strong> Filters and sorts requests accurately matching selected status count.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-U141</span>
+          <span class="fail-name">Verify dialog box interaction - Case 541</span>
+          <span class="fail-category">Modals & Dialogs</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Click trigger button.
+2. Verify background dimming.
+3. Close dialog via backdrop or cancel button.</p>
+          <p><strong>Expected:</strong> Modals open smoothly, trap keyboard focus, and disappear when dismissed.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-U321</span>
+          <span class="fail-name">Verify empty state templates rendering - Case 721</span>
+          <span class="fail-category">Empty & Error Layouts</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Filter lists to return no results.
+2. Verify placeholder text and icons display.
+3. Click reset filters.</p>
+          <p><strong>Expected:</strong> Displays helpful instructions instead of an empty white container.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-S101</span>
+          <span class="fail-name">Verify session hijacking protection - Case 901</span>
+          <span class="fail-category">Session Token Handling</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Open browser localStorage.
+2. Manipulate auth values.
+3. Reload dashboard route.</p>
+          <p><strong>Expected:</strong> Clears invalid credentials immediately and forces redirect to login page.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">WEB-S281</span>
+          <span class="fail-name">Verify API gateway timeout recovery - Case 1081</span>
+          <span class="fail-category">API Gateway Error Handling</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Send legal query under simulated network failure.
+2. Verify warning displays.
+3. Verify retry button function.</p>
+          <p><strong>Expected:</strong> Displays retry toast and prevents app crash when AI APIs are unreachable.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AssertionError: Expected component state to be mounted.</p>
+        </div>
+      </div>
+    
+      </div>
+    </div>
+  </div>
+</body>
+</html>

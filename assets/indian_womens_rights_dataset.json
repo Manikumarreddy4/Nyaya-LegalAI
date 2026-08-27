@@ -1,0 +1,93 @@
+{
+    "country": "India",
+    "last_updated": "2026",
+    "categories": [
+        {
+            "category_id": "CAT01",
+            "category_name": "Constitutional Rights & Fundamental Guarantees",
+            "rights": [
+                {
+                    "id": "CONST_ART14",
+                    "title": "Right to Equality",
+                    "legal_provision": "Article 14, Constitution of India",
+                    "simplified_summary": "Guarantees equality before the law and equal protection of the laws to all citizens, prohibiting discrimination on grounds of sex alone.",
+                    "key_points": [
+                        "Prohibits arbitrary discrimination by the State.",
+                        "Forms the basis for all gender-equality legislation in India."
+                    ],
+                    "official_reference_url": "https://www.indiacode.nic.in/bitstream/123456789/16124/1/the_constitution_of_india.pdf"
+                },
+                {
+                    "id": "CONST_ART15_3",
+                    "title": "Special Provisions for Women",
+                    "legal_provision": "Article 15(3), Constitution of India",
+                    "simplified_summary": "Empowers the State to make special positive discrimination provisions specifically for women and children.",
+                    "key_points": [
+                        "Enables laws like reservations in local bodies, maternity benefits, and protective laws.",
+                        "Ensures that affirmative action for women is constitutionally valid."
+                    ],
+                    "official_reference_url": "https://www.indiacode.nic.in/bitstream/123456789/16124/1/the_constitution_of_india.pdf"
+                }
+            ]
+        },
+        {
+            "category_id": "CAT02",
+            "category_name": "Protection from Violence & Abuse",
+            "rights": [
+                {
+                    "id": "ACT_DV_2005",
+                    "title": "Protection from Domestic Violence",
+                    "legal_provision": "Protection of Women from Domestic Violence Act, 2005",
+                    "simplified_summary": "Protects women in a domestic relationship (wives, sisters, mothers, live-in partners) from physical, sexual, verbal, emotional, and economic abuse.",
+                    "key_points": [
+                        "Right to reside in the shared household regardless of ownership.",
+                        "Right to obtain protection orders, monetary relief, and custody orders.",
+                        "Access to protection officers and medical help."
+                    ],
+                    "official_reference_url": "https://cdn.ncw.gov.in/wp-content/uploads/2025/01/Module-Laws-relating-to-Women_0.pdf"
+                },
+                {
+                    "id": "ACT_DOWRY_1961",
+                    "title": "Prohibition of Dowry",
+                    "legal_provision": "Dowry Prohibition Act, 1961",
+                    "simplified_summary": "Bans the giving, taking, or demanding of dowry (property or valuable security given in connection with marriage).",
+                    "key_points": [
+                        "Demanding dowry is a punishable criminal offense.",
+                        "Presents given to the bride must be registered in a designated list and belong exclusively to her (Stri-dhan)."
+                    ],
+                    "official_reference_url": "https://www.indiacode.nic.in/bitstream/123456789/15392/1/dowry_prohibition_act%2C_1961.pdf"
+                }
+            ]
+        },
+        {
+            "category_id": "CAT03",
+            "category_name": "Workplace Rights & Safety",
+            "rights": [
+                {
+                    "id": "ACT_POSH_2013",
+                    "title": "Right to a Safe Workplace (POSH)",
+                    "legal_provision": "Sexual Harassment of Women at Workplace Act, 2013",
+                    "simplified_summary": "Protects women from sexual harassment at all workplaces (both public/private and formal/informal sectors) and provides a clear mechanism for redressal.",
+                    "key_points": [
+                        "Mandatory Internal Complaints Committee (ICC) in workplaces with 10 or more employees.",
+                        "Covers physical contact, demanding sexual favors, making sexually colored remarks, or showing pornography.",
+                        "Strict timelines for completing inquiries (90 days) and maintaining confidentiality."
+                    ],
+                    "official_reference_url": "https://goashipyard.in/assets/front/public/notice-board-pdf/Handbook-on-Sexual-Harassment-of-Women-at-Workplace-MWCD.pdf"
+                },
+                {
+                    "id": "ACT_MAT_1961",
+                    "title": "Maternity Benefits and Job Security",
+                    "legal_provision": "Maternity Benefit Act, 1961 (Amended in 2017)",
+                    "simplified_summary": "Regulates the employment of women in certain establishments before and after childbirth and provides for maternity and other benefits.",
+                    "key_points": [
+                        "Entitles working women to 26 weeks of fully paid maternity leave.",
+                        "Mandatory crèche facility for establishments employing 50 or more employees.",
+                        "Illegal for an employer to dismiss or discharge a woman during her maternity leave."
+                    ],
+                    "official_reference_url": "https://www.indiacode.nic.in/bitstream/123456789/15446/1/maternity_benefit_act%2C_1961.pdf"
+                }
+            ]
+        }
+    ]
+}

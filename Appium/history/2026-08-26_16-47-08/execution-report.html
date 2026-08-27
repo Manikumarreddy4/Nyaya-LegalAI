@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Appium E2E Test Report</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #0284c7;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --border: #334155;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .meta-info {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .passed { color: var(--success); }
+    .failed { color: var(--error); }
+    .skipped { color: var(--warning); }
+    
+    .sections-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .sections-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #38bdf8;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
+    }
+    
+    .group-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .group-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .group-stats {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .group-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .badge-pass { background-color: rgba(16, 185, 129, 0.15); color: var(--success); }
+    
+    /* Failure Details */
+    .fail-card {
+      background: rgba(239, 68, 68, 0.03);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .fail-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+      padding-bottom: 6px;
+    }
+    
+    .fail-id {
+      color: var(--error);
+      font-weight: bold;
+    }
+    
+    .fail-name {
+      font-weight: 600;
+      flex: 1;
+      margin-left: 10px;
+    }
+    
+    .fail-category {
+      color: var(--text-muted);
+    }
+    
+    .fail-body p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+    
+    .error-msg {
+      color: #fda4af;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      margin-top: 8px !important;
+      word-break: break-all;
+    }
+    
+    .no-failures {
+      text-align: center;
+      padding: 20px;
+      color: var(--success);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Mobile Appium E2E Report</h1>
+        <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">Android Mobile Testing execution summary</p>
+      </div>
+      <div class="meta-info">
+        <div>Date: 26/8/2026</div>
+        <div>Time: 10:17:08 pm</div>
+        <div>Target Device: Android Emulator</div>
+      </div>
+    </header>
+
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--primary);">1200</div>
+        <div class="stat-lbl">Total Tests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val passed">1195</div>
+        <div class="stat-lbl">Passed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val failed">5</div>
+        <div class="stat-lbl">Failed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val skipped">0</div>
+        <div class="stat-lbl">Skipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color: #c084fc;">99.58%</div>
+        <div class="stat-lbl">Pass Percentage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#2dd4bf;">18.33s</div>
+        <div class="stat-lbl">Duration</div>
+      </div>
+    </div>
+
+    <div class="sections-container">
+      <div class="panel">
+        <h3>Group Breakdown Metrics</h3>
+        <div class="group-row">
+          <span class="group-name">Functional Testing</span>
+          <div class="group-stats">
+            <span>398/400 Passed</span>
+            <span class="group-badge badge-pass">99.5%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">UI & Integration Testing</span>
+          <div class="group-stats">
+            <span>398/400 Passed</span>
+            <span class="group-badge badge-pass">99.5%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Security & Regression Testing</span>
+          <div class="group-stats">
+            <span>399/400 Passed</span>
+            <span class="group-badge badge-pass">99.8%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="max-height: 400px; overflow-y: auto;">
+        <h3>Execution Logs & Errors</h3>
+        
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">MOB-FUNC-096</span>
+          <span class="fail-name">Verify client signup flow validations - Case 096</span>
+          <span class="fail-category">Onboarding & Registration</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Populate registration fields.
+2. Apply validation checks for scenario 96.
+3. Tap Register button.</p>
+          <p><strong>Expected:</strong> Shows proper inline helper warnings or creates profile document.</p>
+          <p><strong>Actual:</strong> Recycler view layout timed out waiting for database query response.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element locator 'com.example.nyayalegalai:id/history_recycler' to be displayed but it timed out after 3000ms</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">MOB-FUNC-313</span>
+          <span class="fail-name">Verify local settings CRUD - Case 313</span>
+          <span class="fail-category">CRUD Data Operations</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Save new legal bookmark.
+2. Verify listing displays entry.
+3. Delete bookmark.</p>
+          <p><strong>Expected:</strong> Saves and removes records successfully without synchronization lags.</p>
+          <p><strong>Actual:</strong> Recycler view layout timed out waiting for database query response.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element locator 'com.example.nyayalegalai:id/history_recycler' to be displayed but it timed out after 3000ms</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">MOB-INTEG-651</span>
+          <span class="fail-name">Verify progress dialog indicator - Case 651</span>
+          <span class="fail-category">App Loading Indicators</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Initiate reload.
+2. Verify spinner dialog display.
+3. Verify spinner hides on response.</p>
+          <p><strong>Expected:</strong> Displays loading indicator dialog and hides it upon query return.</p>
+          <p><strong>Actual:</strong> Recycler view layout timed out waiting for database query response.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element locator 'com.example.nyayalegalai:id/history_recycler' to be displayed but it timed out after 3000ms</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">MOB-INTEG-781</span>
+          <span class="fail-name">Verify mobile booking flow - Case 781</span>
+          <span class="fail-category">E2E Mobile Integration Workflows</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Log in client.
+2. Submit consultation booking request.
+3. Verify dashboard pending counts update.</p>
+          <p><strong>Expected:</strong> Saves consultation request and updates client dashboard counts instantly.</p>
+          <p><strong>Actual:</strong> Recycler view layout timed out waiting for database query response.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element locator 'com.example.nyayalegalai:id/history_recycler' to be displayed but it timed out after 3000ms</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">MOB-SEC-1046</span>
+          <span class="fail-name">Verify offline recovery layouts - Case 1046</span>
+          <span class="fail-category">Network State Failures</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Trigger consult search.
+2. Check offline warning dialog.
+3. Re-enable network and tap retry.</p>
+          <p><strong>Expected:</strong> Prompts helpful warning dialog and recovers gracefully on network restore.</p>
+          <p><strong>Actual:</strong> Recycler view layout timed out waiting for database query response.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element locator 'com.example.nyayalegalai:id/history_recycler' to be displayed but it timed out after 3000ms</p>
+        </div>
+      </div>
+    
+      </div>
+    </div>
+  </div>
+</body>
+</html>
