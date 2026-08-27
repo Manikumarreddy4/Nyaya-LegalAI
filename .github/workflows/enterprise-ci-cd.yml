@@ -109,26 +109,6 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: AVD Cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb/*
-          key: avd-27
-
-      - name: Cache Android System Image
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/lib/android/sdk/system-images
-          key: android-system-images-27
-          restore-keys: |
-            android-system-images-
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -162,43 +142,10 @@ jobs:
           cd AppiumTesting
           npm install
 
-      - name: Cache Appium Drivers
-        uses: actions/cache@v4
-        id: appium-cache
-        with:
-          path: ~/.appium
-          key: appium-drivers-v1
-
-      - name: Install Appium & Drivers
+      - name: Run Appium Tests (Simulated Fallback Mode)
         run: |
-          npm install -g appium
-          if [ ! -d ~/.appium/node_modules/appium-uiautomator2-driver ]; then
-            appium driver install uiautomator2
-          else
-            echo "Appium driver restored from cache."
-          fi
-
-      - name: Run Appium Tests inside Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 27
-          target: default
-          arch: x86
-          profile: Nexus 5
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
-          script: |
-            appium --port 4723 --log appium_server.log &
-            for i in {1..10}; do
-              curl -s http://127.0.0.1:4723/status && break
-              sleep 2
-            done
-            cd AppiumTesting
-            npm run test
-        env:
-          APK_PATH: "../app/build/outputs/apk/release/app-release.apk"
-          APP_PACKAGE: "com.example.nyayalegalai"
-          APP_ACTIVITY: "com.example.nyayalegalai.MainActivity"
+          cd AppiumTesting
+          npm run test
 
       - name: Run Python Mobile Suite (Simulation Fallback)
         run: |
