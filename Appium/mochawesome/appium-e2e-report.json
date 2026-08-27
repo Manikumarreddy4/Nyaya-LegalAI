@@ -5,9 +5,9 @@
     "passes": 9,
     "pending": 0,
     "failures": 0,
-    "start": "2026-08-27T15:53:10.935Z",
-    "end": "2026-08-27T15:53:11.341Z",
-    "duration": 406,
+    "start": "2026-08-27T16:45:01.431Z",
+    "end": "2026-08-27T16:45:01.833Z",
+    "duration": 402,
     "testsRegistered": 9,
     "passPercent": 100,
     "pendingPercent": 0,
@@ -18,7 +18,7 @@
   },
   "results": [
     {
-      "uuid": "67b38e7d-edda-4b68-851a-8af043dd4112",
+      "uuid": "4c429c79-3ddf-4966-a3d0-577b794376e4",
       "title": "",
       "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
       "file": "/tests/e2e-tests.spec.js",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "600ec063-1415-47d1-bd7f-a6ed48cad31b",
+          "uuid": "9c36fd21-fddd-401f-ace9-092350a15b61",
           "title": "Nyaya Legal AI - Appium Mobile E2E Automation",
           "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
           "file": "/tests/e2e-tests.spec.js",
@@ -36,7 +36,7 @@
               "title": "\"before all\" hook in \"Nyaya Legal AI - Appium Mobile E2E Automation\"",
               "fullTitle": "Nyaya Legal AI - Appium Mobile E2E Automation \"before all\" hook in \"Nyaya Legal AI - Appium Mobile E2E Automation\"",
               "timedOut": false,
-              "duration": 389,
+              "duration": 386,
               "state": null,
               "speed": null,
               "pass": false,
@@ -45,8 +45,8 @@
               "context": null,
               "code": "logger.info('Starting Mobile Appium E2E Automation spec run...');\nclient = await DriverFactory.createDriver();\nloginPage = new LoginPage(client);\ndashboardPage = new DashboardPage(client);",
               "err": {},
-              "uuid": "b54ba9ef-fa64-4fe1-9d77-7a9da5acc266",
-              "parentUUID": "600ec063-1415-47d1-bd7f-a6ed48cad31b",
+              "uuid": "a9c704b5-e369-45c5-843e-2a7dbafd734a",
+              "parentUUID": "9c36fd21-fddd-401f-ace9-092350a15b61",
               "isHook": true,
               "skipped": false
             }
@@ -65,8 +65,8 @@
               "context": null,
               "code": "if (client) {\n  try {\n    await client.deleteSession();\n    logger.info('Appium webdriver session closed successfully.');\n  } catch (err) {\n    logger.error(`Error closing Appium session: ${err.message}`);\n  }\n}",
               "err": {},
-              "uuid": "bcd00b58-139f-47bf-97a5-b29c04db8771",
-              "parentUUID": "600ec063-1415-47d1-bd7f-a6ed48cad31b",
+              "uuid": "38a9f173-0ed1-41c8-beca-71680580d77b",
+              "parentUUID": "9c36fd21-fddd-401f-ace9-092350a15b61",
               "isHook": true,
               "skipped": false
             }
@@ -74,7 +74,7 @@
           "tests": [],
           "suites": [
             {
-              "uuid": "972912fd-671f-42da-bbda-8c4ba77e287e",
+              "uuid": "5ceb1d70-777f-43bc-8e23-5f56b9d63a0e",
               "title": "1. Authentication Module",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -94,8 +94,8 @@
                   "context": null,
                   "code": "logger.info('[Test] Executing Authentication empty field validation');\ntry {\n  await loginPage.login('', '');\n  const validation = await loginPage.getValidationText();\n  expect(validation).to.contain('required');\n} catch (err) {\n  await loginPage.captureFailure('Auth_Empty_Fields', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "2f56c1e9-728b-4678-9a21-fe8408ff6aa4",
-                  "parentUUID": "972912fd-671f-42da-bbda-8c4ba77e287e",
+                  "uuid": "a562e056-1fc9-424e-b0f1-050240b1d2c1",
+                  "parentUUID": "5ceb1d70-777f-43bc-8e23-5f56b9d63a0e",
                   "isHook": false,
                   "skipped": false
                 },
@@ -112,8 +112,8 @@
                   "context": null,
                   "code": "logger.info('[Test] Executing invalid credentials login validation');\ntry {\n  await loginPage.login('invalid@example.com', 'WrongPass123!');\n  const errorText = await loginPage.getValidationText();\n  expect(errorText).to.be.a('string');\n} catch (err) {\n  await loginPage.captureFailure('Auth_Invalid_Credentials', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "a9941a60-d66e-4d10-9376-4539a7be1fd4",
-                  "parentUUID": "972912fd-671f-42da-bbda-8c4ba77e287e",
+                  "uuid": "865963e7-ec8c-48fe-8ae6-71e90904767c",
+                  "parentUUID": "5ceb1d70-777f-43bc-8e23-5f56b9d63a0e",
                   "isHook": false,
                   "skipped": false
                 },
@@ -130,17 +130,17 @@
                   "context": null,
                   "code": "logger.info('[Test] Executing successful authentication login flow');\ntry {\n  await loginPage.login('client@example.com', 'ClientPass123!');\n  const dashboardTitle = await dashboardPage.waitForDisplayed(dashboardPage.legalAssistantCard);\n  expect(dashboardTitle).to.be.true;\n} catch (err) {\n  await loginPage.captureFailure('Auth_Valid_Login', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "6054e1d6-35de-4c6f-b352-4c1f62db20c1",
-                  "parentUUID": "972912fd-671f-42da-bbda-8c4ba77e287e",
+                  "uuid": "afa74691-b1bc-46f2-8446-b7aa5abd9279",
+                  "parentUUID": "5ceb1d70-777f-43bc-8e23-5f56b9d63a0e",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "2f56c1e9-728b-4678-9a21-fe8408ff6aa4",
-                "a9941a60-d66e-4d10-9376-4539a7be1fd4",
-                "6054e1d6-35de-4c6f-b352-4c1f62db20c1"
+                "a562e056-1fc9-424e-b0f1-050240b1d2c1",
+                "865963e7-ec8c-48fe-8ae6-71e90904767c",
+                "afa74691-b1bc-46f2-8446-b7aa5abd9279"
               ],
               "failures": [],
               "pending": [],
@@ -151,7 +151,7 @@
               "_timeout": 60000
             },
             {
-              "uuid": "48f5f958-84bd-4dd7-a919-1255e9c0442e",
+              "uuid": "3c22bebb-dc60-4166-9477-ca015bd62dbb",
               "title": "2. Form Validation Module",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -171,8 +171,8 @@
                   "context": null,
                   "code": "logger.info('[Test] Validate registration phone formats');\ntry {\n  // Toggle signup screen\n  await loginPage.register('Test User', 'signup@example.com', '123', 'Pass123!');\n  const validation = await loginPage.getValidationText();\n  expect(validation).to.contain('10 digits');\n} catch (err) {\n  await loginPage.captureFailure('Form_Phone_Validation', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "d5370cf6-c7bd-445f-9932-9661af1f0958",
-                  "parentUUID": "48f5f958-84bd-4dd7-a919-1255e9c0442e",
+                  "uuid": "54f12d9e-42a6-4d6b-ac97-1a008765226e",
+                  "parentUUID": "3c22bebb-dc60-4166-9477-ca015bd62dbb",
                   "isHook": false,
                   "skipped": false
                 },
@@ -189,16 +189,16 @@
                   "context": null,
                   "code": "logger.info('[Test] Validate password security complexity checks');\ntry {\n  await loginPage.register('Test User', 'signup@example.com', '9876543210', '123');\n  const validation = await loginPage.getValidationText();\n  expect(validation).to.contain('Password must contain');\n} catch (err) {\n  await loginPage.captureFailure('Form_Password_Complexity', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "55ebe1ac-46a0-4a0e-be5c-ed23591e64e4",
-                  "parentUUID": "48f5f958-84bd-4dd7-a919-1255e9c0442e",
+                  "uuid": "279a7d46-175b-481f-b7ff-9d1cf0b7bed5",
+                  "parentUUID": "3c22bebb-dc60-4166-9477-ca015bd62dbb",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "d5370cf6-c7bd-445f-9932-9661af1f0958",
-                "55ebe1ac-46a0-4a0e-be5c-ed23591e64e4"
+                "54f12d9e-42a6-4d6b-ac97-1a008765226e",
+                "279a7d46-175b-481f-b7ff-9d1cf0b7bed5"
               ],
               "failures": [],
               "pending": [],
@@ -209,7 +209,7 @@
               "_timeout": 60000
             },
             {
-              "uuid": "0d008179-e2d4-4386-9efb-364a3cc220ce",
+              "uuid": "f1b6a117-45dd-469b-9e86-63db75cb4059",
               "title": "3. UI Component & Navigation Module",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -229,8 +229,8 @@
                   "context": null,
                   "code": "logger.info('[Test] Checking quick action buttons layout');\nconst assistantCardVisible = await dashboardPage.waitForDisplayed(dashboardPage.legalAssistantCard);\nexpect(assistantCardVisible).to.be.true;",
                   "err": {},
-                  "uuid": "221069a1-b8ea-477b-9dc5-fd21ff39ffec",
-                  "parentUUID": "0d008179-e2d4-4386-9efb-364a3cc220ce",
+                  "uuid": "5d72b24f-d3a2-494e-b334-f3f611d027cd",
+                  "parentUUID": "f1b6a117-45dd-469b-9e86-63db75cb4059",
                   "isHook": false,
                   "skipped": false
                 },
@@ -238,7 +238,7 @@
                   "title": "should submit consultation booking form successfully",
                   "fullTitle": "Nyaya Legal AI - Appium Mobile E2E Automation 3. UI Component & Navigation Module should submit consultation booking form successfully",
                   "timedOut": false,
-                  "duration": 2,
+                  "duration": 0,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -247,27 +247,27 @@
                   "context": null,
                   "code": "logger.info('[Test] Submitting consultation schedule request');\ntry {\n  await dashboardPage.bookConsultation('9999988888', 'Online', '2026-09-01', '14:30');\n  const successVisible = await dashboardPage.waitForDisplayed(dashboardPage.bookingSuccessMsg);\n  expect(successVisible).to.be.true;\n} catch (err) {\n  await dashboardPage.captureFailure('Booking_Form_Submission', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "57db1614-7d76-433e-8296-cc0dd37df933",
-                  "parentUUID": "0d008179-e2d4-4386-9efb-364a3cc220ce",
+                  "uuid": "e6d024fb-86c1-449d-9e6b-236e87a20819",
+                  "parentUUID": "f1b6a117-45dd-469b-9e86-63db75cb4059",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "221069a1-b8ea-477b-9dc5-fd21ff39ffec",
-                "57db1614-7d76-433e-8296-cc0dd37df933"
+                "5d72b24f-d3a2-494e-b334-f3f611d027cd",
+                "e6d024fb-86c1-449d-9e6b-236e87a20819"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 2,
+              "duration": 0,
               "root": false,
               "rootEmpty": false,
               "_timeout": 60000
             },
             {
-              "uuid": "73fd9394-63fa-47f2-8336-4836622daab6",
+              "uuid": "957c48ac-7523-460d-8920-a7d3f45fe527",
               "title": "4. Mobile Gestures Module",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -287,15 +287,15 @@
                   "context": null,
                   "code": "logger.info('[Test] Executing swipe and scroll gestures');\ntry {\n  await gestureUtils.scroll(client, 'down');\n  const el = await dashboardPage.findEl(dashboardPage.encyclopediaCard);\n  await gestureUtils.tap(client, el);\n  expect(true).to.be.true;\n} catch (err) {\n  await dashboardPage.captureFailure('Gesture_Scroll_Tap', err);\n  throw err;\n}",
                   "err": {},
-                  "uuid": "4ff0ef5b-8516-4f09-83b0-f286f8a3e521",
-                  "parentUUID": "73fd9394-63fa-47f2-8336-4836622daab6",
+                  "uuid": "5ee2036d-bf49-4292-932f-877fdd975e93",
+                  "parentUUID": "957c48ac-7523-460d-8920-a7d3f45fe527",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "4ff0ef5b-8516-4f09-83b0-f286f8a3e521"
+                "5ee2036d-bf49-4292-932f-877fdd975e93"
               ],
               "failures": [],
               "pending": [],
@@ -306,7 +306,7 @@
               "_timeout": 60000
             },
             {
-              "uuid": "dc387f06-4496-40b3-8201-a57b121f150d",
+              "uuid": "57da656c-148c-4173-8cbb-ab2d126284d0",
               "title": "5. Smart AI Assister Screen Analyzer",
               "fullFile": "/home/runner/work/Nyaya-LegalAI/Nyaya-LegalAI/AppiumTesting/tests/e2e-tests.spec.js",
               "file": "/tests/e2e-tests.spec.js",
@@ -317,7 +317,7 @@
                   "title": "should automatically discover screen widgets and validation scenarios",
                   "fullTitle": "Nyaya Legal AI - Appium Mobile E2E Automation 5. Smart AI Assister Screen Analyzer should automatically discover screen widgets and validation scenarios",
                   "timedOut": false,
-                  "duration": 2,
+                  "duration": 1,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -326,20 +326,20 @@
                   "context": null,
                   "code": "logger.info('[Test] Invoking Smart AI test scenarios generator');\nconst aiTester = new SmartAiTester(client);\nconst report = await aiTester.analyzeCurrentScreen();\n\nexpect(report.widgets).to.be.an('array');\nexpect(report.scenarios).to.be.an('array');\nexpect(report.scenarios.length).to.be.greaterThan(0);\nlogger.info(`[Test] AI Screen Analyzer generated ${report.scenarios.length} test configurations.`);",
                   "err": {},
-                  "uuid": "729da6bf-5b42-4ce3-886e-63aaf57235d0",
-                  "parentUUID": "dc387f06-4496-40b3-8201-a57b121f150d",
+                  "uuid": "f1144162-627e-4896-92d8-7a3033cbad6f",
+                  "parentUUID": "57da656c-148c-4173-8cbb-ab2d126284d0",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "729da6bf-5b42-4ce3-886e-63aaf57235d0"
+                "f1144162-627e-4896-92d8-7a3033cbad6f"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 2,
+              "duration": 1,
               "root": false,
               "rootEmpty": false,
               "_timeout": 60000
