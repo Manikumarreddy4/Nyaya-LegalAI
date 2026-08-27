@@ -45,7 +45,7 @@ graph TD
 
     subgraph External_Services [AI & Database Cloud]
         Firebase[Firebase Database & Auth]
-        Groq[Groq API / Gemini API]
+        AIService[AI Service Provider]
     end
 
     UI --> VM
@@ -55,7 +55,7 @@ graph TD
     Repo --> API
     FB_SDK --> Firebase
     API --> Env
-    API --> Groq
+    API --> AIService
 ```
 
 ### 📱 Android Application
@@ -68,7 +68,7 @@ Built using modern Android development principles:
 
 ### 🌐 Web Gateway Server
 *   **Engine**: Node.js & Express server.
-*   **Core Role**: Serves as a secure gateway for LLM requests (using the Groq API / Gemini API).
+*   **Core Role**: Serves as a secure gateway for LLM requests (using the AI Service Provider).
 *   **Security**: Prevents exposing AI api keys on client devices by loading them securely from local properties/environment variables on the server.
 
 ---
@@ -80,7 +80,7 @@ Built using modern Android development principles:
 *   **Database**: Room DB, SQLite, Firebase Firestore
 *   **Authentication**: Firebase Authentication
 *   **Cloud Storage**: Firebase Storage
-*   **AI Integration**: Groq API (`groq/compound-mini`), Gemini API (`BuildConfig.GEMINI_API_KEY`)
+*   **AI Integration**: AI Service Provider (e.g., Groq / Gemini APIs)
 
 ---
 

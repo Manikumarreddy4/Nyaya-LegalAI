@@ -1,11 +1,11 @@
 package com.example.nyayalegalai.utils
 
 import com.example.nyayalegalai.BuildConfig
-import com.example.nyayalegalai.GroqRepository
+import com.example.nyayalegalai.AiRepository
 import com.example.nyayalegalai.models.LegalSearchResult
 
 class LegalContentFormatter {
-    private val groqRepository = GroqRepository()
+    private val aiRepository = AiRepository()
 
     suspend fun formatLegalContent(result: LegalSearchResult): String {
         val systemPrompt = "You are an expert Indian Legal AI Assistant. Format raw legal data into simple and easy-to-understand educational explanations with Indian examples."
@@ -43,7 +43,7 @@ class LegalContentFormatter {
         """.trimIndent()
 
         return try {
-            val response = groqRepository.askGroq(
+            val response = aiRepository.askAi(
                 apiKey = BuildConfig.GROQ_LEARNING_API_KEY,
                 systemPrompt = systemPrompt,
                 userPrompt = userPrompt,
@@ -52,9 +52,9 @@ class LegalContentFormatter {
                 topP = 0.9,
                 isAssistant = false
             )
-            if (response == "Invalid Groq API Key." || 
+            if (response == "Invalid AI API Key." || 
                 response == "Daily API limit reached." || 
-                response == "Groq Server Error." || 
+                response == "AI Server Error." || 
                 response == "No Internet Connection.") {
                 fallbackFormat(result)
             } else {

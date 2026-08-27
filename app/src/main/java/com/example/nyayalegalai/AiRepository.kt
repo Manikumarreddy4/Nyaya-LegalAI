@@ -11,8 +11,8 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 
-class GroqRepository {
-    private val TAG = "GroqRepository"
+class AiRepository {
+    private val TAG = "AiRepository"
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -20,16 +20,16 @@ class GroqRepository {
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private val apiService: GroqService by lazy {
+    private val apiService: AiService by lazy {
         Retrofit.Builder()
             .baseUrl("https://api.groq.com/openai/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(GroqService::class.java)
+            .create(AiService::class.java)
     }
 
-    suspend fun askGroq(
+    suspend fun askAi(
         apiKey: String,
         systemPrompt: String,
         userPrompt: String,
@@ -39,8 +39,8 @@ class GroqRepository {
         isAssistant: Boolean = false
     ): String {
         if (apiKey.isEmpty() || apiKey == "NO_KEY_FOUND" || apiKey.contains("YOUR_API_KEY") || apiKey.contains("PLACEHOLDER")) {
-            Log.e(TAG, "Groq API key is invalid or not configured.")
-            return if (isAssistant) "Assistant API key is invalid." else "Invalid Groq API Key."
+            Log.e(TAG, "AI API key is invalid or not configured.")
+            return if (isAssistant) "Assistant API key is invalid." else "Invalid AI API Key."
         }
 
         // Try primary model
@@ -57,12 +57,12 @@ class GroqRepository {
         return if (isAssistant) {
             text == "Assistant API key is invalid." || 
             text == "Daily quota exceeded." || 
-            text == "Groq Server Error" || 
+            text == "AI Server Error" || 
             text == "No Internet Connection"
         } else {
-            text == "Invalid Groq API Key." || 
+            text == "Invalid AI API Key." || 
             text == "Daily API limit reached." || 
-            text == "Groq Server Error." || 
+            text == "AI Server Error." || 
             text == "No Internet Connection."
         }
     }
@@ -77,11 +77,11 @@ class GroqRepository {
         topP: Double,
         isAssistant: Boolean
     ): String {
-        val request = GroqChatRequest(
+        val request = AiChatRequest(
             model = modelName,
             messages = listOf(
-                GroqMessage(role = "system", content = systemPrompt),
-                GroqMessage(role = "user", content = userPrompt)
+                AiMessage(role = "system", content = systemPrompt),
+                AiMessage(role = "user", content = userPrompt)
             ),
             temperature = temperature,
             maxTokens = maxTokens,
@@ -93,68 +93,68 @@ class GroqRepository {
         val requestUrl = "https://api.groq.com/openai/v1/chat/completions"
 
         // Log request URL
-        Log.d("GroqAPI", "Request URL: $requestUrl")
+        Log.d("AiAPI", "Request URL: $requestUrl")
 
         return try {
             val response = apiService.getChatCompletion(authHeader, request)
             
             // Log HTTP status code
-            Log.d("GroqAPI", "HTTP Status Code: ${response.code()}")
+            Log.d("AiAPI", "HTTP Status Code: ${response.code()}")
 
             if (response.isSuccessful) {
                 val body = response.body()
                 val bodyJsonString = body?.let { com.google.gson.Gson().toJson(it) } ?: ""
                 
                 // Log response body
-                Log.d("GroqAPI", "Response Body: $bodyJsonString")
+                Log.d("AiAPI", "Response Body: $bodyJsonString")
 
                 val choiceContent = body?.choices?.firstOrNull()?.message?.content
                 if (!choiceContent.isNullOrBlank()) {
                     // Log parsed AI Answer
-                    Log.d("GroqAPI", "Parsed AI Answer: ${choiceContent.trim()}")
+                    Log.d("AiAPI", "Parsed AI Answer: ${choiceContent.trim()}")
                     choiceContent.trim()
                 } else {
-                    Log.e(TAG, "Empty response from Groq.")
-                    if (isAssistant) "Groq Server Error" else "Groq Server Error."
+                    Log.e(TAG, "Empty response from AI.")
+                    if (isAssistant) "AI Server Error" else "AI Server Error."
                 }
             } else {
                 val errorCode = response.code()
                 val errorBody = response.errorBody()?.string() ?: ""
                 
                 // Show exact server error in Logcat
-                Log.e("GroqAssistant", "Exact Server Error (Code $errorCode): $errorBody")
-                Log.d("GroqAPI", "Response Body (Error): $errorBody")
-                Log.e(TAG, "Groq API Error: Code=$errorCode")
+                Log.e("AiAssistant", "Exact Server Error (Code $errorCode): $errorBody")
+                Log.d("AiAPI", "Response Body (Error): $errorBody")
+                Log.e(TAG, "AI API Error: Code=$errorCode")
                 
                 if (isAssistant) {
                     when (errorCode) {
                         401, 403 -> "Assistant API key is invalid."
                         429 -> "Daily quota exceeded."
-                        else -> "Groq Server Error"
+                        else -> "AI Server Error"
                     }
                 } else {
                     when (errorCode) {
-                        401, 403 -> "Invalid Groq API Key."
+                        401, 403 -> "Invalid AI API Key."
                         429 -> "Daily API limit reached."
-                        else -> "Groq Server Error."
+                        else -> "AI Server Error."
                     }
                 }
             }
         } catch (e: UnknownHostException) {
-            Log.d("GroqAPI", "No internet connection: ${e.message}")
+            Log.d("AiAPI", "No internet connection: ${e.message}")
             if (isAssistant) "No Internet Connection" else "No Internet Connection."
         } catch (e: ConnectException) {
-            Log.d("GroqAPI", "No internet connection: ${e.message}")
+            Log.d("AiAPI", "No internet connection: ${e.message}")
             if (isAssistant) "No Internet Connection" else "No Internet Connection."
         } catch (e: SocketTimeoutException) {
-            Log.d("GroqAPI", "Timeout: ${e.message}")
+            Log.d("AiAPI", "Timeout: ${e.message}")
             if (isAssistant) "No Internet Connection" else "No Internet Connection."
         } catch (e: IOException) {
-            Log.d("GroqAPI", "IO error: ${e.message}")
+            Log.d("AiAPI", "IO error: ${e.message}")
             if (isAssistant) "No Internet Connection" else "No Internet Connection."
         } catch (e: Exception) {
             Log.e(TAG, "Unexpected error: ${e.message}")
-            if (isAssistant) "Groq Server Error" else "Groq Server Error."
+            if (isAssistant) "AI Server Error" else "AI Server Error."
         }
     }
 }

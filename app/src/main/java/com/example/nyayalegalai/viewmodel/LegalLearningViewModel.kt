@@ -1,6 +1,6 @@
 package com.example.nyayalegalai.viewmodel
 
-import com.example.nyayalegalai.GroqLearningManager
+import com.example.nyayalegalai.LegalLearningManager
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -115,14 +115,14 @@ class LegalLearningViewModel(
                     💡 Important Notes
                 """.trimIndent()
 
-                Log.d(TAG, "Groq request started (Learning)")
+                Log.d(TAG, "AI request started (Learning)")
                 val result = try {
-                    GroqLearningManager.askLearning(prompt)
+                    LegalLearningManager.askLearning(prompt)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Groq call failed (Learning): ${e.message}")
-                    "Groq Server Error."
+                    Log.e(TAG, "AI call failed (Learning): ${e.message}")
+                    "AI Server Error."
                 }
-                Log.d(TAG, "Groq response received (Learning)")
+                Log.d(TAG, "AI response received (Learning)")
 
                 // Save Bot Message
                 chatHistoryRepository.addMessage(sessionId, "Bot", result)

@@ -3,13 +3,13 @@ package com.example.nyayalegalai.utils
 import android.content.Context
 import android.util.Log
 import com.example.nyayalegalai.BuildConfig
-import com.example.nyayalegalai.GroqRepository
+import com.example.nyayalegalai.AiRepository
 import com.example.nyayalegalai.models.LegalSearchResult
 import com.example.nyayalegalai.repository.LocalLegalRepository
 
 class LegalReasoningEngine(private val context: Context, private val localRepository: LocalLegalRepository) {
 
-    private val groqRepository = GroqRepository()
+    private val aiRepository = AiRepository()
 
     suspend fun analyze(query: String): String {
         Log.d("LegalReasoningEngine", "Analyzing educational query: $query")
@@ -39,8 +39,8 @@ class LegalReasoningEngine(private val context: Context, private val localReposi
         }
 
         return try {
-            Log.d("Groq", "Sending request to Groq via LegalReasoningEngine")
-            val response = groqRepository.askGroq(
+            Log.d("AiAPI", "Sending request to AI via LegalReasoningEngine")
+            val response = aiRepository.askAi(
                 apiKey = BuildConfig.GROQ_LEARNING_API_KEY,
                 systemPrompt = systemPrompt,
                 userPrompt = userPrompt,
@@ -50,9 +50,9 @@ class LegalReasoningEngine(private val context: Context, private val localReposi
                 isAssistant = false
             )
             
-            if (response == "Invalid Groq API Key." || 
+            if (response == "Invalid AI API Key." || 
                 response == "Daily API limit reached." || 
-                response == "Groq Server Error." || 
+                response == "AI Server Error." || 
                 response == "No Internet Connection.") {
                 formatLocalFallback(localRecords, query)
             } else {

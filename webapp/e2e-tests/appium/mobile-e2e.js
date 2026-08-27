@@ -10,7 +10,7 @@ const testCases = [
   { id: 'MOB-E2E-001', component: 'Android Launch', name: 'Verify app launch, main activity creation, and layout display' },
   { id: 'MOB-E2E-002', component: 'Authentication', name: 'Verify user registration with client credentials' },
   { id: 'MOB-E2E-003', component: 'Authentication', name: 'Verify login authentication with lawyer credentials' },
-  { id: 'MOB-E2E-004', component: 'AI Assistant', name: 'Verify GroqAssistantManager integration and chat submission' },
+  { id: 'MOB-E2E-004', component: 'AI Assistant', name: 'Verify LegalAssistantManager integration and chat submission' },
   { id: 'MOB-E2E-005', component: 'AI Assistant', name: 'Verify rejection of non-legal queries' },
   { id: 'MOB-E2E-006', component: 'Learning History', name: 'Verify learning history recycler view rendering' },
   { id: 'MOB-E2E-007', component: 'Learning History', name: 'Verify backward compatibility for legacy id and timestamp formats' },

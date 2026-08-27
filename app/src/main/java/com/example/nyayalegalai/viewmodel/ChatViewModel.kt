@@ -3,7 +3,7 @@ package com.example.nyayalegalai.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.nyayalegalai.GroqAssistantManager
+import com.example.nyayalegalai.LegalAssistantManager
 import com.example.nyayalegalai.models.*
 import com.example.nyayalegalai.repository.ChatHistoryRepository
 import com.example.nyayalegalai.repository.FirestoreRepository
@@ -179,7 +179,7 @@ class ChatViewModel(
 
                 // 3. Call Groq
                 val responseText = withContext(Dispatchers.IO) {
-                    GroqAssistantManager.askQuestion(prompt)
+                    LegalAssistantManager.askQuestion(prompt)
                 }
 
                 // 4. Save Bot Message

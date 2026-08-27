@@ -4,14 +4,14 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object GroqAssistantManager {
+object LegalAssistantManager {
 
-    private const val TAG = "GroqAssistantManager"
-    private val repository by lazy { GroqRepository() }
+    private const val TAG = "LegalAssistantManager"
+    private val repository by lazy { AiRepository() }
 
     suspend fun askQuestion(prompt: String): String = withContext(Dispatchers.IO) {
-        Log.d("GroqAssistant", "Assistant API request started")
-        Log.d("GroqAssistant", "Assistant key loaded = ${BuildConfig.GROQ_ASSISTANT_API_KEY.isNotBlank()}")
+        Log.d("LegalAssistant", "Assistant API request started")
+        Log.d("LegalAssistant", "Assistant key loaded = ${BuildConfig.GROQ_ASSISTANT_API_KEY.isNotBlank()}")
 
         if (BuildConfig.GROQ_ASSISTANT_API_KEY.isBlank()) {
             return@withContext "Assistant API key is missing."
@@ -73,7 +73,7 @@ object GroqAssistantManager {
             - Keep your entire response within approximately 400 words.
         """.trimIndent()
 
-        repository.askGroq(
+        repository.askAi(
             apiKey = BuildConfig.GROQ_ASSISTANT_API_KEY,
             systemPrompt = systemPrompt,
             userPrompt = userScenario,
