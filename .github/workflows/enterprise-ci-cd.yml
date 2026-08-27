@@ -119,13 +119,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb/*
-          key: avd-29
+          key: avd-27
 
       - name: Cache Android System Image
         uses: actions/cache@v4
         with:
           path: /usr/local/lib/android/sdk/system-images
-          key: android-system-images-29
+          key: android-system-images-27
           restore-keys: |
             android-system-images-
 
@@ -181,10 +181,10 @@ jobs:
       - name: Run Appium Tests inside Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          target: google_apis
+          api-level: 27
+          target: default
           arch: x86
-          profile: Nexus 6
+          profile: Nexus 5
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
           script: |
