@@ -185,7 +185,10 @@ fun BookingStatusScreen(navController: NavController, viewModel: ConsultationVie
 
 @Composable
 fun BookingCard(booking: Consultation, onClick: () -> Unit, onCancel: () -> Unit, onRateExperience: () -> Unit) {
-    val safeStatus = booking.status ?: "PENDING"
+    val apptTime = booking.parsedAppointmentDate()
+    val isPastAppt = apptTime != null && apptTime.before(java.util.Date())
+    val safeStatus = if ((booking.status ?: "PENDING").uppercase() == "PENDING" && isPastAppt) "EXPIRED" else booking.status ?: "PENDING"
+
     val (statusLabel, statusBg, statusTextColor) = when (safeStatus.uppercase()) {
         "ACCEPTED" -> Triple("ACCEPTED", Color(0xFFE8F5E9), Color(0xFF2E7D32)) // Soft Green
         "REJECTED" -> Triple("REJECTED", Color(0xFFFFEBEE), Color(0xFFC62828)) // Soft Red
@@ -316,7 +319,7 @@ fun BookingCard(booking: Consultation, onClick: () -> Unit, onCancel: () -> Unit
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Your consultation request expired because the lawyer did not respond before the scheduled appointment time.",
+                        text = "This consultation request automatically expired because the scheduled appointment time was reached before the lawyer responded.",
                         color = Color(0xFFC62828),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,

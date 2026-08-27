@@ -21,17 +21,333 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-fun DocumentSnapshot.getSafeLong(fieldName: String, defaultValue: Long = 0L): Long {
+fun DocumentSnapshot.getSafeId(fieldName: String = "id"): String {
     return try {
         when (val value = get(fieldName)) {
+            null -> this.id
+            is String -> if (value.isBlank()) this.id else value
+            is Number -> value.toString()
+            else -> value.toString().ifBlank { this.id }
+        }
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_HISTORY", "Error parsing ID for field $fieldName in doc $id", e)
+        this.id
+    }
+}
+
+fun DocumentSnapshot.getSafeLong(fieldName: String, defaultValue: Long = 0L): Long {
+    return try {
+        val value = get(fieldName)
+        when (value) {
+            null -> defaultValue
             is com.google.firebase.Timestamp -> value.toDate().time
             is Number -> value.toLong()
-            is String -> value.toLongOrNull() ?: defaultValue
+            is String -> {
+                val directLong = value.toLongOrNull()
+                if (directLong != null) {
+                    directLong
+                } else {
+                    try {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            java.time.Instant.parse(value).toEpochMilli()
+                        } else {
+                            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                            sdf.parse(value)?.time ?: defaultValue
+                        }
+                    } catch (parseEx: Exception) {
+                        defaultValue
+                    }
+                }
+            }
             else -> defaultValue
         }
     } catch (e: Exception) {
         Log.e("FIRESTORE_HISTORY", "Invalid timestamp/Long in document $id for field $fieldName", e)
         defaultValue
+    }
+}
+
+fun DocumentSnapshot.getSafeInt(fieldName: String, defaultValue: Int = 0): Int {
+    return try {
+        when (val value = get(fieldName)) {
+            is Number -> value.toInt()
+            is String -> value.toIntOrNull() ?: defaultValue
+            else -> defaultValue
+        }
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_HISTORY", "Invalid Int in document $id for field $fieldName", e)
+        defaultValue
+    }
+}
+
+fun DocumentSnapshot.toSafeLearningHistory(): LearningHistory? {
+    if (!exists()) return null
+    return try {
+        val question = getString("question") ?: getString("query") ?: ""
+        val answer = getString("answer") ?: getString("explanation") ?: ""
+        val id = getSafeId("id")
+        val timestamp = getSafeLong("timestamp", System.currentTimeMillis())
+
+        LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_HISTORY", "Error parsing learning history document $id", e)
+        null
+    }
+}
+
+fun DocumentSnapshot.getSafeAppointmentDate(): java.util.Date? {
+    try {
+        val stored = get("appointmentDateTime")
+        if (stored is com.google.firebase.Timestamp) {
+            return stored.toDate()
+        }
+        
+        // Resolve date string
+        val dateStr = (getString("date") ?: "").ifBlank {
+            (getString("dateTime") ?: "").ifBlank {
+                (getString("appointmentDate") ?: "").ifBlank {
+                    (getString("consultationDate") ?: "")
+                }
+            }
+        }
+        
+        if (dateStr.isBlank()) return null
+        
+        val cleanDateStr = dateStr.trim()
+        var resolvedDateVal: java.util.Date? = null
+        
+        if (cleanDateStr.equals("today", ignoreCase = true)) {
+            val cal = java.util.Calendar.getInstance()
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            cal.set(java.util.Calendar.MINUTE, 0)
+            cal.set(java.util.Calendar.SECOND, 0)
+            cal.set(java.util.Calendar.MILLISECOND, 0)
+            resolvedDateVal = cal.time
+        } else if (cleanDateStr.equals("tomorrow", ignoreCase = true)) {
+            val cal = java.util.Calendar.getInstance()
+            cal.add(java.util.Calendar.DAY_OF_YEAR, 1)
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            cal.set(java.util.Calendar.MINUTE, 0)
+            cal.set(java.util.Calendar.SECOND, 0)
+            cal.set(java.util.Calendar.MILLISECOND, 0)
+            resolvedDateVal = cal.time
+        } else {
+            var datePart = cleanDateStr
+            if (cleanDateStr.contains(",")) {
+                datePart = cleanDateStr.split(",").first().trim()
+            } else if (cleanDateStr.contains(" at ", ignoreCase = true)) {
+                datePart = cleanDateStr.split(Regex("(?i) at ")).first().trim()
+            }
+            
+            val formats = listOf("dd/MM/yyyy", "dd MMMM yyyy", "dd MMM yyyy", "yyyy-MM-dd")
+            for (format in formats) {
+                try {
+                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
+                    sdf.isLenient = false
+                    val parsed = sdf.parse(datePart)
+                    if (parsed != null) {
+                        resolvedDateVal = parsed
+                        break
+                    }
+                } catch (e: Exception) {}
+            }
+            
+            if (resolvedDateVal == null) {
+                for (format in formats) {
+                    try {
+                        val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
+                        sdf.isLenient = false
+                        val parsed = sdf.parse(cleanDateStr)
+                        if (parsed != null) {
+                            resolvedDateVal = parsed
+                            break
+                        }
+                    } catch (e: Exception) {}
+                }
+            }
+        }
+        
+        if (resolvedDateVal == null) return null
+        
+        // Resolve time string
+        val timeStr = (getString("time") ?: "").ifBlank {
+            (getString("appointmentTime") ?: "").ifBlank {
+                (getString("consultationTime") ?: "").ifBlank { "Not scheduled" }
+            }
+        }
+        
+        var resolvedTimeVal: java.util.Date? = null
+        if (timeStr.isNotBlank() && timeStr != "Not scheduled") {
+            val cleanTime = timeStr.trim()
+            val formats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm")
+            for (format in formats) {
+                try {
+                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
+                    sdf.isLenient = false
+                    val parsed = sdf.parse(cleanTime)
+                    if (parsed != null) {
+                        resolvedTimeVal = parsed
+                        break
+                    }
+                } catch (e: Exception) {}
+            }
+        }
+        
+        val cal = java.util.Calendar.getInstance()
+        cal.time = resolvedDateVal
+        if (resolvedTimeVal != null) {
+            val timeCal = java.util.Calendar.getInstance()
+            timeCal.time = resolvedTimeVal
+            cal.set(java.util.Calendar.HOUR_OF_DAY, timeCal.get(java.util.Calendar.HOUR_OF_DAY))
+            cal.set(java.util.Calendar.MINUTE, timeCal.get(java.util.Calendar.MINUTE))
+        } else {
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 23)
+            cal.set(java.util.Calendar.MINUTE, 59)
+        }
+        cal.set(java.util.Calendar.SECOND, 0)
+        cal.set(java.util.Calendar.MILLISECOND, 0)
+        return cal.time
+    } catch (e: Exception) {
+        return null
+    }
+}
+
+fun DocumentSnapshot.getSafeTimestamp(fieldName: String): com.google.firebase.Timestamp? {
+    return try {
+        when (val value = get(fieldName)) {
+            is com.google.firebase.Timestamp -> value
+            is Number -> com.google.firebase.Timestamp(java.util.Date(value.toLong()))
+            is String -> {
+                val longVal = value.toLongOrNull()
+                if (longVal != null) {
+                    com.google.firebase.Timestamp(java.util.Date(longVal))
+                } else {
+                    try {
+                        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                        val date = sdf.parse(value)
+                        if (date != null) com.google.firebase.Timestamp(date) else null
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+            }
+            else -> null
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+fun DocumentSnapshot.toSafeConsultation(): Consultation? {
+    if (!exists()) return null
+    return try {
+        val id = this.id
+        val consultationId = getString("consultationId") ?: getString("bookingId") ?: id
+        val clientId = getString("clientId") ?: getString("userId") ?: ""
+        val userId = getString("userId") ?: getString("clientId") ?: ""
+        val lawyerId = getString("lawyerId") ?: ""
+        val clientName = getString("clientName") ?: getString("userName") ?: ""
+        val userName = getString("userName") ?: getString("clientName") ?: ""
+        val lawyerName = getString("lawyerName") ?: ""
+        val caseTitle = getString("caseTitle") ?: getString("issueTitle") ?: getString("issueType") ?: ""
+        val issueType = getString("issueType") ?: getString("caseTitle") ?: ""
+        val issueTitle = getString("issueTitle") ?: getString("caseTitle") ?: ""
+        val caseDescription = getString("caseDescription") ?: getString("issueDescription") ?: ""
+        val issueDescription = getString("issueDescription") ?: getString("caseDescription") ?: ""
+        val consultationType = getString("consultationType") ?: "Online"
+        
+        val date = getString("date") ?: getString("dateTime") ?: ""
+        val dateTime = getString("dateTime") ?: getString("date") ?: ""
+        val time = getString("time") ?: ""
+        val appointmentDate = getString("appointmentDate") ?: ""
+        val appointmentTime = getString("appointmentTime") ?: ""
+        val consultationDate = getString("consultationDate") ?: ""
+        val consultationTime = getString("consultationTime") ?: ""
+        val preferredLanguage = getString("preferredLanguage") ?: "English"
+        val contactNumber = getString("contactNumber") ?: ""
+        
+        val docUrlsVal = get("documentUrls")
+        val documentUrls = if (docUrlsVal is List<*>) {
+            docUrlsVal.mapNotNull { it?.toString() }
+        } else {
+            emptyList()
+        }
+        
+        val status = getString("status") ?: "PENDING"
+        
+        val feeVal = get("fee")
+        val fee = when (feeVal) {
+            is Number -> feeVal.toDouble()
+            is String -> feeVal.toDoubleOrNull() ?: 0.0
+            else -> 0.0
+        }
+        
+        val notes = getString("notes") ?: ""
+        val bookingId = getString("bookingId") ?: ""
+        val userPhone = getString("userPhone") ?: getString("contactNumber") ?: ""
+        val userEmail = getString("userEmail") ?: ""
+        val language = getString("language") ?: ""
+        val additionalNotes = getString("additionalNotes") ?: ""
+        
+        val acceptedAt = getSafeTimestamp("acceptedAt")
+        val rejectedAt = getSafeTimestamp("rejectedAt")
+        val appointmentDateTime = getSafeTimestamp("appointmentDateTime")
+        
+        val createdAt = getSafeTimestamp("createdAt") ?: com.google.firebase.Timestamp.now()
+        val updatedAt = getSafeTimestamp("updatedAt") ?: com.google.firebase.Timestamp.now()
+        
+        val hasReviewedVal = get("hasReviewed")
+        val hasReviewed = when (hasReviewedVal) {
+            is Boolean -> hasReviewedVal
+            is String -> hasReviewedVal.toBoolean()
+            else -> false
+        }
+        val reviewId = getString("reviewId") ?: ""
+        
+        Consultation(
+            consultationId = consultationId,
+            clientId = clientId,
+            userId = userId,
+            lawyerId = lawyerId,
+            clientName = clientName,
+            userName = userName,
+            lawyerName = lawyerName,
+            caseTitle = caseTitle,
+            issueType = issueType,
+            issueTitle = issueTitle,
+            caseDescription = caseDescription,
+            issueDescription = issueDescription,
+            consultationType = consultationType,
+            date = date,
+            dateTime = dateTime,
+            time = time,
+            appointmentDate = appointmentDate,
+            appointmentTime = appointmentTime,
+            consultationDate = consultationDate,
+            consultationTime = consultationTime,
+            preferredLanguage = preferredLanguage,
+            contactNumber = contactNumber,
+            documentUrls = documentUrls,
+            status = status,
+            fee = fee,
+            notes = notes,
+            bookingId = bookingId,
+            userPhone = userPhone,
+            userEmail = userEmail,
+            language = language,
+            additionalNotes = additionalNotes,
+            acceptedAt = acceptedAt,
+            rejectedAt = rejectedAt,
+            appointmentDateTime = appointmentDateTime,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            hasReviewed = hasReviewed,
+            reviewId = reviewId
+        )
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_CONSULTATION", "Error safely parsing consultation $id", e)
+        null
     }
 }
 
@@ -99,8 +415,11 @@ fun DocumentSnapshot.toLawyerProfile(): LawyerProfile? {
         val fullName = getString("fullName") ?: ""
         val displayName = getString("displayName") ?: ""
         val isAvailable = getBoolean("isAvailable") ?: getBoolean("onlineAvailable") ?: false
+        val availability_status = getBoolean("availability_status")
+        val video_consultation_available = getBoolean("video_consultation_available")
         val availabilityUpdatedAt = getTimestamp("availabilityUpdatedAt")
         val isInPersonAvailable = getBoolean("isInPersonAvailable") ?: getBoolean("inPersonAvailable") ?: false
+        val in_person_consultation_available = getBoolean("in_person_consultation_available")
         val inPersonAvailabilityUpdatedAt = getTimestamp("inPersonAvailabilityUpdatedAt")
         val createdAt = getTimestamp("createdAt") ?: com.google.firebase.Timestamp.now()
         val updatedAt = getTimestamp("updatedAt") ?: com.google.firebase.Timestamp.now()
@@ -143,8 +462,11 @@ fun DocumentSnapshot.toLawyerProfile(): LawyerProfile? {
             fullName = fullName,
             displayName = displayName,
             isAvailable = isAvailable,
+            availability_status = availability_status,
+            video_consultation_available = video_consultation_available,
             availabilityUpdatedAt = availabilityUpdatedAt,
             isInPersonAvailable = isInPersonAvailable,
+            in_person_consultation_available = in_person_consultation_available,
             inPersonAvailabilityUpdatedAt = inPersonAvailabilityUpdatedAt,
             createdAt = createdAt,
             updatedAt = updatedAt
@@ -336,6 +658,8 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         val updates = mapOf(
             "isAvailable" to isAvailable,
             "onlineAvailable" to isAvailable,
+            "availability_status" to isAvailable,
+            "video_consultation_available" to isAvailable,
             "availabilityUpdatedAt" to com.google.firebase.Timestamp.now(),
             "updatedAt" to com.google.firebase.Timestamp.now()
         )
@@ -358,6 +682,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
         if (lawyerId.isBlank()) return
         val updates = mapOf(
             "isInPersonAvailable" to isInPersonAvailable,
+            "in_person_consultation_available" to isInPersonAvailable,
             "inPersonAvailabilityUpdatedAt" to com.google.firebase.Timestamp.now(),
             "updatedAt" to com.google.firebase.Timestamp.now()
         )
@@ -648,10 +973,10 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
 
     suspend fun saveLearningHistory(uid: String, item: LearningHistory) {
         if (uid.isBlank()) return
-        val docId = if (item.id == 0) {
+        val docId = if (item.id.isBlank()) {
             db.collection("users").document(uid).collection("learningHistory").document().id
         } else {
-            item.id.toString()
+            item.id
         }
         db.collection("users").document(uid).collection("learningHistory").document(docId).set(item).await()
     }
@@ -664,23 +989,10 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 .get().await()
             snapshot.documents.mapNotNull { doc ->
                 try {
-                    doc.toObject(LearningHistory::class.java)
+                    doc.toSafeLearningHistory()
                 } catch (e: Exception) {
-                    try {
-                        val question = doc.getString("question") ?: doc.getString("query") ?: ""
-                        val answer = doc.getString("answer") ?: doc.getString("explanation") ?: ""
-                        val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
-                        val idVal = doc.get("id")
-                        val id = when (idVal) {
-                            is Number -> idVal.toInt()
-                            is String -> idVal.toIntOrNull() ?: doc.id.hashCode()
-                            else -> doc.id.hashCode()
-                        }
-                        LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
-                    } catch (innerEx: Exception) {
-                        Log.e("FIRESTORE_HISTORY", "Error parsing learning history document ${doc.id}", innerEx)
-                        null
-                    }
+                    Log.e("FIRESTORE_HISTORY", "Failed to parse document ${doc.id} in list", e)
+                    null
                 }
             }
         } catch (e: Exception) {
@@ -705,23 +1017,10 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 snapshot?.let {
                     val list = it.documents.mapNotNull { doc ->
                         try {
-                            doc.toObject(LearningHistory::class.java)
+                            doc.toSafeLearningHistory()
                         } catch (e: Exception) {
-                            try {
-                                val question = doc.getString("question") ?: doc.getString("query") ?: ""
-                                val answer = doc.getString("answer") ?: doc.getString("explanation") ?: ""
-                                val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
-                                val idVal = doc.get("id")
-                                val id = when (idVal) {
-                                    is Number -> idVal.toInt()
-                                    is String -> idVal.toIntOrNull() ?: doc.id.hashCode()
-                                    else -> doc.id.hashCode()
-                                }
-                                LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
-                            } catch (innerEx: Exception) {
-                                Log.e("FIRESTORE_HISTORY", "Error parsing learning history document ${doc.id}", innerEx)
-                                null
-                            }
+                            Log.e("FIRESTORE_HISTORY", "Failed to parse document ${doc.id} in flow", e)
+                            null
                         }
                     }
                     trySend(list)
@@ -882,7 +1181,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 .get()
                 .await()
             for (doc in snapshot.documents) {
-                val booking = doc.toObject(Consultation::class.java)
+                val booking = doc.toSafeConsultation()
                 if (booking != null) {
                     val apptDate = booking.parsedAppointmentDate()
                     val targetDate = appointmentDateTime.toDate()
@@ -961,7 +1260,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 for (document in snapshot.documents) {
                     try {
                         Log.d("MY_BOOKINGS", "Booking loaded: id=${document.id}, data=${document.data}")
-                        var booking = document.toObject(Consultation::class.java)
+                        var booking = document.toSafeConsultation()
                         if (booking != null) {
                             if (booking.consultationId.isBlank()) {
                                 booking = booking.copy(consultationId = document.id)
@@ -1004,7 +1303,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                     
                     for (document in snapshot.documents) {
                         try {
-                            var booking = document.toObject(Consultation::class.java)
+                            var booking = document.toSafeConsultation()
                             if (booking != null) {
                                 if (booking.consultationId.isBlank()) {
                                     booking = booking.copy(consultationId = document.id)
@@ -1043,7 +1342,9 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
                 val snapshot = transaction.get(docRef)
                 if (snapshot.exists()) {
                     val existingStatus = snapshot.getString("status") ?: "PENDING"
-                    if (existingStatus.uppercase() == "EXPIRED") {
+                    val apptTime = snapshot.getSafeAppointmentDate()
+                    val isPastAppt = apptTime != null && apptTime.before(java.util.Date())
+                    if (existingStatus.uppercase() == "EXPIRED" || (existingStatus.uppercase() == "PENDING" && isPastAppt)) {
                         return@runTransaction
                     }
 
@@ -1071,7 +1372,7 @@ class FirestoreRepository(private val db: FirebaseFirestore = FirebaseFirestore.
 
             // Update subcollections if they exist
             val rootDoc = db.collection("consultations").document(id).get().await()
-            val consultation = rootDoc.toObject(Consultation::class.java)
+            val consultation = rootDoc.toSafeConsultation()
 
             if (consultation != null) {
                 val updateMap = mutableMapOf<String, Any>(

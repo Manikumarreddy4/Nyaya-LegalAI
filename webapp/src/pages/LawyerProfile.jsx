@@ -119,8 +119,14 @@ export default function LawyerProfile({ user, lawyerId, onNavigate }) {
   }
 
   // Determine availability states
-  const isOnlineAvailable = lawyer.onlineAvailable !== false && lawyer.isAvailable !== false;
-  const isInPersonAvailable = lawyer.isInPersonAvailable !== false && lawyer.isAvailable !== false;
+  const isOnlineAvailable = lawyer && (
+    (lawyer.availability_status !== undefined ? lawyer.availability_status === true : (lawyer.isAvailable !== false && lawyer.onlineAvailable !== false)) &&
+    (lawyer.video_consultation_available !== undefined ? lawyer.video_consultation_available === true : lawyer.onlineAvailable !== false)
+  );
+  const isInPersonAvailable = lawyer && (
+    (lawyer.availability_status !== undefined ? lawyer.availability_status === true : (lawyer.isAvailable !== false && lawyer.onlineAvailable !== false)) &&
+    (lawyer.in_person_consultation_available !== undefined ? lawyer.in_person_consultation_available === true : lawyer.isInPersonAvailable !== false)
+  );
 
   return (
     <div className="fade-in-up" style={styles.container}>
@@ -152,15 +158,10 @@ export default function LawyerProfile({ user, lawyerId, onNavigate }) {
             <div style={styles.summaryMeta}>
               <div style={styles.nameRow}>
                 <h2 style={styles.lawyerName}>{lawyer.name}</h2>
-                {lawyer.verificationStatus === 'VERIFIED' ? (
+                {lawyer.verificationStatus === 'VERIFIED' && (
                   <div style={styles.verifiedBadge}>
                     <ShieldCheck size={14} color="var(--secondary)" />
                     <span>Verified Advocate</span>
-                  </div>
-                ) : (
-                  <div style={styles.pendingBadge}>
-                    <Clock size={12} color="var(--accent)" />
-                    <span>Verification Under Review</span>
                   </div>
                 )}
               </div>

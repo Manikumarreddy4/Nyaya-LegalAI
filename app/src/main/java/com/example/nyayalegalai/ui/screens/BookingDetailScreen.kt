@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nyayalegalai.models.Consultation
 import com.example.nyayalegalai.repository.FirestoreRepository
+import com.example.nyayalegalai.repository.toSafeConsultation
 import com.example.nyayalegalai.viewmodel.ConsultationViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -38,9 +39,7 @@ fun BookingDetailScreen(
         try {
             val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
             val docSnap = db.collection("consultations").document(consultationId).get().await()
-            consultation = docSnap.toObject(Consultation::class.java)?.let {
-                if (it.consultationId.isBlank()) it.copy(consultationId = docSnap.id) else it
-            }
+            consultation = docSnap.toSafeConsultation()
         } catch (e: Exception) {
             // Fallback: check viewmodel flow
         }
@@ -80,7 +79,7 @@ fun BookingDetailScreen(
             }
         } else {
             val booking = consultation!!
-            val safeStatus = booking.status ?: "PENDING"
+            val safeStatus = if ((booking.status ?: "PENDING").uppercase() == "PENDING" && booking.parsedAppointmentDate()?.before(java.util.Date()) == true) "EXPIRED" else booking.status ?: "PENDING"
             val (statusLabel, statusBg, statusTextColor) = when (safeStatus.uppercase()) {
                 "ACCEPTED" -> Triple("ACCEPTED", Color(0xFFE8F5E9), Color(0xFF2E7D32))
                 "REJECTED" -> Triple("REJECTED", Color(0xFFFFEBEE), Color(0xFFC62828))
@@ -139,7 +138,7 @@ fun BookingDetailScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(
-                                    text = "Your consultation request expired because the lawyer did not respond before the scheduled appointment time.",
+                                    text = "This consultation request automatically expired because the scheduled appointment time was reached before the lawyer responded.",
                                     color = Color(0xFFC62828),
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,

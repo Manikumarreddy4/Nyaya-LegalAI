@@ -170,6 +170,9 @@ interface UnifiedHistoryDao {
     @Query("SELECT * FROM chat_history_messages WHERE sessionId = :sessionId ORDER BY timestamp ASC")
     fun getMessagesForSession(sessionId: Long): Flow<List<ChatHistoryMessage>>
 
+    @Query("SELECT * FROM chat_history_messages WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    suspend fun getMessagesForSessionList(sessionId: Long): List<ChatHistoryMessage>
+
     @Query("SELECT * FROM chat_history_messages WHERE sessionId = :sessionId ORDER BY timestamp DESC LIMIT 1")
     fun getLastMessageForSession(sessionId: Long): Flow<ChatHistoryMessage?>
 

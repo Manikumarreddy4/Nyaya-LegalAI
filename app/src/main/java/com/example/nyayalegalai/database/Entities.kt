@@ -50,7 +50,7 @@ data class LearningProgress(
 
 @Entity(tableName = "learning_history")
 data class LearningHistory(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: String = "",
     val question: String = "",
     val answer: String = "",
     val timestamp: Long = System.currentTimeMillis()

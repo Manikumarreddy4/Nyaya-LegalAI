@@ -63,9 +63,13 @@ fun DashboardScreen(navController: NavController, historyViewModel: HistoryViewM
     }.collectAsState(initial = com.example.nyayalegalai.repository.ActivityStats())
 
     LaunchedEffect(user) {
-        if (user != null && user.role.uppercase() == "LAWYER") {
-            navController.navigate(Route.LawyerDashboard.route) {
-                popUpTo(Route.Dashboard.route) { inclusive = true }
+        if (user != null) {
+            if (user.role.uppercase() == "LAWYER") {
+                navController.navigate(Route.LawyerDashboard.route) {
+                    popUpTo(Route.Dashboard.route) { inclusive = true }
+                }
+            } else if (user.uid.isNotEmpty()) {
+                historyViewModel.refreshHistory(user.uid)
             }
         }
     }

@@ -199,14 +199,6 @@ class LawViewModel(
                     _lastRead.value = encyclopediaRepo.getLastReadSection()
                     _navLevel.value = EncyclopediaNavLevel.SECTION
                     Log.d("CENTRAL_ACT_DEBUG", "SECTION_LOAD: Successfully displayed section ${nav.currentSection.number} (${nav.currentSection.title})")
-
-                    try {
-                        val sessionId = chatHistoryRepository.createSession(nav.currentSection.number, "ENCYCLOPEDIA")
-                        chatHistoryRepository.addMessage(sessionId, "User", "Viewed ${nav.currentSection.number}: ${nav.currentSection.title}")
-                        chatHistoryRepository.addMessage(sessionId, "Bot", "Explaining ${nav.currentSection.number}: ${nav.currentSection.shortMeaning}")
-                    } catch (e: Exception) {
-                        Log.e("CENTRAL_ACT_ERROR", "Chat session creation warning for section $sectionId", e)
-                    }
                 } else {
                     Log.e("CENTRAL_ACT_ERROR", "SECTION_LOAD: Navigation null for sectionId=$sectionId, lawId=$lawId, chapterId=$chapterId")
                 }

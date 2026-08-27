@@ -54,6 +54,8 @@ fun LawyerListingScreen(
     }
     
     LaunchedEffect(currentUid) {
+        lawyerViewModel.onOnlineToggled(false)
+        lawyerViewModel.onInPersonToggled(false)
         lawyerViewModel.loadLawyers(force = true)
     }
 
@@ -65,8 +67,6 @@ fun LawyerListingScreen(
     val selectedSort by lawyerViewModel.selectedSort.collectAsState()
     val onlineOnly by lawyerViewModel.onlineOnly.collectAsState()
     val inPersonOnly by lawyerViewModel.inPersonOnly.collectAsState()
-
-    var showFilterSheet by remember { mutableStateOf(false) }
 
     val specializations = listOf("All", "Criminal Law", "Civil Law", "Corporate Law", "Family & Corporate Law", "Property Law", "Cyber Law", "Tax Law")
     val sortOptions = listOf("Recommended", "Highest Rated", "Most Experienced", "Lowest Fee", "Highest Fee")
@@ -83,11 +83,6 @@ fun LawyerListingScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showFilterSheet = true }) {
-                        Icon(Icons.Default.FilterList, contentDescription = "Filter")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -302,49 +297,7 @@ fun LawyerListingScreen(
         }
     }
 
-    // Filter Bottom Sheet Dialog
-    if (showFilterSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showFilterSheet = false }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("Filter Lawyers", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Online Consultation Only", style = MaterialTheme.typography.bodyLarge)
-                    Switch(checked = onlineOnly, onCheckedChange = { lawyerViewModel.onOnlineToggled(it) })
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("In-Person Consultation Only", style = MaterialTheme.typography.bodyLarge)
-                    Switch(checked = inPersonOnly, onCheckedChange = { lawyerViewModel.onInPersonToggled(it) })
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = { showFilterSheet = false },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text("Apply Filters", fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -613,12 +566,12 @@ fun ProfessionalLawyerCard(
                   verticalAlignment = Alignment.CenterVertically
               ) {
                   AvailabilityBadge(
-                      text = "📱 Video Call: ${if (lawyer.onlineAvailable) "ON" else "OFF"}",
-                      isActive = lawyer.onlineAvailable
+                      text = "📱 Video Call: ${if (lawyer.isOnlineAvailable) "ON" else "OFF"}",
+                      isActive = lawyer.isOnlineAvailable
                   )
                   AvailabilityBadge(
-                      text = "🏢 In-Person: ${if (lawyer.inPersonAvailable) "ON" else "OFF"}",
-                      isActive = lawyer.inPersonAvailable
+                      text = "🏢 In-Person: ${if (lawyer.isInPersonOnlineAvailable) "ON" else "OFF"}",
+                      isActive = lawyer.isInPersonOnlineAvailable
                   )
               }
 
@@ -653,10 +606,10 @@ fun ProfessionalLawyerCard(
                       shape = RoundedCornerShape(8.dp),
                       colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                       contentPadding = PaddingValues(horizontal = 4.dp),
-                      enabled = lawyer.onlineAvailable || lawyer.inPersonAvailable
+                      enabled = lawyer.isOnlineAvailable || lawyer.isInPersonOnlineAvailable
                   ) {
                       Text(
-                          text = if (lawyer.onlineAvailable || lawyer.inPersonAvailable) "Book Consultation" else "Unavailable",
+                          text = if (lawyer.isOnlineAvailable || lawyer.isInPersonOnlineAvailable) "Book Consultation" else "Unavailable",
                           fontWeight = FontWeight.Bold,
                           fontSize = 13.sp,
                           maxLines = 1,

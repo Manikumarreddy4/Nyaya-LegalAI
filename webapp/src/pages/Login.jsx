@@ -30,6 +30,18 @@ export default function Login({ onAuthSuccess }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
+  const isPhoneValid = /^[0-9]{10}$/.test(phone);
+  const isPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/.test(password);
+
+  const phoneError = (isSignup && phone && !isPhoneValid) ? "Phone number must contain exactly 10 digits." : "";
+  const passwordError = (isSignup && password && !isPasswordValid) ? "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character." : "";
+
+  const isFormValid = name.trim() !== '' && 
+                      email.trim() !== '' && 
+                      isPhoneValid && 
+                      isPasswordValid && 
+                      (!isLawyer || (barId.trim() !== '' && specialization.trim() !== '' && experience.trim() !== '' && location.trim() !== ''));
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -74,8 +86,12 @@ export default function Login({ onAuthSuccess }) {
       setError('Please fill in all required fields');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!isPhoneValid) {
+      setError('Phone number must contain exactly 10 digits.');
+      return;
+    }
+    if (!isPasswordValid) {
+      setError('Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.');
       return;
     }
     if (isLawyer && (!barId || !specialization || !experience || !location)) {
@@ -86,6 +102,18 @@ export default function Login({ onAuthSuccess }) {
     setLoading(true);
     setError('');
     try {
+      const apiEndpoint = import.meta.env.DEV ? 'http://localhost:5000/api/auth/signup/validate' : '/api/auth/signup/validate';
+      const valResponse = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone.trim(), password })
+      });
+      
+      const valData = await valResponse.json();
+      if (!valResponse.ok) {
+        throw new Error(valData.error || 'Server-side validation failed.');
+      }
+
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const uid = userCredential.user.uid;
       const finalRole = isLawyer ? 'LAWYER' : 'USER';
@@ -107,8 +135,11 @@ export default function Login({ onAuthSuccess }) {
           consultationFee: parseFloat(fee) || 500,
           onlineAvailable: true,
           isAvailable: true,
+          availability_status: true,
+          video_consultation_available: true,
           inPersonAvailable: true,
           isInPersonAvailable: true,
+          in_person_consultation_available: true,
           verificationStatus: 'PENDING',
           role: 'LAWYER',
           createdAt: new Date(),
@@ -187,23 +218,31 @@ export default function Login({ onAuthSuccess }) {
                 <input 
                   type="text" 
                   placeholder="Full Name" 
-                  className="input-field" 
+                  className="input-field input-field-icon" 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
                   required 
                 />
               </div>
 
-              <div style={styles.inputWrapper}>
-                <Phone size={18} style={styles.icon} />
-                <input 
-                  type="tel" 
-                  placeholder="Phone Number (10 digits)" 
-                  className="input-field" 
-                  value={phone} 
-                  onChange={(e) => setPhone(e.target.value)} 
-                  required 
-                />
+              <div style={styles.inputGroup}>
+                <div style={styles.inputWrapper}>
+                  <Phone size={18} style={styles.icon} />
+                  <input 
+                    type="tel" 
+                    placeholder="Phone Number (10 digits)" 
+                    className="input-field input-field-icon" 
+                    value={phone} 
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (/^[0-9]*$/.test(val) && val.length <= 10) {
+                        setPhone(val);
+                      }
+                    }} 
+                    required 
+                  />
+                </div>
+                {phoneError && <span style={styles.fieldError}>{phoneError}</span>}
               </div>
 
               <div style={styles.roleHeader}>I am registering as:</div>
@@ -232,7 +271,7 @@ export default function Login({ onAuthSuccess }) {
                     <input 
                       type="text" 
                       placeholder="Bar Council ID / Enrollment No." 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={barId} 
                       onChange={(e) => setBarId(e.target.value)} 
                       required 
@@ -243,7 +282,7 @@ export default function Login({ onAuthSuccess }) {
                     <input 
                       type="text" 
                       placeholder="Specialization (e.g. Criminal, Civil)" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={specialization} 
                       onChange={(e) => setSpecialization(e.target.value)} 
                       required 
@@ -254,7 +293,7 @@ export default function Login({ onAuthSuccess }) {
                     <input 
                       type="number" 
                       placeholder="Experience (Years)" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={experience} 
                       onChange={(e) => setExperience(e.target.value)} 
                       required 
@@ -265,7 +304,7 @@ export default function Login({ onAuthSuccess }) {
                     <input 
                       type="text" 
                       placeholder="Location / City" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={location} 
                       onChange={(e) => setLocation(e.target.value)} 
                       required 
@@ -276,7 +315,7 @@ export default function Login({ onAuthSuccess }) {
                     <input 
                       type="number" 
                       placeholder="Consultation Fee (INR)" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={fee} 
                       onChange={(e) => setFee(e.target.value)} 
                       required 
@@ -286,7 +325,7 @@ export default function Login({ onAuthSuccess }) {
                     <BookOpen size={18} style={styles.icon} />
                     <textarea 
                       placeholder="Professional Bio" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       rows="3" 
                       value={bio} 
                       onChange={(e) => setBio(e.target.value)} 
@@ -303,23 +342,46 @@ export default function Login({ onAuthSuccess }) {
             <input 
               type="email" 
               placeholder="Email Address" 
-              className="input-field" 
+              className="input-field input-field-icon" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required 
             />
           </div>
 
-          <div style={styles.inputWrapper}>
-            <Lock size={18} style={styles.icon} />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              className="input-field" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-            />
+          <div style={styles.inputGroup}>
+            <div style={styles.inputWrapper}>
+              <Lock size={18} style={styles.icon} />
+              <input 
+                type="password" 
+                placeholder="Password" 
+                className="input-field input-field-icon" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+            {passwordError && <span style={styles.fieldError}>{passwordError}</span>}
+            {isSignup && password && (
+              <div style={styles.requirementsContainer}>
+                <div style={styles.requirementsTitle}>Password Requirements:</div>
+                <div style={{ ...styles.requirementItem, color: password.length >= 6 ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {password.length >= 6 ? '✓' : '○'} At least 6 characters
+                </div>
+                <div style={{ ...styles.requirementItem, color: /[A-Z]/.test(password) ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {/[A-Z]/.test(password) ? '✓' : '○'} One uppercase letter
+                </div>
+                <div style={{ ...styles.requirementItem, color: /[a-z]/.test(password) ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {/[a-z]/.test(password) ? '✓' : '○'} One lowercase letter
+                </div>
+                <div style={{ ...styles.requirementItem, color: /\d/.test(password) ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {/\d/.test(password) ? '✓' : '○'} One number
+                </div>
+                <div style={{ ...styles.requirementItem, color: /[^A-Za-z0-9]/.test(password) ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {/[^A-Za-z0-9]/.test(password) ? '✓' : '○'} One special character
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -336,7 +398,7 @@ export default function Login({ onAuthSuccess }) {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary" style={styles.submitBtn} disabled={loading}>
+          <button type="submit" className="btn btn-primary" style={styles.submitBtn} disabled={loading || (isSignup && !isFormValid)}>
             {loading ? 'Processing...' : isSignup ? 'Sign Up' : 'Log In'}
           </button>
 
@@ -420,7 +482,8 @@ const styles = {
   icon: {
     position: 'absolute',
     left: '16px',
-    color: 'var(--primary)'
+    color: 'var(--primary)',
+    pointerEvents: 'none'
   },
   submitBtn: {
     height: '48px',
@@ -494,5 +557,42 @@ const styles = {
     borderRadius: '12px',
     color: 'var(--text-main)',
     fontSize: '13px'
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px'
+  },
+  fieldError: {
+    color: 'var(--error)',
+    fontSize: '11px',
+    marginTop: '2px',
+    marginLeft: '4px',
+    textAlign: 'left',
+    display: 'block'
+  },
+  requirementsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '10px 14px',
+    background: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid var(--border)',
+    borderRadius: '8px',
+    marginTop: '4px',
+    textAlign: 'left'
+  },
+  requirementsTitle: {
+    fontSize: '12px',
+    fontWeight: '700',
+    color: 'var(--text-main)',
+    marginBottom: '4px'
+  },
+  requirementItem: {
+    fontSize: '11px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    transition: 'color 0.2s'
   }
 };

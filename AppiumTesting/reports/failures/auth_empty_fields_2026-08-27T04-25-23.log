@@ -1,0 +1,4 @@
+MOCK DEVICE LOGS
+Stack trace: AssertionError: expected 'Required fields cannot be left empty.' to include 'required'
+    at Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/AppiumTesting/tests/e2e-tests.spec.js:39:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

@@ -3,6 +3,33 @@ import { db, auth } from '../firebase';
 import { collection, getDocs, doc, setDoc, query, where, onSnapshot, getDoc } from 'firebase/firestore';
 import { Search, MapPin, Award, Clock, DollarSign, ArrowLeft, Calendar, FileText, Phone, CheckCircle, ShieldAlert, MessageSquare, User } from 'lucide-react';
 
+const combineDateAndTime = (dateStr, timeStr) => {
+  if (!dateStr || !timeStr) return null;
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0);
+};
+
+const generateTimeSlots = () => {
+  const slots = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let min of [0, 15, 30, 45]) {
+      const hh = String(hour).padStart(2, '0');
+      const mm = String(min).padStart(2, '0');
+      const val = `${hh}:${mm}`;
+      
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+      const displayMin = String(min).padStart(2, '0');
+      const label = `${displayHour}:${displayMin} ${ampm}`;
+      
+      slots.push({ value: val, label });
+    }
+  }
+  return slots;
+};
+const ALL_TIME_SLOTS = generateTimeSlots();
+
 export default function FindLawyer({ user, onNavigate, navExtra }) {
   const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,8 +43,9 @@ export default function FindLawyer({ user, onNavigate, navExtra }) {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   
-  // Custom categories filter tab
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedSort, setSelectedSort] = useState('Recommended');
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
   // Booking Form Fields matching Android
   const [caseTitle, setCaseTitle] = useState('');
@@ -27,12 +55,40 @@ export default function FindLawyer({ user, onNavigate, navExtra }) {
   const [dateChoice, setDateChoice] = useState('today'); // today, tomorrow, custom
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const getSelectableTimeSlots = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (date !== todayStr) {
+      return ALL_TIME_SLOTS;
+    }
+    const minAllowedTime = Date.now() + 2 * 60 * 1000;
+    return ALL_TIME_SLOTS.filter(slot => {
+      const slotDateTime = combineDateAndTime(date, slot.value);
+      return slotDateTime && slotDateTime.getTime() >= minAllowedTime;
+    });
+  };
   const [preferredLanguage, setPreferredLanguage] = useState('English');
   const [issueType, setIssueType] = useState('Civil Law');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showConfirmSummary, setShowConfirmSummary] = useState(false);
   const [retryTrigger, setRetryTrigger] = useState(0);
+
+  const isContactNumberValid = /^[0-9]{10}$/.test(contactNumber);
+  const contactNumberError = (contactNumber && !isContactNumberValid) ? "Phone number must contain exactly 10 digits." : "";
+
+  const isOnlineAvailable = (lawyer) => {
+    if (!lawyer) return false;
+    const globalStatus = lawyer.availability_status !== undefined ? lawyer.availability_status === true : (lawyer.isAvailable !== false && lawyer.onlineAvailable !== false);
+    if (!globalStatus) return false;
+    return lawyer.video_consultation_available !== undefined ? lawyer.video_consultation_available === true : lawyer.onlineAvailable !== false;
+  };
+
+  const isInPersonAvailable = (lawyer) => {
+    if (!lawyer) return false;
+    const globalStatus = lawyer.availability_status !== undefined ? lawyer.availability_status === true : (lawyer.isAvailable !== false && lawyer.onlineAvailable !== false);
+    if (!globalStatus) return false;
+    return lawyer.in_person_consultation_available !== undefined ? lawyer.in_person_consultation_available === true : lawyer.isInPersonAvailable !== false;
+  };
 
   const handleRetry = () => {
     setLoading(true);
@@ -47,10 +103,24 @@ export default function FindLawyer({ user, onNavigate, navExtra }) {
   }, [user]);
 
   useEffect(() => {
-    if (selectedLawyer && selectedLawyer.isInPersonAvailable === false && consultationType === 'In-Person') {
-      setConsultationType('Online');
+    if (selectedLawyer) {
+      if (!isInPersonAvailable(selectedLawyer) && consultationType === 'In-Person') {
+        setConsultationType('Online');
+      } else if (!isOnlineAvailable(selectedLawyer) && consultationType === 'Online') {
+        setConsultationType('In-Person');
+      }
     }
   }, [selectedLawyer, consultationType]);
+
+  useEffect(() => {
+    const handleGlobalClick = () => {
+      setSortDropdownOpen(false);
+    };
+    document.addEventListener('click', handleGlobalClick);
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
 
   useEffect(() => {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -66,6 +136,22 @@ export default function FindLawyer({ user, onNavigate, navExtra }) {
       // Allow custom date selection
     }
   }, [dateChoice]);
+
+  useEffect(() => {
+    const checkSelectedTimeValidity = () => {
+      if (date && time) {
+        const selectedDateTime = combineDateAndTime(date, time);
+        const minAllowedTime = Date.now() + 2 * 60 * 1000;
+        if (selectedDateTime && selectedDateTime.getTime() < minAllowedTime) {
+          setTime('');
+          alert("Please select a consultation time at least 2 minutes from now.");
+        }
+      }
+    };
+    checkSelectedTimeValidity();
+    const interval = setInterval(checkSelectedTimeValidity, 5000);
+    return () => clearInterval(interval);
+  }, [date, time]);
 
   useEffect(() => {
     if (navExtra?.startBooking && navExtra?.lawyer) {
@@ -138,7 +224,7 @@ export default function FindLawyer({ user, onNavigate, navExtra }) {
         
         // General lawyer availability status check.
         // As per Step 7: availability filtering should safely handle true/false and old firestore fields
-        const isAvailable = data.isAvailable !== false;
+        const isAvailable = data.availability_status !== undefined ? data.availability_status === true : data.isAvailable !== false;
         
         if (isAvailable && isLawyer && resolvedName && resolvedName.toLowerCase() !== 'advocate') {
           list.push({ id: docSnapshot.id, ...data, name: resolvedName });
@@ -286,6 +372,18 @@ function matchesCategory(specialization, selectedCategory) {
       alert('Please fill in all booking fields.');
       return;
     }
+    if (!isContactNumberValid) {
+      alert('Phone number must contain exactly 10 digits.');
+      return;
+    }
+
+    const selectedDateTime = new Date(`${date}T${time}`);
+    const minAllowedTime = Date.now() + 2 * 60 * 1000;
+    if (isNaN(selectedDateTime.getTime()) || selectedDateTime.getTime() < minAllowedTime) {
+      alert("Please select a consultation time at least 2 minutes from now.");
+      return;
+    }
+
     setShowConfirmSummary(true);
   };
 
@@ -298,6 +396,46 @@ function matchesCategory(specialization, selectedCategory) {
       if (!currentUser) {
         throw new Error("Please login again to book a consultation.");
       }
+
+      // Call backend consultation validator endpoint
+      const apiEndpoint = import.meta.env.DEV ? 'http://localhost:5000/api/consultations/validate' : '/api/consultations/validate';
+      const validateRes = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: contactNumber.trim(),
+          userId: currentUser.uid,
+          lawyerId: selectedLawyer.lawyerId || selectedLawyer.id,
+          consultationType,
+          date,
+          time,
+          video_consultation_available: isOnlineAvailable(selectedLawyer),
+          in_person_consultation_available: isInPersonAvailable(selectedLawyer),
+          availability_status: selectedLawyer.availability_status !== undefined ? selectedLawyer.availability_status === true : selectedLawyer.isAvailable !== false
+        })
+      });
+
+      const responseText = await validateRes.text();
+      let valData = null;
+      if (responseText && responseText.trim()) {
+        try {
+          valData = JSON.parse(responseText);
+        } catch (error) {
+          console.error("Invalid JSON response:", responseText);
+          throw new Error(
+            `Server returned an invalid response. Status: ${validateRes.status}`
+          );
+        }
+      }
+
+      if (!validateRes.ok) {
+        throw new Error(
+          valData?.error ||
+          valData?.message ||
+          `Failed to book consultation. Status: ${validateRes.status}`
+        );
+      }
+
       const lawyerId = selectedLawyer.lawyerId || selectedLawyer.id;
       console.log("BOOKING: Lawyer ID =", lawyerId);
       console.log("BOOKING: Fetching lawyer document");
@@ -318,18 +456,15 @@ function matchesCategory(specialization, selectedCategory) {
         throw new Error("Lawyer profile not found.");
       }
 
-      const mainAvailable = lawyerData.isAvailable !== false;
-      const inPersonAvailable = lawyerData.isInPersonAvailable !== false;
+      const onlineAvail = isOnlineAvailable(lawyerData);
+      const inPersonAvail = isInPersonAvailable(lawyerData);
 
       if (consultationType === 'Online') {
-        if (!mainAvailable) {
-          throw new Error("This lawyer is currently unavailable.");
+        if (!onlineAvail) {
+          throw new Error("This lawyer is currently unavailable for online consultations.");
         }
       } else if (consultationType === 'In-Person') {
-        if (!mainAvailable) {
-          throw new Error("This lawyer is currently unavailable.");
-        }
-        if (!inPersonAvailable) {
+        if (!inPersonAvail) {
           throw new Error("This lawyer is not currently available for in-person consultations. Please select Online consultation.");
         }
       }
@@ -415,15 +550,36 @@ function matchesCategory(specialization, selectedCategory) {
     }
   };
 
-  const filteredLawyers = lawyers.filter(l => {
-    const matchesSpec = selectedCategory === 'All' || matchesCategory(l.specialization, selectedCategory);
-    const q = searchQuery.toLowerCase().trim();
-    const matchesQuery = !q || 
-                         l.name.toLowerCase().includes(q) || 
-                         (l.specialization || '').toLowerCase().includes(q) ||
-                         (l.location || '').toLowerCase().includes(q);
-    return matchesSpec && matchesQuery;
-  });
+  const getSortedLawyers = (lawyerList) => {
+    const sorted = [...lawyerList];
+    if (selectedSort === 'Highest Rated') {
+      return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (selectedSort === 'Most Experienced') {
+      const getExpYears = (expStr) => {
+        if (!expStr) return 0;
+        const matches = expStr.match(/\d+/);
+        return matches ? parseInt(matches[0], 10) : 0;
+      };
+      return sorted.sort((a, b) => getExpYears(b.experience) - getExpYears(a.experience));
+    } else if (selectedSort === 'Lowest Fee') {
+      return sorted.sort((a, b) => (a.consultationFee || 0) - (b.consultationFee || 0));
+    } else if (selectedSort === 'Highest Fee') {
+      return sorted.sort((a, b) => (b.consultationFee || 0) - (a.consultationFee || 0));
+    }
+    return sorted; // Recommended: keep the original order
+  };
+
+  const filteredLawyers = getSortedLawyers(
+    lawyers.filter(l => {
+      const matchesSpec = selectedCategory === 'All' || matchesCategory(l.specialization, selectedCategory);
+      const q = searchQuery.toLowerCase().trim();
+      const matchesQuery = !q || 
+                           l.name.toLowerCase().includes(q) || 
+                           (l.specialization || '').toLowerCase().includes(q) ||
+                           (l.location || '').toLowerCase().includes(q);
+      return matchesSpec && matchesQuery;
+    })
+  );
 
   return (
     <div className="fade-in-up" style={styles.container}>
@@ -464,6 +620,43 @@ function matchesCategory(specialization, selectedCategory) {
                 {cat}
               </button>
             ))}
+          </div>
+
+          {/* Sort Dropdown */}
+          <div style={styles.sortContainer}>
+            <div style={styles.sortWrapper}>
+              <span style={styles.sortLabel}>Sort:</span>
+              <button 
+                style={styles.sortSelectButton} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSortDropdownOpen(!sortDropdownOpen);
+                }}
+              >
+                {selectedSort} <span style={styles.sortArrow}>▼</span>
+              </button>
+              
+              {sortDropdownOpen && (
+                <div style={styles.sortDropdownMenu}>
+                  {['Recommended', 'Highest Rated', 'Most Experienced', 'Lowest Fee', 'Highest Fee'].map((option) => (
+                    <div 
+                      key={option}
+                      style={{
+                        ...styles.sortDropdownItem,
+                        fontWeight: selectedSort === option ? 'bold' : 'normal',
+                        color: selectedSort === option ? 'var(--secondary)' : 'var(--text-main)',
+                      }}
+                      onClick={() => {
+                        setSelectedSort(option);
+                        setSortDropdownOpen(false);
+                      }}
+                    >
+                      {selectedSort === option ? '✓ ' : ''}{option}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -543,19 +736,19 @@ function matchesCategory(specialization, selectedCategory) {
                   <div style={styles.availabilityBadgesRow}>
                     <div style={{
                       ...styles.availabilityBadge,
-                      backgroundColor: (lawyer.onlineAvailable !== false && lawyer.isAvailable !== false) ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-                      color: (lawyer.onlineAvailable !== false && lawyer.isAvailable !== false) ? 'var(--secondary)' : 'var(--text-muted)',
-                      border: `1px solid ${(lawyer.onlineAvailable !== false && lawyer.isAvailable !== false) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`
+                      backgroundColor: isOnlineAvailable(lawyer) ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                      color: isOnlineAvailable(lawyer) ? 'var(--secondary)' : 'var(--text-muted)',
+                      border: `1px solid ${isOnlineAvailable(lawyer) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`
                     }}>
-                      🖥 Video Call: {(lawyer.onlineAvailable !== false && lawyer.isAvailable !== false) ? 'ON' : 'OFF'}
+                      🖥 Video Call: {isOnlineAvailable(lawyer) ? 'ON' : 'OFF'}
                     </div>
                     <div style={{
                       ...styles.availabilityBadge,
-                      backgroundColor: (lawyer.isInPersonAvailable !== false && lawyer.isAvailable !== false) ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-                      color: (lawyer.isInPersonAvailable !== false && lawyer.isAvailable !== false) ? 'var(--secondary)' : 'var(--text-muted)',
-                      border: `1px solid ${(lawyer.isInPersonAvailable !== false && lawyer.isAvailable !== false) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`
+                      backgroundColor: isInPersonAvailable(lawyer) ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                      color: isInPersonAvailable(lawyer) ? 'var(--secondary)' : 'var(--text-muted)',
+                      border: `1px solid ${isInPersonAvailable(lawyer) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`
                     }}>
-                      🏢 In-Person: {(lawyer.isInPersonAvailable !== false && lawyer.isAvailable !== false) ? 'ON' : 'OFF'}
+                      🏢 In-Person: {isInPersonAvailable(lawyer) ? 'ON' : 'OFF'}
                     </div>
                   </div>
 
@@ -577,10 +770,10 @@ function matchesCategory(specialization, selectedCategory) {
                         height: '36px', 
                         fontSize: '13px', 
                         padding: '0 8px',
-                        background: (lawyer.onlineAvailable === false && lawyer.isInPersonAvailable === false) || lawyer.isAvailable === false ? 'var(--border)' : 'linear-gradient(135deg, var(--primary), var(--tertiary))',
-                        cursor: (lawyer.onlineAvailable === false && lawyer.isInPersonAvailable === false) || lawyer.isAvailable === false ? 'not-allowed' : 'pointer'
+                        background: (!isOnlineAvailable(lawyer) && !isInPersonAvailable(lawyer)) ? 'var(--border)' : 'linear-gradient(135deg, var(--primary), var(--tertiary))',
+                        cursor: (!isOnlineAvailable(lawyer) && !isInPersonAvailable(lawyer)) ? 'not-allowed' : 'pointer'
                       }}
-                      disabled={(lawyer.onlineAvailable === false && lawyer.isInPersonAvailable === false) || lawyer.isAvailable === false}
+                      disabled={!isOnlineAvailable(lawyer) && !isInPersonAvailable(lawyer)}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedLawyer(lawyer);
@@ -769,10 +962,20 @@ function matchesCategory(specialization, selectedCategory) {
                             placeholder="Phone for callback" 
                             className="input-field"
                             value={contactNumber}
-                            onChange={(e) => setContactNumber(e.target.value)}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^[0-9]*$/.test(val) && val.length <= 10) {
+                                setContactNumber(val);
+                              }
+                            }}
                             required
                           />
                         </div>
+                        {contactNumberError && (
+                          <span style={{ color: 'var(--error)', fontSize: '11px', marginTop: '2px', marginLeft: '4px', textAlign: 'left', display: 'block' }}>
+                            {contactNumberError}
+                          </span>
+                        )}
                       </div>
                       <div style={{...styles.formGroup, flex: 1}}>
                         <label style={styles.label}>Consultation Type</label>
@@ -782,9 +985,11 @@ function matchesCategory(specialization, selectedCategory) {
                           onChange={(e) => setConsultationType(e.target.value)}
                           style={{paddingLeft: '16px', background: 'rgba(15,23,42,0.8)'}}
                         >
-                          <option value="Online">Online / Video Call</option>
-                          <option value="In-Person" disabled={selectedLawyer?.isInPersonAvailable === false}>
-                            In-Person at Office{selectedLawyer?.isInPersonAvailable === false ? ' (Currently unavailable)' : ''}
+                          <option value="Online" disabled={!isOnlineAvailable(selectedLawyer)}>
+                            Online / Video Call{!isOnlineAvailable(selectedLawyer) ? ' (Currently unavailable)' : ''}
+                          </option>
+                          <option value="In-Person" disabled={!isInPersonAvailable(selectedLawyer)}>
+                            In-Person at Office{!isInPersonAvailable(selectedLawyer) ? ' (Currently unavailable)' : ''}
                           </option>
                         </select>
                       </div>
@@ -846,6 +1051,7 @@ function matchesCategory(specialization, selectedCategory) {
                           className="input-field" 
                           value={date} 
                           onChange={(e) => setDate(e.target.value)}
+                          min={new Date().toISOString().split('T')[0]}
                           style={{paddingLeft: '16px', background: 'rgba(15,23,42,0.8)'}}
                           required
                         />
@@ -854,14 +1060,20 @@ function matchesCategory(specialization, selectedCategory) {
 
                     <div style={styles.formGroup}>
                       <label style={styles.label}>Time Slot</label>
-                      <input 
-                        type="time" 
-                        className="input-field" 
-                        value={time} 
+                      <select
+                        className="input-field"
+                        value={time}
                         onChange={(e) => setTime(e.target.value)}
-                        style={{paddingLeft: '16px', background: 'rgba(15,23,42,0.8)'}}
+                        style={{paddingLeft: '16px', background: 'rgba(15,23,42,0.8)', color: 'white'}}
                         required
-                      />
+                      >
+                        <option value="">Select Time Slot</option>
+                        {getSelectableTimeSlots().map(slot => (
+                          <option key={slot.value} value={slot.value}>
+                            {slot.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div style={styles.formGroup}>
@@ -876,7 +1088,7 @@ function matchesCategory(specialization, selectedCategory) {
                       />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={styles.submitBtn} disabled={bookingLoading}>
+                    <button type="submit" className="btn btn-primary" style={styles.submitBtn} disabled={bookingLoading || !isContactNumberValid}>
                       {bookingLoading ? 'Submitting request...' : 'Confirm and Book'}
                     </button>
                   </form>
@@ -1274,5 +1486,67 @@ const styles = {
     display: 'flex',
     gap: '8px',
     marginTop: '10px'
+  },
+  sortContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '16px',
+    position: 'relative',
+    zIndex: 10
+  },
+  sortWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    position: 'relative'
+  },
+  sortLabel: {
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    fontWeight: '500'
+  },
+  sortSelectButton: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid var(--border)',
+    borderRadius: '8px',
+    padding: '6px 12px',
+    color: 'var(--primary)',
+    fontSize: '13px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    transition: 'all 0.2s',
+    outline: 'none'
+  },
+  sortArrow: {
+    fontSize: '10px',
+    color: 'var(--primary)'
+  },
+  sortDropdownMenu: {
+    position: 'absolute',
+    top: '36px',
+    right: 0,
+    background: 'rgba(15, 23, 42, 0.95)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid var(--border)',
+    borderRadius: '10px',
+    padding: '6px 0',
+    minWidth: '160px',
+    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+    zIndex: 100
+  },
+  sortDropdownItem: {
+    padding: '8px 16px',
+    fontSize: '13px',
+    cursor: 'pointer',
+    transition: 'background 0.2s, color 0.2s',
+    textAlign: 'left',
+    display: 'flex',
+    alignItems: 'center',
+    ':hover': {
+      background: 'rgba(255, 255, 255, 0.05)'
+    }
   }
 };

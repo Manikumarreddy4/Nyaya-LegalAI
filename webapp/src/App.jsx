@@ -223,7 +223,7 @@ export default function App() {
       case 'profile':
         return <Profile user={user} onProfileUpdate={(updatedUser) => setUser(updatedUser)} />;
       case 'chat-history':
-        return <ChatHistory user={user} onNavigate={handleNavigate} />;
+        return <ChatHistory user={user} onNavigate={handleNavigate} initialTab={navExtra?.initialTab} />;
       default:
         return <ClientDashboard user={user} onNavigate={handleNavigate} />;
     }

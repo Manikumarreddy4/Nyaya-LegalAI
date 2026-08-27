@@ -17,6 +17,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 class ConsultationViewModel(
     private val firestoreRepo: FirestoreRepository,
@@ -242,6 +249,19 @@ class ConsultationViewModel(
             _uploadState.value = UploadState.Loading
             try {
                 val user = sessionManager.getUser() ?: throw Exception("Not logged in")
+                val cleanContact = contact.ifBlank { user.phone }.trim()
+                val phonePattern = "^[0-9]{10}$".toRegex()
+                if (!phonePattern.matches(cleanContact)) {
+                    throw Exception("Phone number must contain exactly 10 digits.")
+                }
+
+                // Call backend consultations validation endpoint
+                val serverError = withContext(Dispatchers.IO) {
+                    validateBookingOnBackend(cleanContact)
+                }
+                if (serverError != null) {
+                    throw Exception(serverError)
+                }
                 
                 Log.d("BOOKING", "BOOKING: Checking lawyer availability")
                 Log.d("BOOKING", "BOOKING: Lawyer ID = $lawyerUid")
@@ -343,7 +363,73 @@ class ConsultationViewModel(
                 val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
                 val docSnap = db.collection("consultations").document(consultationId).get().await()
                 val currentStatus = docSnap.getString("status") ?: "PENDING"
-                if (currentStatus.uppercase() == "EXPIRED") {
+                var isPastAppt = false
+                try {
+                    val apptDateTimeVal = docSnap.get("appointmentDateTime") as? com.google.firebase.Timestamp
+                    if (apptDateTimeVal != null) {
+                        isPastAppt = apptDateTimeVal.toDate().before(java.util.Date())
+                    } else {
+                        val dateStr = (docSnap.getString("date") ?: "").ifBlank {
+                            (docSnap.getString("dateTime") ?: "").ifBlank {
+                                (docSnap.getString("appointmentDate") ?: "").ifBlank {
+                                    (docSnap.getString("consultationDate") ?: "")
+                                }
+                            }
+                        }
+                        val timeStr = (docSnap.getString("time") ?: "").ifBlank {
+                            (docSnap.getString("appointmentTime") ?: "").ifBlank {
+                                (docSnap.getString("consultationTime") ?: "").ifBlank { "Not scheduled" }
+                            }
+                        }
+                        if (dateStr.isNotBlank()) {
+                            var dateVal: java.util.Date? = null
+                            var timeVal: java.util.Date? = null
+                            val formats = listOf("dd/MM/yyyy", "dd MMMM yyyy", "dd MMM yyyy", "yyyy-MM-dd")
+                            for (format in formats) {
+                                try {
+                                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
+                                    sdf.isLenient = false
+                                    val parsed = sdf.parse(dateStr)
+                                    if (parsed != null) {
+                                        dateVal = parsed
+                                        break
+                                    }
+                                } catch (e: Exception) {}
+                            }
+                            if (timeStr.isNotBlank() && timeStr != "Not scheduled") {
+                                val timeFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm")
+                                for (format in timeFormats) {
+                                    try {
+                                        val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
+                                        sdf.isLenient = false
+                                        timeVal = sdf.parse(timeStr)
+                                        break
+                                    } catch (e: Exception) {}
+                                }
+                            }
+                            if (dateVal != null) {
+                                val cal = java.util.Calendar.getInstance()
+                                cal.time = dateVal
+                                if (timeVal != null) {
+                                    val timeCal = java.util.Calendar.getInstance()
+                                    timeCal.time = timeVal
+                                    cal.set(java.util.Calendar.HOUR_OF_DAY, timeCal.get(java.util.Calendar.HOUR_OF_DAY))
+                                    cal.set(java.util.Calendar.MINUTE, timeCal.get(java.util.Calendar.MINUTE))
+                                } else {
+                                    cal.set(java.util.Calendar.HOUR_OF_DAY, 23)
+                                    cal.set(java.util.Calendar.MINUTE, 59)
+                                }
+                                cal.set(java.util.Calendar.SECOND, 0)
+                                cal.set(java.util.Calendar.MILLISECOND, 0)
+                                isPastAppt = cal.time.before(java.util.Date())
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("ConsultationViewModel", "Error checking appointment date in updateStatus", e)
+                }
+
+                if (currentStatus.uppercase() == "EXPIRED" || (currentStatus.uppercase() == "PENDING" && isPastAppt)) {
                     Log.w("ConsultationViewModel", "Cannot update status of expired consultation.")
                     return@launch
                 }
@@ -421,6 +507,39 @@ class ConsultationViewModel(
 
     fun getLawyerReviewsFlow(lawyerId: String): kotlinx.coroutines.flow.Flow<List<com.example.nyayalegalai.models.LawyerReview>> {
         return firestoreRepo.getLawyerReviewsFlow(lawyerId)
+    }
+
+    private suspend fun validateBookingOnBackend(phone: String): String? {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        val json = JSONObject()
+        json.put("phone", phone)
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = json.toString().toRequestBody(mediaType)
+        
+        // Target host machine localhost from Android Emulator: 10.0.2.2
+        val request = Request.Builder()
+            .url("http://10.0.2.2:5000/api/consultations/validate")
+            .post(body)
+            .build()
+
+        return try {
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                val errBody = response.body?.string() ?: ""
+                val errJson = JSONObject(errBody)
+                errJson.optString("error", "Server validation failed.")
+            } else {
+                null // Success!
+            }
+        } catch (e: Exception) {
+            Log.w("BOOKING", "Backend booking validation endpoint unreachable: ${e.message}. Falling back to local validation.")
+            null // Fallback to local validation when backend is offline
+        }
     }
 }
 

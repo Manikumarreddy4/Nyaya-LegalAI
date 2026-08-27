@@ -106,6 +106,38 @@ function getAppointmentDateTime(c) {
   return parsedDate;
 }
 
+function getActivityTimestamp(c) {
+  if (!c) return 0;
+  const times = [
+    c.updatedAt,
+    c.createdAt,
+    c.acceptedAt,
+    c.rejectedAt,
+    c.completedAt,
+    c.expiredAt
+  ];
+  let maxMs = 0;
+  for (const t of times) {
+    if (t) {
+      let ms = 0;
+      if (typeof t.toMillis === 'function') {
+        ms = t.toMillis();
+      } else if (t.seconds) {
+        ms = t.seconds * 1000;
+      } else if (t instanceof Date) {
+        ms = t.getTime();
+      } else {
+        const parsed = Date.parse(t);
+        if (!isNaN(parsed)) ms = parsed;
+      }
+      if (ms > maxMs) {
+        maxMs = ms;
+      }
+    }
+  }
+  return maxMs;
+}
+
 async function checkAndExpireConsultations(docs) {
   const now = new Date();
   const promises = [];
@@ -181,12 +213,12 @@ export default function LawyerDashboard({ user, onNavigate }) {
           if (docSnapshot.exists()) {
             const profileData = docSnapshot.data();
             setProfile(profileData);
-            const isAvail = profileData.isAvailable !== false && profileData.onlineAvailable !== false;
+            const isAvail = profileData.availability_status !== undefined ? profileData.availability_status === true : (profileData.isAvailable !== false && profileData.onlineAvailable !== false);
             console.log(`LAWYER_AVAILABILITY: Listener received = ${isAvail}`);
             console.log(`LAWYER_AVAILABILITY: Loaded status = ${isAvail}`);
             setIsOnline(isAvail);
 
-            const isInPersonAvail = profileData.isInPersonAvailable !== false;
+            const isInPersonAvail = profileData.in_person_consultation_available !== undefined ? profileData.in_person_consultation_available === true : profileData.isInPersonAvailable !== false;
             console.log(`IN_PERSON_AVAILABILITY: Loaded = ${isInPersonAvail}`);
             setIsInPersonOnline(isInPersonAvail);
           }
@@ -208,7 +240,8 @@ export default function LawyerDashboard({ user, onNavigate }) {
 
           await checkAndExpireConsultations(docs);
 
-          setConsultations(docs);
+          const sortedDocs = [...docs].sort((a, b) => getActivityTimestamp(b) - getActivityTimestamp(a));
+          setConsultations(sortedDocs);
           setLoading(false);
         }, (error) => {
           console.error('Error listening to lawyer consultations', error);
@@ -256,9 +289,10 @@ export default function LawyerDashboard({ user, onNavigate }) {
 
       await updateDoc(docRef, updates);
       
-      setConsultations(prev => 
-        prev.map(c => c.id === consultationId ? { ...c, ...updates } : c)
-      );
+      setConsultations(prev => {
+        const updated = prev.map(c => c.id === consultationId ? { ...c, ...updates } : c);
+        return [...updated].sort((a, b) => getActivityTimestamp(b) - getActivityTimestamp(a));
+      });
     } catch (e) {
       alert('Error updating consultation status: ' + e.message);
     }
@@ -274,6 +308,8 @@ export default function LawyerDashboard({ user, onNavigate }) {
       const updates = {
         isAvailable: newStatus,
         onlineAvailable: newStatus,
+        availability_status: newStatus,
+        video_consultation_available: newStatus,
         availabilityUpdatedAt: new Date(),
         updatedAt: new Date()
       };
@@ -297,6 +333,7 @@ export default function LawyerDashboard({ user, onNavigate }) {
     try {
       const updates = {
         isInPersonAvailable: newStatus,
+        in_person_consultation_available: newStatus,
         inPersonAvailabilityUpdatedAt: new Date(),
         updatedAt: new Date()
       };
@@ -360,12 +397,14 @@ export default function LawyerDashboard({ user, onNavigate }) {
       <div className="glass-panel" style={styles.welcomeBanner}>
         <div style={styles.bannerLeft}>
           <h1 style={styles.title}>Welcome, Advocate {profile?.name || user?.name || 'Advocate'}</h1>
-          <div style={styles.verifyBadge}>
-            <ShieldCheck size={16} color={profile?.verificationStatus === 'VERIFIED' ? 'var(--secondary)' : 'var(--accent)'} />
-            <span style={{color: profile?.verificationStatus === 'VERIFIED' ? 'var(--secondary)' : 'var(--accent)', fontWeight: 'bold'}}>
-              {profile?.verificationStatus === 'VERIFIED' ? '✓ Verified Advocate' : 'Verification Under Review'}
-            </span>
-          </div>
+          {profile?.verificationStatus === 'VERIFIED' && (
+            <div style={styles.verifyBadge}>
+              <ShieldCheck size={16} color="var(--secondary)" />
+              <span style={{color: 'var(--secondary)', fontWeight: 'bold'}}>
+                ✓ Verified Advocate
+              </span>
+            </div>
+          )}
           <p style={styles.subtitle}>Manage your consultation slots, approve pending appointments, and view earning stats.</p>
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>

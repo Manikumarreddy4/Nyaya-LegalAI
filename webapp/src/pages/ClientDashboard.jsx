@@ -225,7 +225,7 @@ export default function ClientDashboard({ user, onNavigate }) {
     unsubChat = onSnapshot(chatRef, (snap) => {
       chatList = [];
       snap.forEach(docSnap => {
-        chatList.push({ id: docSnap.id, ...docSnap.data() });
+        chatList.push({ ...docSnap.data(), id: docSnap.id });
       });
       combineAndSort();
     }, (err) => {
@@ -237,7 +237,7 @@ export default function ClientDashboard({ user, onNavigate }) {
     unsubLearn = onSnapshot(learnRef, (snap) => {
       learnList = [];
       snap.forEach(docSnap => {
-        learnList.push({ id: docSnap.id, ...docSnap.data() });
+        learnList.push({ ...docSnap.data(), id: docSnap.id });
       });
       combineAndSort();
     }, (err) => {
@@ -335,6 +335,7 @@ export default function ClientDashboard({ user, onNavigate }) {
           <div 
             className="glass-panel activity-card" 
             style={styles.statCard}
+            onClick={() => onNavigate('chat-history', { initialTab: 'AI_ASSISTANT' })}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(168, 85, 247, 0.1)', color: 'var(--tertiary)' }}>
               <Bot size={20} />
@@ -349,6 +350,7 @@ export default function ClientDashboard({ user, onNavigate }) {
           <div 
             className="glass-panel activity-card" 
             style={styles.statCard}
+            onClick={() => onNavigate('chat-history', { initialTab: 'LEGAL_LEARNING' })}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(16, 185, 129, 0.1)', color: 'var(--secondary)' }}>
               <BookOpen size={20} />
@@ -363,6 +365,7 @@ export default function ClientDashboard({ user, onNavigate }) {
           <div 
             className="glass-panel" 
             style={styles.statCard}
+            onClick={() => onNavigate('chat-history')}
           >
             <div style={{ ...styles.statIconContainer, background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
               <MessageSquare size={20} />
@@ -630,7 +633,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: '16px 20px',
-    cursor: 'default',
+    cursor: 'pointer',
     gap: '16px'
   },
   statIconContainer: {

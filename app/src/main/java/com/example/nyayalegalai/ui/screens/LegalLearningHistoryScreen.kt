@@ -26,9 +26,12 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LegalLearningHistoryScreen(navController: NavController, viewModel: LegalLearningViewModel) {
+    LaunchedEffect(Unit) {
+        viewModel.refreshHistory()
+    }
     val history by viewModel.recentHistory.collectAsState()
     
-    val selectedItems = remember { mutableStateListOf<Int>() }
+    val selectedItems = remember { mutableStateListOf<String>() }
     var isInSelectionMode by remember { mutableStateOf(false) }
     var showDeleteSelectedDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<LearningHistory?>(null) }

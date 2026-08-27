@@ -18,7 +18,7 @@ class ViewModelFactory(
     private val authRepo = FirebaseAuthRepository()
     private val firestoreRepo = FirestoreRepository()
     private val storageRepo = StorageRepository()
-    private val chatHistoryRepository = ChatHistoryRepository(db.unifiedHistoryDao(), sessionManager, firestoreRepo)
+    private val chatHistoryRepository = ChatHistoryRepository(db.unifiedHistoryDao(), sessionManager, firestoreRepo, db.learningHistoryDao())
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {

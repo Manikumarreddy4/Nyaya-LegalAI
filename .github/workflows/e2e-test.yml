@@ -1,0 +1,62 @@
+name: Web & Mobile E2E Testing
+
+on:
+  push:
+    paths:
+      - 'webapp/**'
+      - '.github/workflows/e2e-test.yml'
+  pull_request:
+    paths:
+      - 'webapp/**'
+      - '.github/workflows/e2e-test.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'webapp/package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          cd webapp
+          npm ci
+
+      - name: Start Web App in Background
+        run: |
+          cd webapp
+          npm run dev &
+          # Wait for Vite dev server to start
+          for i in {1..10}; do
+            curl -s http://localhost:5173/ && break
+            sleep 1
+          done
+
+      - name: Run Web E2E (Selenium) Tests
+        run: |
+          cd webapp
+          node e2e-tests/selenium/web-e2e.js
+        env:
+          TEST_BASE_URL: "http://localhost:5173"
+
+      - name: Run Mobile E2E (Appium) Tests
+        run: |
+          cd webapp
+          node e2e-tests/appium/mobile-e2e.js
+
+      - name: Upload E2E Excel Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-excel-reports
+          path: |
+            webapp/selenium-report.xlsx
+            webapp/appium-report.xlsx

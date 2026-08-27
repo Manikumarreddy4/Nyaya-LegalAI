@@ -19,6 +19,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 class SignupViewModel(
     private val authRepo: FirebaseAuthRepository,
@@ -53,31 +60,39 @@ class SignupViewModel(
         officeAddress: String = "",
         availableDays: String = "Mon - Sat",
         availableTime: String = "09:00 AM - 06:00 PM",
-        profilePhotoUrl: String = ""
+        profilePhotoUrl: String = "",
+        fcmToken: String = ""
     ) {
         Log.d("SIGNUP_DEBUG", "ViewModel Called: name=$name, email=$email, isLawyer=$isLawyer")
 
-        // Validation
+        // 1. Blank fields validation
         if (name.isBlank() || email.isBlank() || phone.isBlank() || pass.isBlank()) {
-            Log.e("SIGNUP_DEBUG", "Validation Failed: Blank fields")
             _signupState.value = SignupState.Error("All required fields must be filled")
             return
         }
+        // 2. Email pattern validation
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
-            Log.e("SIGNUP_DEBUG", "Validation Failed: Invalid email format: '$email'")
             _signupState.value = SignupState.Error("Invalid email address")
             return
         }
-        if (pass.length < 6) {
-            Log.e("SIGNUP_DEBUG", "Validation Failed: Password too short")
-            _signupState.value = SignupState.Error("Password must be at least 6 characters")
+        // 3. Phone pattern validation
+        val phonePattern = "^[0-9]{10}$".toRegex()
+        if (!phonePattern.matches(phone.trim())) {
+            _signupState.value = SignupState.Error("Phone number must contain exactly 10 digits.")
             return
         }
+        // 4. Password strong criteria validation
+        val passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{6,}$".toRegex()
+        if (!passwordPattern.matches(pass)) {
+            _signupState.value = SignupState.Error("Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.")
+            return
+        }
+        // 5. Matching confirmation passwords
         if (pass != confirmPass) {
-            Log.e("SIGNUP_DEBUG", "Validation Failed: Passwords do not match")
             _signupState.value = SignupState.Error("Passwords do not match")
             return
         }
+        // 6. Professional field validation for lawyers
         if (isLawyer) {
             if (barId.isBlank() || specialization.isBlank() || experience.isBlank() || location.isBlank()) {
                 _signupState.value = SignupState.Error("Bar ID, Specialization, Experience & City are required for lawyers")
@@ -87,9 +102,19 @@ class SignupViewModel(
 
         viewModelScope.launch {
             _signupState.value = SignupState.Loading
+            
+            // Server-side validation check
+            val serverError = withContext(Dispatchers.IO) {
+                validateSignupOnBackend(phone.trim(), pass)
+            }
+            if (serverError != null) {
+                _signupState.value = SignupState.Error(serverError)
+                return@launch
+            }
+
             try {
                 Log.d("SIGNUP_DEBUG", "1. Attempting Auth Signup")
-                val authResult = authRepo.signup(email.trim(), pass)
+                val authResult = authRepo.signup(email.trim(), pass.trim())
                 val firebaseUser = authResult.user ?: FirebaseAuth.getInstance().currentUser ?: throw Exception("Auth UID is null")
                 val userId = firebaseUser.uid
                 
@@ -128,6 +153,11 @@ class SignupViewModel(
                                 consultationFee = consultationFee,
                                 onlineAvailable = onlineAvailable,
                                 inPersonAvailable = inPersonAvailable,
+                                isAvailable = onlineAvailable,
+                                availability_status = onlineAvailable,
+                                video_consultation_available = onlineAvailable,
+                                isInPersonAvailable = inPersonAvailable,
+                                in_person_consultation_available = inPersonAvailable,
                                 emergencyAvailable = emergencyAvailable,
                                 officeAddress = officeAddress.trim(),
                                 availableDays = availableDays.ifBlank { "Mon - Sat" },
@@ -205,10 +235,46 @@ class SignupViewModel(
         )
     }
 
+    private suspend fun validateSignupOnBackend(phone: String, pass: String): String? {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        val json = JSONObject()
+        json.put("phone", phone)
+        json.put("password", pass)
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = json.toString().toRequestBody(mediaType)
+        
+        // Target host machine localhost from Android Emulator: 10.0.2.2
+        val request = Request.Builder()
+            .url("http://10.0.2.2:5000/api/auth/signup/validate")
+            .post(body)
+            .build()
+
+        return try {
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                val errBody = response.body?.string() ?: ""
+                val errJson = JSONObject(errBody)
+                errJson.optString("error", "Server validation failed.")
+            } else {
+                null // Success!
+            }
+        } catch (e: Exception) {
+            Log.w("SIGNUP_DEBUG", "Backend validation endpoint unreachable: ${e.message}. Falling back to local validation.")
+            null // Fallback to local validation when backend is offline
+        }
+    }
+
     fun resetState() {
         _signupState.value = SignupState.Idle
     }
 }
+
+
 
 sealed class SignupState {
     object Idle : SignupState()

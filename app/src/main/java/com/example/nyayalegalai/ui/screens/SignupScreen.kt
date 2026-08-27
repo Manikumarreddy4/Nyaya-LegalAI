@@ -80,6 +80,16 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
     val isFullNameValid = remember(fullName) { fullName.trim().length >= 3 }
     val isEmailValid = remember(email) { android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches() }
     val isPhoneValid = remember(phone) { phone.trim().length == 10 && phone.all { it.isDigit() } }
+    
+    val hasMinLength = remember(password) { password.length >= 6 }
+    val hasUppercase = remember(password) { password.any { it.isUpperCase() } }
+    val hasLowercase = remember(password) { password.any { it.isLowerCase() } }
+    val hasDigit = remember(password) { password.any { it.isDigit() } }
+    val hasSpecialChar = remember(password) { password.any { !it.isLetterOrDigit() } }
+    val isPasswordValid = remember(password) {
+        hasMinLength && hasUppercase && hasLowercase && hasDigit && hasSpecialChar
+    }
+
     val isConfirmPasswordValid = remember(password, confirmPassword) { confirmPassword.isNotEmpty() && confirmPassword == password }
 
     // Handle SignupState changes
@@ -297,7 +307,11 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
                     // Phone Number Input
                     OutlinedTextField(
                         value = phone,
-                        onValueChange = { phone = it },
+                        onValueChange = { input ->
+                            if (input.length <= 10 && input.all { it.isDigit() }) {
+                                phone = input
+                            }
+                        },
                         label = { Text(stringResource(id = R.string.phone_number)) },
                         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = primaryColor) },
                         trailingIcon = {
@@ -326,7 +340,7 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
                     )
                     if (phone.isNotEmpty() && !isPhoneValid) {
                         Text(
-                            text = "Phone number must be exactly 10 digits",
+                            text = "Phone number must contain exactly 10 digits.",
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -617,6 +631,7 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
                                 Icon(imageVector = image, contentDescription = "Toggle password visibility")
                             }
                         },
+                        isError = password.isNotEmpty() && !isPasswordValid,
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         shape = RoundedCornerShape(16.dp),
@@ -628,6 +643,32 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
                             errorBorderColor = MaterialTheme.colorScheme.error
                         )
                     )
+
+                    if (password.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                                .padding(12.dp)
+                        ) {
+                            Text("Password Requirements:", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            PasswordCheckItem("At least 6 characters", hasMinLength)
+                            PasswordCheckItem("One uppercase letter", hasUppercase)
+                            PasswordCheckItem("One lowercase letter", hasLowercase)
+                            PasswordCheckItem("One number", hasDigit)
+                            PasswordCheckItem("One special character", hasSpecialChar)
+                        }
+                        if (!isPasswordValid) {
+                            Text(
+                                text = "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -702,7 +743,7 @@ fun SignupScreen(navController: NavController, signupViewModel: SignupViewModel)
 
                     // Dynamic form validation flags
                     val isFormValid = isFullNameValid && isEmailValid && isPhoneValid && 
-                            password.isNotEmpty() && isConfirmPasswordValid && 
+                            isPasswordValid && isConfirmPasswordValid && 
                             (!isLawyerSelected || (barId.isNotBlank() && specialization.isNotBlank() && experience.isNotBlank() && location.isNotBlank()))
 
                     // Signup Submit Button with premium horizontal gradient

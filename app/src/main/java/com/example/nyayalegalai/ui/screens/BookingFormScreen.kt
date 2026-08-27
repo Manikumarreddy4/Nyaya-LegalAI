@@ -75,39 +75,87 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
 
     var showConfirmDialog by remember { mutableStateOf(false) }
 
-    val inPersonAvailable = lawyerProfile?.isInPersonAvailable ?: true
-    LaunchedEffect(inPersonAvailable) {
-        if (!inPersonAvailable && consultationType == "In-Person") {
+    val onlineAvailable = lawyerProfile?.isOnlineAvailable ?: true
+    val inPersonAvailable = lawyerProfile?.isInPersonOnlineAvailable ?: true
+    LaunchedEffect(onlineAvailable, inPersonAvailable) {
+        if (!inPersonAvailable && consultationType == "In-Person" && onlineAvailable) {
             consultationType = "Online"
+        } else if (!onlineAvailable && consultationType == "Online" && inPersonAvailable) {
+            consultationType = "In-Person"
         }
     }
 
-    val calendar = java.util.Calendar.getInstance()
-    val datePickerDialog = android.app.DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val selCal = java.util.Calendar.getInstance()
-            selCal.set(year, month, dayOfMonth)
-            val format = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-            date = format.format(selCal.time)
-        },
-        calendar.get(java.util.Calendar.YEAR),
-        calendar.get(java.util.Calendar.MONTH),
-        calendar.get(java.util.Calendar.DAY_OF_MONTH)
-    )
+    val showDatePicker = {
+        val currentCal = java.util.Calendar.getInstance()
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val selCal = java.util.Calendar.getInstance()
+                selCal.set(year, month, dayOfMonth)
+                val format = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                date = format.format(selCal.time)
+            },
+            currentCal.get(java.util.Calendar.YEAR),
+            currentCal.get(java.util.Calendar.MONTH),
+            currentCal.get(java.util.Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.minDate = System.currentTimeMillis() - 1000
+        }.show()
+    }
 
-    val timePickerDialog = android.app.TimePickerDialog(
-        context,
-        { _, hourOfDay, minute ->
-            val amPm = if (hourOfDay < 12) "AM" else "PM"
-            val hour = if (hourOfDay % 12 == 0) 12 else hourOfDay % 12
-            val minStr = String.format("%02d", minute)
-            selectedTimeSlot = "$hour:$minStr $amPm"
-        },
-        calendar.get(java.util.Calendar.HOUR_OF_DAY),
-        calendar.get(java.util.Calendar.MINUTE),
-        false
-    )
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+
+    val allTimeSlots = remember {
+        val list = mutableListOf<Pair<String, String>>()
+        for (hour in 0..23) {
+            for (min in listOf(0, 15, 30, 45)) {
+                val hh = String.format("%02d", hour)
+                val mm = String.format("%02d", min)
+                val amPm = if (hour < 12) "AM" else "PM"
+                val displayHour = if (hour % 12 == 0) 12 else hour % 12
+                val displayMin = String.format("%02d", min)
+                list.add(Pair("$hh:$mm", "$displayHour:$displayMin $amPm"))
+            }
+        }
+        list
+    }
+
+    val getSelectableTimeSlots = {
+        val curTodayStr = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date())
+        if (date != curTodayStr) {
+            allTimeSlots
+        } else {
+            val minTime = System.currentTimeMillis() + 2 * 60 * 1000
+            allTimeSlots.filter { slot ->
+                val parts = slot.first.split(":")
+                val hour = parts[0].toInt()
+                val min = parts[1].toInt()
+                
+                val checkCal = java.util.Calendar.getInstance()
+                checkCal.set(java.util.Calendar.HOUR_OF_DAY, hour)
+                checkCal.set(java.util.Calendar.MINUTE, min)
+                checkCal.set(java.util.Calendar.SECOND, 0)
+                checkCal.set(java.util.Calendar.MILLISECOND, 0)
+                
+                checkCal.timeInMillis >= minTime
+            }
+        }
+    }
+
+    LaunchedEffect(date, selectedTimeSlot) {
+        if (date.isNotEmpty() && selectedTimeSlot.isNotEmpty()) {
+            while (true) {
+                val apptDate = parseAppointmentDateTime(date, selectedTimeSlot)
+                val minAllowed = java.util.Date(System.currentTimeMillis() + 2 * 60 * 1000)
+                if (apptDate == null || apptDate.before(minAllowed)) {
+                    selectedTimeSlot = ""
+                    Toast.makeText(context, "Please select a consultation time at least 2 minutes from now.", Toast.LENGTH_LONG).show()
+                    break
+                }
+                kotlinx.coroutines.delay(5000)
+            }
+        }
+    }
 
     LaunchedEffect(uploadState) {
         if (uploadState is UploadState.Success) {
@@ -166,6 +214,61 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
             dismissButton = {
                 TextButton(onClick = { showConfirmDialog = false }) {
                     Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Time Slot Selection Dialog
+    if (showTimePickerDialog) {
+        AlertDialog(
+            onDismissRequest = { showTimePickerDialog = false },
+            title = { Text("Select Time Slot", fontWeight = FontWeight.Bold) },
+            text = {
+                val slots = getSelectableTimeSlots()
+                if (slots.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("No slots available for today.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                } else {
+                    Box(modifier = Modifier.height(300.dp).fillMaxWidth()) {
+                        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                            columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(slots.size) { index ->
+                                val slot = slots[index]
+                                val isSelected = selectedTimeSlot == slot.second
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectedTimeSlot = slot.second
+                                            showTimePickerDialog = false
+                                        },
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (isSelected) primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    border = BorderStroke(1.dp, if (isSelected) primaryColor else MaterialTheme.colorScheme.outlineVariant)
+                                ) {
+                                    Text(
+                                        text = slot.second,
+                                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp),
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showTimePickerDialog = false }) {
+                    Text("Close")
                 }
             }
         )
@@ -323,13 +426,31 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
 
                     OutlinedTextField(
                         value = contactNumber,
-                        onValueChange = { contactNumber = it },
+                        onValueChange = { input ->
+                            if (input.length <= 10 && input.all { it.isDigit() }) {
+                                contactNumber = input
+                            }
+                        },
                         label = { Text("Contact Phone Number *") },
                         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = primaryColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        isError = contactNumber.isNotEmpty() && contactNumber.length != 10
                     )
+
+                    if (contactNumber.isNotEmpty() && contactNumber.length != 10) {
+                        Text(
+                            text = "Phone number must contain exactly 10 digits.",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
 
                     Text("2. Consultation Mode", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = primaryColor)
 
@@ -341,15 +462,50 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
                             modifier = Modifier
                                 .weight(1f)
                                 .height(46.dp)
-                                .clickable { consultationType = "Online" },
+                                .clickable(enabled = onlineAvailable) { consultationType = "Online" },
                             shape = RoundedCornerShape(12.dp),
-                            color = if (consultationType == "Online") primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            border = BorderStroke(1.dp, if (consultationType == "Online") primaryColor else MaterialTheme.colorScheme.outlineVariant)
+                            color = if (!onlineAvailable) {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+                            } else if (consultationType == "Online") {
+                                primaryColor
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            },
+                            border = BorderStroke(
+                                1.dp,
+                                if (!onlineAvailable) {
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                } else if (consultationType == "Online") {
+                                    primaryColor
+                                } else {
+                                    MaterialTheme.colorScheme.outlineVariant
+                                }
+                            )
                         ) {
                             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.VideoCall, contentDescription = null, tint = if (consultationType == "Online") Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Icon(
+                                    Icons.Default.VideoCall,
+                                    contentDescription = null,
+                                    tint = if (!onlineAvailable) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                    } else if (consultationType == "Online") {
+                                        Color.White
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Online", fontWeight = FontWeight.Bold, color = if (consultationType == "Online") Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    text = if (onlineAvailable) "Online" else "Online (Unavailable)",
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (!onlineAvailable) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                    } else if (consultationType == "Online") {
+                                        Color.White
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
                             }
                         }
 
@@ -424,7 +580,17 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
 
                         FilterChip(
                             selected = isTodaySelected,
-                            onClick = { date = todayStr },
+                            onClick = { 
+                                date = todayStr
+                                if (selectedTimeSlot.isNotEmpty()) {
+                                    val apptDate = parseAppointmentDateTime(todayStr, selectedTimeSlot)
+                                    val minAllowed = java.util.Date(System.currentTimeMillis() + 2 * 60 * 1000)
+                                    if (apptDate == null || apptDate.before(minAllowed)) {
+                                        selectedTimeSlot = ""
+                                        Toast.makeText(context, "Please select a consultation time at least 2 minutes from now.", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            },
                             label = { Text("Today") },
                             shape = RoundedCornerShape(10.dp)
                         )
@@ -436,14 +602,14 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
                         )
                         FilterChip(
                             selected = isCustomSelected,
-                            onClick = { datePickerDialog.show() },
+                            onClick = { showDatePicker() },
                             label = { Text(if (isCustomSelected) date else "Select Date") },
                             shape = RoundedCornerShape(10.dp)
                         )
                     }
 
                     // Date Picker
-                    Box(modifier = Modifier.fillMaxWidth().clickable { datePickerDialog.show() }) {
+                    Box(modifier = Modifier.fillMaxWidth().clickable { showDatePicker() }) {
                         OutlinedTextField(
                             value = if (date.isEmpty()) "Select Preferred Date *" else date,
                             onValueChange = {},
@@ -463,7 +629,7 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
                     }
 
                     // Time Picker
-                    Box(modifier = Modifier.fillMaxWidth().clickable { timePickerDialog.show() }) {
+                    Box(modifier = Modifier.fillMaxWidth().clickable { showTimePickerDialog = true }) {
                         OutlinedTextField(
                             value = if (selectedTimeSlot.isEmpty()) "Select Preferred Time *" else selectedTimeSlot,
                             onValueChange = {},
@@ -563,13 +729,20 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
             }
 
             // Confirm Booking Button
-            val isConsultationTypeValid = consultationType == "Online" || (consultationType == "In-Person" && inPersonAvailable)
-            val isFormValid = clientName.isNotBlank() && caseTitle.isNotBlank() && caseDescription.isNotBlank() && contactNumber.isNotBlank() && date.isNotBlank() && selectedTimeSlot.isNotBlank() && isConsultationTypeValid
+            val isPhoneValid = contactNumber.length == 10 && contactNumber.all { it.isDigit() }
+            val isConsultationTypeValid = (consultationType == "Online" && onlineAvailable) || (consultationType == "In-Person" && inPersonAvailable)
+            val isFormValid = clientName.isNotBlank() && caseTitle.isNotBlank() && caseDescription.isNotBlank() && isPhoneValid && date.isNotBlank() && selectedTimeSlot.isNotBlank() && isConsultationTypeValid
 
             Button(
                 onClick = {
                     if (isFormValid) {
-                        showConfirmDialog = true
+                        val apptDate = parseAppointmentDateTime(date, selectedTimeSlot)
+                        val minAllowed = java.util.Date(System.currentTimeMillis() + 2 * 60 * 1000)
+                        if (apptDate == null || apptDate.before(minAllowed)) {
+                            Toast.makeText(context, "Please select a consultation time at least 2 minutes from now.", Toast.LENGTH_LONG).show()
+                        } else {
+                            showConfirmDialog = true
+                        }
                     }
                 },
                 modifier = Modifier
@@ -585,6 +758,16 @@ fun BookingFormScreen(navController: NavController, viewModel: ConsultationViewM
                 }
             }
         }
+    }
+}
+
+private fun parseAppointmentDateTime(dateStr: String, timeStr: String): java.util.Date? {
+    if (dateStr.isBlank() || timeStr.isBlank()) return null
+    return try {
+        val format = java.text.SimpleDateFormat("dd/MM/yyyy h:mm a", java.util.Locale.US)
+        format.parse("$dateStr $timeStr")
+    } catch (e: Exception) {
+        null
     }
 }
 

@@ -1,0 +1,5 @@
+{
+  "currentUrl": "http://localhost:5173/",
+  "browserLogs": [],
+  "errorStack": "WebDriverError: unknown error: net::ERR_CONNECTION_REFUSED\n  (Session info: chrome=151.0.7922.174)\n    at Object.throwDecodedError (C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\SeleniumTesting\\node_modules\\selenium-webdriver\\lib\\error.js:523:15)\n    at parseHttpResponse (C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\SeleniumTesting\\node_modules\\selenium-webdriver\\lib\\http.js:527:13)\n    at Executor.execute (C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\SeleniumTesting\\node_modules\\selenium-webdriver\\lib\\http.js:459:28)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Driver.execute (C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\SeleniumTesting\\node_modules\\selenium-webdriver\\lib\\webdriver.js:745:17)\n    at async LoginPage.getUrl (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/SeleniumTesting/pages/BasePage.js:19:5)\n    at async Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/SeleniumTesting/tests/e2e-tests.spec.js:60:9)"
+}

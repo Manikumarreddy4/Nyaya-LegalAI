@@ -43,8 +43,8 @@ data class LawyerProfile(
     val languages: String = "",
     val bio: String = "",
     val consultationFee: Double = 500.0,
-    val onlineAvailable: Boolean = true,
-    val inPersonAvailable: Boolean = true,
+    val onlineAvailable: Boolean = false,
+    val inPersonAvailable: Boolean = false,
     val emergencyAvailable: Boolean = false,
     val officeAddress: String = "",
     val availableDays: String = "Mon - Sat",
@@ -58,14 +58,34 @@ data class LawyerProfile(
     val fullName: String = "",
     val displayName: String = "",
     @get:PropertyName("isAvailable")
-    val isAvailable: Boolean = true,
+    val isAvailable: Boolean = false,
+    @get:PropertyName("availability_status")
+    val availability_status: Boolean? = null,
+    @get:PropertyName("video_consultation_available")
+    val video_consultation_available: Boolean? = null,
     val availabilityUpdatedAt: Timestamp? = null,
     @get:PropertyName("isInPersonAvailable")
-    val isInPersonAvailable: Boolean = true,
+    val isInPersonAvailable: Boolean = false,
+    @get:PropertyName("in_person_consultation_available")
+    val in_person_consultation_available: Boolean? = null,
     val inPersonAvailabilityUpdatedAt: Timestamp? = null,
     val createdAt: Timestamp = Timestamp.now(),
     val updatedAt: Timestamp = Timestamp.now()
 ) {
+    val isOnlineAvailable: Boolean
+        get() {
+            val status = availability_status ?: isAvailable
+            if (!status) return false
+            return video_consultation_available ?: onlineAvailable
+        }
+
+    val isInPersonOnlineAvailable: Boolean
+        get() {
+            val status = availability_status ?: isAvailable
+            if (!status) return false
+            return in_person_consultation_available ?: inPersonAvailable
+        }
+
     val displayNameString: String
         get() = name.ifBlank { fullName.ifBlank { displayName.ifBlank { "Advocate" } } }
 

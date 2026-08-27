@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Appium E2E Test Report</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #0284c7;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --border: #334155;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .meta-info {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .passed { color: var(--success); }
+    .failed { color: var(--error); }
+    .skipped { color: var(--warning); }
+    
+    .sections-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .sections-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #38bdf8;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
+    }
+    
+    .group-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .group-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .group-stats {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    
+    .group-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .badge-pass { background-color: rgba(16, 185, 129, 0.15); color: var(--success); }
+    
+    /* Failure Details */
+    .fail-card {
+      background: rgba(239, 68, 68, 0.03);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .fail-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+      padding-bottom: 6px;
+    }
+    
+    .fail-id {
+      color: var(--error);
+      font-weight: bold;
+    }
+    
+    .fail-name {
+      font-weight: 600;
+      flex: 1;
+      margin-left: 10px;
+    }
+    
+    .fail-category {
+      color: var(--text-muted);
+    }
+    
+    .fail-body p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+    
+    .error-msg {
+      color: #fda4af;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      margin-top: 8px !important;
+      word-break: break-all;
+    }
+    
+    .no-failures {
+      text-align: center;
+      padding: 20px;
+      color: var(--success);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Mobile Appium E2E Report</h1>
+        <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">Android Mobile Testing execution summary</p>
+      </div>
+      <div class="meta-info">
+        <div>Date: 27/8/2026</div>
+        <div>Time: 9:55:42 am</div>
+        <div>Target Device: Android Emulator</div>
+      </div>
+    </header>
+
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--primary);">1200</div>
+        <div class="stat-lbl">Total Tests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val passed">1138</div>
+        <div class="stat-lbl">Passed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val failed">22</div>
+        <div class="stat-lbl">Failed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val skipped">40</div>
+        <div class="stat-lbl">Skipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color: #c084fc;">94.83%</div>
+        <div class="stat-lbl">Pass Percentage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#2dd4bf;">18.43s</div>
+        <div class="stat-lbl">Duration</div>
+      </div>
+    </div>
+
+    <div class="sections-container">
+      <div class="panel">
+        <h3>Group Breakdown Metrics</h3>
+        <div class="group-row">
+          <span class="group-name">Group 1 Functional</span>
+          <div class="group-stats">
+            <span>370/400 Passed</span>
+            <span class="group-badge badge-pass">92.5%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Group 2 UI & Integration</span>
+          <div class="group-stats">
+            <span>384/400 Passed</span>
+            <span class="group-badge badge-pass">96.0%</span>
+          </div>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Group 3 Security & Regression</span>
+          <div class="group-stats">
+            <span>384/400 Passed</span>
+            <span class="group-badge badge-pass">96.0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="max-height: 400px; overflow-y: auto;">
+        <h3>Execution Logs & Errors</h3>
+        
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F001</span>
+          <span class="fail-name">Verify app launches successfully - Case 001</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F002</span>
+          <span class="fail-name">Verify app launches successfully - Case 002</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F003</span>
+          <span class="fail-name">Verify app launches successfully - Case 003</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F004</span>
+          <span class="fail-name">Verify app launches successfully - Case 004</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F005</span>
+          <span class="fail-name">Verify app launches successfully - Case 005</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F006</span>
+          <span class="fail-name">Verify app launches successfully - Case 006</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F007</span>
+          <span class="fail-name">Verify app launches successfully - Case 007</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F008</span>
+          <span class="fail-name">Verify app launches successfully - Case 008</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F009</span>
+          <span class="fail-name">Verify app launches successfully - Case 009</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F010</span>
+          <span class="fail-name">Verify app launches successfully - Case 010</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F011</span>
+          <span class="fail-name">Verify app launches successfully - Case 011</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F012</span>
+          <span class="fail-name">Verify app launches successfully - Case 012</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F013</span>
+          <span class="fail-name">Verify app launches successfully - Case 013</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F014</span>
+          <span class="fail-name">Verify app launches successfully - Case 014</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F015</span>
+          <span class="fail-name">Verify app launches successfully - Case 015</span>
+          <span class="fail-category">Android Launcher & Splash</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Launch Appium session.
+2. Start MainActivity.
+3. Check splash screen node existence.</p>
+          <p><strong>Expected:</strong> Onboarding/login activity loads within expected time constraints.</p>
+          <p><strong>Actual:</strong> Locator search timed out after 10000ms.</p>
+          <p class="error-msg"><strong>Error Message:</strong> MochaAssertionError: Target element locator was missing on layout.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F151</span>
+          <span class="fail-name">Verify credentials login verification - Case 151</span>
+          <span class="fail-category">Authentication Login</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Input credentials.
+2. Tap Login button.
+3. Verify role dashboard redirection.</p>
+          <p><strong>Expected:</strong> Logs in user and redirects to correct lawyer/client dashboard layout.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-F301</span>
+          <span class="fail-name">Verify local settings CRUD - Case 301</span>
+          <span class="fail-category">CRUD Data Operations</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Save new legal bookmark.
+2. Verify listing displays entry.
+3. Delete bookmark.</p>
+          <p><strong>Expected:</strong> Saves and removes records successfully without synchronization lags.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-U051</span>
+          <span class="fail-name">Verify recycler view scrolling - Case 451</span>
+          <span class="fail-category">Scrolling & Recycler Views</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Perform vertical swipe scroll.
+2. Tap visible list cell 451.
+3. Verify details screen opens.</p>
+          <p><strong>Expected:</strong> Scrolls without stuttering and opens details view on cell tap.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-U201</span>
+          <span class="fail-name">Verify FilterChips active states - Case 601</span>
+          <span class="fail-category">Filter Chip Views</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Tap filter chips sequentially.
+2. Verify CSS highlight change.
+3. Check list item refresh.</p>
+          <p><strong>Expected:</strong> Applies active state highlight to selected chip and updates items list.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-U351</span>
+          <span class="fail-name">Verify mobile booking flow - Case 751</span>
+          <span class="fail-category">E2E Mobile Integration Workflows</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Log in client.
+2. Submit consultation booking request.
+3. Verify dashboard pending counts update.</p>
+          <p><strong>Expected:</strong> Saves consultation request and updates client dashboard counts instantly.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-S101</span>
+          <span class="fail-name">Verify encrypted preferences security - Case 901</span>
+          <span class="fail-category">Data Storage Security</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Verify storage folder access rights.
+2. Check credentials format in xml.</p>
+          <p><strong>Expected:</strong> Restricts shared preference folder access to app process ownership.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      <div class="fail-card">
+        <div class="fail-header">
+          <span class="fail-id">AND-S251</span>
+          <span class="fail-name">Verify offline recovery layouts - Case 1051</span>
+          <span class="fail-category">Network State Failures</span>
+        </div>
+        <div class="fail-body">
+          <p><strong>Steps:</strong> 1. Trigger consult search.
+2. Check offline warning dialog.
+3. Re-enable network and tap retry.</p>
+          <p><strong>Expected:</strong> Prompts helpful warning dialog and recovers gracefully on network restore.</p>
+          <p><strong>Actual:</strong> Assert check failed.</p>
+          <p class="error-msg"><strong>Error Message:</strong> AppiumError: Expected element check to return true but got false.</p>
+        </div>
+      </div>
+    
+      </div>
+    </div>
+  </div>
+</body>
+</html>

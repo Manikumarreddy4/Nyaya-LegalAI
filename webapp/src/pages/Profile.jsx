@@ -49,7 +49,6 @@ export default function Profile({ user, onProfileUpdate }) {
   const [darkMode, setDarkMode] = useState(false);
   const [themeColor, setThemeColor] = useState('Default');
   const [fontColor, setFontColor] = useState('Default');
-  const [settingsLanguage, setSettingsLanguage] = useState('en');
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState('');
 
@@ -120,7 +119,6 @@ export default function Profile({ user, onProfileUpdate }) {
         setDarkMode(data.darkMode ?? false);
         setThemeColor(data.themeColor ?? 'Default');
         setFontColor(data.fontColor ?? 'Default');
-        setSettingsLanguage(data.language ?? 'en');
       }
     }, (error) => {
       console.error('Error listening to user settings:', error);
@@ -148,8 +146,8 @@ export default function Profile({ user, onProfileUpdate }) {
           title.startsWith('Untitled');
         if (!isTitleEmptyOrDefault) {
           docs.push({
-            id: d.id,
             ...data,
+            id: d.id,
             sessionId: data.sessionId || d.id
           });
         }
@@ -177,8 +175,8 @@ export default function Profile({ user, onProfileUpdate }) {
         const explanationText = (data.explanation || data.answer || '').trim();
         if (queryText.length > 0) {
           docs.push({
-            id: d.id,
             ...data,
+            id: d.id,
             query: queryText,
             question: queryText,
             explanation: explanationText,
@@ -273,8 +271,7 @@ export default function Profile({ user, onProfileUpdate }) {
       await setDoc(settingsDocRef, {
         darkMode,
         themeColor,
-        fontColor,
-        language: settingsLanguage
+        fontColor
       });
       setSettingsMessage('✓ Customization settings saved successfully.');
       setTimeout(() => {
@@ -471,7 +468,7 @@ export default function Profile({ user, onProfileUpdate }) {
                 <User size={16} style={styles.icon} />
                 <input 
                   type="text" 
-                  className="input-field" 
+                  className="input-field input-field-icon" 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
                   required 
@@ -485,7 +482,7 @@ export default function Profile({ user, onProfileUpdate }) {
                 <Mail size={16} style={styles.icon} />
                 <input 
                   type="email" 
-                  className="input-field" 
+                  className="input-field input-field-icon" 
                   value={profile?.email || user?.email || ''} 
                   disabled 
                   style={{ opacity: 0.5, cursor: 'not-allowed' }}
@@ -499,7 +496,7 @@ export default function Profile({ user, onProfileUpdate }) {
                 <Phone size={16} style={styles.icon} />
                 <input 
                   type="tel" 
-                  className="input-field" 
+                  className="input-field input-field-icon" 
                   value={phone} 
                   onChange={(e) => setPhone(e.target.value)} 
                   required 
@@ -517,7 +514,7 @@ export default function Profile({ user, onProfileUpdate }) {
                     <FileText size={16} style={styles.icon} />
                     <input 
                       type="text" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={barId} 
                       onChange={(e) => setBarId(e.target.value)} 
                       required 
@@ -531,7 +528,7 @@ export default function Profile({ user, onProfileUpdate }) {
                     <Award size={16} style={styles.icon} />
                     <input 
                       type="text" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={specialization} 
                       onChange={(e) => setSpecialization(e.target.value)} 
                       required 
@@ -545,7 +542,7 @@ export default function Profile({ user, onProfileUpdate }) {
                     <BookOpen size={16} style={styles.icon} />
                     <input 
                       type="text" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={languages} 
                       onChange={(e) => setLanguages(e.target.value)} 
                       placeholder="e.g. English, Hindi, Punjabi"
@@ -561,7 +558,7 @@ export default function Profile({ user, onProfileUpdate }) {
                       <Clock size={16} style={styles.icon} />
                       <input 
                         type="number" 
-                        className="input-field" 
+                        className="input-field input-field-icon" 
                         value={experience} 
                         onChange={(e) => setExperience(e.target.value)} 
                         required 
@@ -575,7 +572,7 @@ export default function Profile({ user, onProfileUpdate }) {
                       <DollarSign size={16} style={styles.icon} />
                       <input 
                         type="number" 
-                        className="input-field" 
+                        className="input-field input-field-icon" 
                         value={fee} 
                         onChange={(e) => setFee(e.target.value)} 
                         required 
@@ -590,7 +587,7 @@ export default function Profile({ user, onProfileUpdate }) {
                     <MapPin size={16} style={styles.icon} />
                     <input 
                       type="text" 
-                      className="input-field" 
+                      className="input-field input-field-icon" 
                       value={location} 
                       onChange={(e) => setLocation(e.target.value)} 
                       required 
@@ -1023,22 +1020,6 @@ export default function Profile({ user, onProfileUpdate }) {
                 </select>
               </div>
 
-              {/* Language Selection */}
-              <div style={styles.modalOptionGroup}>
-                <label style={styles.modalLabel}>App Language</label>
-                <select 
-                  className="input-field"
-                  value={settingsLanguage} 
-                  onChange={(e) => setSettingsLanguage(e.target.value)}
-                  style={styles.modalSelect}
-                >
-                  <option value="en">English</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
-                  <option value="ta">தமிழ் (Tamil)</option>
-                  <option value="te">తెలుగు (Telugu)</option>
-                </select>
-              </div>
-
             </div>
 
             {settingsMessage && (
@@ -1228,7 +1209,8 @@ const styles = {
   icon: {
     position: 'absolute',
     left: '16px',
-    color: 'var(--primary)'
+    color: 'var(--primary)',
+    pointerEvents: 'none'
   },
   formRow: {
     display: 'flex',

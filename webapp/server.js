@@ -40,6 +40,11 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY || localKeys.GROQ_API_KEY;
 const GROQ_LEARNING_API_KEY = process.env.GROQ_LEARNING_API_KEY || localKeys.GROQ_LEARNING_API_KEY || GROQ_API_KEY;
 const GROQ_ASSISTANT_API_KEY = process.env.GROQ_ASSISTANT_API_KEY || localKeys.GROQ_ASSISTANT_API_KEY || GROQ_API_KEY;
 
+// Health check / baseline endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({ status: "healthy", message: "Nyaya Legal AI API Server is running" });
+});
+
 // Unified Chat / AI Assistant & Learning Endpoint
 app.post('/api/chat', async (req, res) => {
   const { message, conversation, isLearning } = req.body;
@@ -177,6 +182,167 @@ if (fs.existsSync(buildPath)) {
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
+
+// Server-side signup parameter validation endpoint
+app.post('/api/auth/signup/validate', (req, res) => {
+  const { phone, password } = req.body;
+
+  if (!phone || typeof phone !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: "Phone number must contain exactly 10 digits."
+    });
+  }
+
+  const phonePattern = /^[0-9]{10}$/;
+  if (!phonePattern.test(phone.trim())) {
+    return res.status(400).json({
+      success: false,
+      error: "Phone number must contain exactly 10 digits."
+    });
+  }
+
+  if (!password || typeof password !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character."
+    });
+  }
+
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+  if (!passwordPattern.test(password)) {
+    return res.status(400).json({
+      success: false,
+      error: "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character."
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Validation successful"
+  });
+});
+
+// Server-side consultation booking parameter validation endpoint
+app.post('/api/consultations/validate', (req, res) => {
+  const { 
+    phone, 
+    contactNumber, 
+    userId, 
+    lawyerId, 
+    consultationType, 
+    date, 
+    time, 
+    video_consultation_available, 
+    in_person_consultation_available, 
+    availability_status 
+  } = req.body;
+
+  const targetPhone = phone || contactNumber;
+
+  // 1. User authentication check
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      error: "User authentication is required."
+    });
+  }
+
+  // 2. Lawyer exists check
+  if (!lawyerId) {
+    return res.status(400).json({
+      success: false,
+      error: "Lawyer profile must be specified."
+    });
+  }
+
+  // 3. Phone number validation
+  if (!targetPhone || typeof targetPhone !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: "Phone number must contain exactly 10 digits."
+    });
+  }
+
+  const phonePattern = /^[0-9]{10}$/;
+  if (!phonePattern.test(targetPhone.trim())) {
+    return res.status(400).json({
+      success: false,
+      error: "Phone number must contain exactly 10 digits."
+    });
+  }
+
+  // 4. Consultation type validation
+  if (!consultationType || (consultationType !== 'Online' && consultationType !== 'In-Person')) {
+    return res.status(400).json({
+      success: false,
+      error: "Consultation type is invalid."
+    });
+  }
+
+  // 5. Date validation
+  if (!date) {
+    return res.status(400).json({
+      success: false,
+      error: "Selected date is invalid."
+    });
+  }
+
+  // 6. Time validation
+  if (!time) {
+    return res.status(400).json({
+      success: false,
+      error: "Selected time is invalid."
+    });
+  }
+
+  // 7. Lawyer availability checks
+  if (availability_status === false) {
+    return res.status(400).json({
+      success: false,
+      error: "Lawyer is currently unavailable."
+    });
+  }
+
+  if (consultationType === 'Online' && video_consultation_available === false) {
+    return res.status(400).json({
+      success: false,
+      error: "The selected consultation type is unavailable."
+    });
+  }
+
+  if (consultationType === 'In-Person' && in_person_consultation_available === false) {
+    return res.status(400).json({
+      success: false,
+      error: "The selected consultation type is unavailable."
+    });
+  }
+
+  // 8. Appointment time has not already passed and is at least 2 minutes in the future
+  if (date && time) {
+    const selectedDateTime = new Date(`${date}T${time}`);
+    if (isNaN(selectedDateTime.getTime())) {
+      return res.status(400).json({
+        success: false,
+        error: "Selected date or time format is invalid.",
+        message: "Selected date or time format is invalid."
+      });
+    }
+    const minAllowedTime = Date.now() + 2 * 60 * 1000;
+    if (selectedDateTime.getTime() < minAllowedTime) {
+      return res.status(400).json({
+        success: false,
+        error: "Please select a consultation time at least 2 minutes from now.",
+        message: "Please select a consultation time at least 2 minutes from now."
+      });
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Validation successful"
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

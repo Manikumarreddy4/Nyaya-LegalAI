@@ -36,8 +36,8 @@ export default function LegalLearning({ user }) {
         const explanationText = (data.explanation || data.answer || '').trim();
         if (queryText.length > 0) {
           docs.push({ 
-            id: d.id, 
             ...data,
+            id: d.id, 
             query: queryText,
             question: queryText,
             explanation: explanationText,

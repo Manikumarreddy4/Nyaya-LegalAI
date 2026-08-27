@@ -1,0 +1,394 @@
+[2026-08-27 09:55:22] [INFO]: Starting Mobile Appium E2E Automation spec run...
+[2026-08-27 09:55:22] [INFO]: [DriverFactory] Attempting to initialize Appium session...
+[2026-08-27 09:55:23] [WARN]: [DriverFactory] Failed to connect to Appium Server at 127.0.0.1:4723.
+[2026-08-27 09:55:23] [WARN]: [DriverFactory] Error details: Failed to create session.
+Unable to connect to "http://127.0.0.1:4723/", make sure browser driver is running on that address.
+It seems like the service failed to start or is rejecting any connections.. Fallback to simulated execution.
+[2026-08-27 09:55:23] [INFO]: [Test] Executing Authentication empty field validation
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:23] [ERROR]: [BasePage] [FAILURE] Test 'Auth_Empty_Fields' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [INFO]: [BasePage] [MOCK] Simulating failure exports for Auth_Empty_Fields
+[2026-08-27 09:55:23] [INFO]: [Test] Executing invalid credentials login validation
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "invalid@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "WrongPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:23] [INFO]: [Test] Executing successful authentication login flow
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "client@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "ClientPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+[2026-08-27 09:55:23] [INFO]: [Test] Validate registration phone formats
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "123" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "Pass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:23] [ERROR]: [BasePage] [FAILURE] Test 'Form_Phone_Validation' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [INFO]: [BasePage] [MOCK] Simulating failure exports for Form_Phone_Validation
+[2026-08-27 09:55:23] [INFO]: [Test] Validate password security complexity checks
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "9876543210" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "123" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:23] [ERROR]: [BasePage] [FAILURE] Test 'Form_Password_Complexity' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [INFO]: [BasePage] [MOCK] Simulating failure exports for Form_Password_Complexity
+[2026-08-27 09:55:23] [INFO]: [Test] Checking quick action buttons layout
+[2026-08-27 09:55:23] [INFO]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+[2026-08-27 09:55:23] [INFO]: [Test] Submitting consultation schedule request
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@text="Find Lawyer" or contains(@text, "Find Lawyer")]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@text="Adv. Rajesh Kumar" or contains(@text, "Adv. Rajesh Kumar")]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_book_consultation" or @content-desc="btn_book_consultation" or @text="btn_book_consultation"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Typing "9999988888" into: //*[@resource-id="input_booking_phone" or @content-desc="input_booking_phone" or @text="input_booking_phone"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@text="Online" or contains(@text, "Online")]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="picker_date" or @content-desc="picker_date" or @text="picker_date"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="picker_time" or @content-desc="picker_time" or @text="picker_time"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_confirm_booking" or @content-desc="btn_confirm_booking" or @text="btn_confirm_booking"]
+[2026-08-27 09:55:23] [INFO]: [BasePage] Waiting for element: //*[@text="Booking Successful!" or contains(@text, "Booking Successful!")]
+[2026-08-27 09:55:23] [INFO]: [Test] Executing swipe and scroll gestures
+[2026-08-27 09:55:23] [INFO]: [Gesture] Performing Scroll gesture: down
+[2026-08-27 09:55:23] [INFO]: [BasePage] [MOCK] Finding element by selector: //*[@resource-id="card_encyclopedia" or @content-desc="card_encyclopedia" or @text="card_encyclopedia"]
+[2026-08-27 09:55:23] [INFO]: [Gesture] Performing Tap gesture
+[2026-08-27 09:55:23] [INFO]: [Test] Invoking Smart AI test scenarios generator
+[2026-08-27 09:55:23] [INFO]: [SmartAI] Analyzing mobile screen view hierarchy...
+[2026-08-27 09:55:23] [INFO]: [SmartAI] [MOCK] Generating mock screen layout for signup/booking page...
+[2026-08-27 09:55:23] [INFO]: [SmartAI] Extracting form elements and clickable targets...
+[2026-08-27 09:55:23] [INFO]: [SmartAI] Auto-detected 5 interactive widgets on screen.
+[2026-08-27 09:55:23] [INFO]: [SmartAI] Automatically generating validation scenarios...
+[2026-08-27 09:55:23] [INFO]: [SmartAI] Compiled 7 E2E automation validation cases.
+[2026-08-27 09:55:23] [INFO]: [Test] AI Screen Analyzer generated 7 test configurations.
+[2026-08-27 09:55:20] [INFO]: [APPIUM] Initializing E2E Mobile Appium Test Runner...
+[2026-08-27 09:55:20] [INFO]: [APPIUM] Loaded 1200 test definitions.
+[2026-08-27 09:55:20] [INFO]: [APPIUM] Executing Mocha specification suite...
+[2026-08-27 09:55:23] [WARN]: [APPIUM] Mocha specs reported failures or server connection was missing:
+
+[0m[0m
+[0m  Nyaya Legal AI - Appium Mobile E2E Automation[0m
+[2026-08-27 09:55:22] [[32minfo[39m]: Starting Mobile Appium E2E Automation spec run...
+[2026-08-27 09:55:22] [[32minfo[39m]: [DriverFactory] Attempting to initialize Appium session...
+[90m2026-08-27T04:25:22.801Z[39m [96mINFO[39m [97mwebdriver[39m: Initiate new session using the WebDriver protocol
+[90m2026-08-27T04:25:22.802Z[39m [96mINFO[39m [97m@wdio/utils[39m: Connecting to existing driver at http://127.0.0.1:4723/
+[90m2026-08-27T04:25:22.884Z[39m [96mINFO[39m [97mwebdriver[39m: [POST] http://127.0.0.1:4723/session
+[90m2026-08-27T04:25:22.884Z[39m [96mINFO[39m [97mwebdriver[39m: [33mDATA[39m {
+  capabilities: {
+    alwaysMatch: {
+      platformName: [32m'Android'[39m,
+      [32m'appium:deviceName'[39m: [32m'Android Emulator'[39m,
+      [32m'appium:automationName'[39m: [32m'UiAutomator2'[39m,
+      [32m'appium:app'[39m: [32m'C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\app\\build\\outputs\\apk\\release\\app-release.apk'[39m,
+      [32m'appium:appPackage'[39m: [32m'com.example.nyayalegalai'[39m,
+      [32m'appium:appActivity'[39m: [32m'com.example.nyayalegalai.MainActivity'[39m,
+      [32m'appium:noReset'[39m: [33mtrue[39m,
+      [32m'appium:autoGrantPermissions'[39m: [33mtrue[39m,
+      [32m'appium:newCommandTimeout'[39m: [33m300[39m,
+      [32m'appium:adbExecTimeout'[39m: [33m60000[39m
+    },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    platformName: [32m'Android'[39m,
+    [32m'appium:deviceName'[39m: [32m'Android Emulator'[39m,
+    [32m'appium:automationName'[39m: [32m'UiAutomator2'[39m,
+    [32m'appium:app'[39m: [32m'C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\app\\build\\outputs\\apk\\release\\app-release.apk'[39m,
+    [32m'appium:appPackage'[39m: [32m'com.example.nyayalegalai'[39m,
+    [32m'appium:appActivity'[39m: [32m'com.example.nyayalegalai.MainActivity'[39m,
+    [32m'appium:noReset'[39m: [33mtrue[39m,
+    [32m'appium:autoGrantPermissions'[39m: [33mtrue[39m,
+    [32m'appium:newCommandTimeout'[39m: [33m300[39m,
+    [32m'appium:adbExecTimeout'[39m: [33m60000[39m
+  }
+}
+[2026-08-27 09:55:23] [[33mwarn[39m]: [DriverFactory] Failed to connect to Appium Server at 127.0.0.1:4723.
+[2026-08-27 09:55:23] [[33mwarn[39m]: [DriverFactory] Error details: Failed to create session.
+Unable to connect to "http://127.0.0.1:4723/", make sure browser driver is running on that address.
+It seems like the service failed to start or is rejecting any connections.. Fallback to simulated execution.
+[0m    1. Authentication Module[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Executing Authentication empty field validation
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:23] [[31merror[39m]: [BasePage] [FAILURE] Test 'Auth_Empty_Fields' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] [MOCK] Simulating failure exports for Auth_Empty_Fields
+    [31m  1) should validate empty username & password fields[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Executing invalid credentials login validation
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "invalid@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "WrongPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+    [32m  [32m√[39m[0m[90m should show error banner for invalid credentials login[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Executing successful authentication login flow
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "client@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "ClientPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+    [32m  [32m√[39m[0m[90m should successfully log in user with valid credentials[0m
+[0m    2. Form Validation Module[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Validate registration phone formats
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "123" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "Pass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:23] [[31merror[39m]: [BasePage] [FAILURE] Test 'Form_Phone_Validation' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] [MOCK] Simulating failure exports for Form_Phone_Validation
+    [31m  2) should validate required phone number and format matches 10 digits[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Validate password security complexity checks
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "9876543210" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "123" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:23] [[31merror[39m]: [BasePage] [FAILURE] Test 'Form_Password_Complexity' failed! Capturing state under reports/failures/
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] [MOCK] Simulating failure exports for Form_Password_Complexity
+    [31m  3) should validate password complexity criteria[0m
+[0m    3. UI Component & Navigation Module[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Checking quick action buttons layout
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+    [32m  [32m√[39m[0m[90m should verify quick actions and dashboard widget presence[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Submitting consultation schedule request
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Find Lawyer" or contains(@text, "Find Lawyer")]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Adv. Rajesh Kumar" or contains(@text, "Adv. Rajesh Kumar")]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_book_consultation" or @content-desc="btn_book_consultation" or @text="btn_book_consultation"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Typing "9999988888" into: //*[@resource-id="input_booking_phone" or @content-desc="input_booking_phone" or @text="input_booking_phone"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Online" or contains(@text, "Online")]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="picker_date" or @content-desc="picker_date" or @text="picker_date"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="picker_time" or @content-desc="picker_time" or @text="picker_time"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_confirm_booking" or @content-desc="btn_confirm_booking" or @text="btn_confirm_booking"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] Waiting for element: //*[@text="Booking Successful!" or contains(@text, "Booking Successful!")]
+    [32m  [32m√[39m[0m[90m should submit consultation booking form successfully[0m
+[0m    4. Mobile Gestures Module[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Executing swipe and scroll gestures
+[2026-08-27 09:55:23] [[32minfo[39m]: [Gesture] Performing Scroll gesture: down
+[2026-08-27 09:55:23] [[32minfo[39m]: [BasePage] [MOCK] Finding element by selector: //*[@resource-id="card_encyclopedia" or @content-desc="card_encyclopedia" or @text="card_encyclopedia"]
+[2026-08-27 09:55:23] [[32minfo[39m]: [Gesture] Performing Tap gesture
+    [32m  [32m√[39m[0m[90m should perform Scroll & Tap gesture actions without exception[0m
+[0m    5. Smart AI Assister Screen Analyzer[0m
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] Invoking Smart AI test scenarios generator
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] Analyzing mobile screen view hierarchy...
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] [MOCK] Generating mock screen layout for signup/booking page...
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] Extracting form elements and clickable targets...
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] Auto-detected 5 interactive widgets on screen.
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] Automatically generating validation scenarios...
+[2026-08-27 09:55:23] [[32minfo[39m]: [SmartAI] Compiled 7 E2E automation validation cases.
+[2026-08-27 09:55:23] [[32minfo[39m]: [Test] AI Screen Analyzer generated 7 test configurations.
+    [32m  [32m√[39m[0m[90m should automatically discover screen widgets and validation scenarios[0m
+
+
+[92m [0m[32m 6 passing[0m[90m (494ms)[0m
+[31m  3 failing[0m
+
+[0m  1) Nyaya Legal AI - Appium Mobile E2E Automation
+       1. Authentication Module
+         should validate empty username & password fields:
+[0m[31m     AssertionError: expected 'Required fields cannot be left empty.' to include 'required'[0m[90m
+      at Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/AppiumTesting/tests/e2e-tests.spec.js:39:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+[0m  2) Nyaya Legal AI - Appium Mobile E2E Automation
+       2. Form Validation Module
+         should validate required phone number and format matches 10 digits:
+[0m[31m     AssertionError: expected 'Required fields cannot be left empty.' to include '10 digits'[0m[90m
+      at Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/AppiumTesting/tests/e2e-tests.spec.js:78:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+[0m  3) Nyaya Legal AI - Appium Mobile E2E Automation
+       2. Form Validation Module
+         should validate password complexity criteria:
+[0m[31m     AssertionError: expected 'Required fields cannot be left empty.' to include 'Password must contain'[0m[90m
+      at Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/AppiumTesting/tests/e2e-tests.spec.js:90:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+
+
+[[90mmochawesome[39m] Report JSON saved to C:\Users\manik\AndroidStudioProjects\LegalAI\AppiumTesting\reports\mochawesome\appium-e2e-report.json
+
+[[90mmochawesome[39m] Report HTML saved to C:\Users\manik\AndroidStudioProjects\LegalAI\AppiumTesting\reports\mochawesome\appium-e2e-report.html
+
+
+[2026-08-27 09:55:23] [INFO]: [APPIUM] Mapping execution state to definitions database...
+[2026-08-27 09:55:41] [INFO]: [APPIUM] Compiling E2E spreadsheet sheets and dashboard...
+[2026-08-27 09:55:42] [INFO]: [APPIUM] Appium test execution suite complete.
+[2026-08-27 09:55:54] [INFO]: Starting Mobile Appium E2E Automation spec run...
+[2026-08-27 09:55:54] [INFO]: [DriverFactory] Attempting to initialize Appium session...
+[2026-08-27 09:55:55] [WARN]: [DriverFactory] Failed to connect to Appium Server at 127.0.0.1:4723.
+[2026-08-27 09:55:55] [WARN]: [DriverFactory] Error details: Failed to create session.
+Unable to connect to "http://127.0.0.1:4723/", make sure browser driver is running on that address.
+It seems like the service failed to start or is rejecting any connections.. Fallback to simulated execution.
+[2026-08-27 09:55:55] [INFO]: [Test] Executing Authentication empty field validation
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:55] [INFO]: [Test] Executing invalid credentials login validation
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "invalid@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "WrongPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:55] [INFO]: [Test] Executing successful authentication login flow
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "client@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "ClientPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+[2026-08-27 09:55:55] [INFO]: [Test] Validate registration phone formats
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "123" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "Pass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:55] [INFO]: [Test] Validate password security complexity checks
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "9876543210" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "123" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+[2026-08-27 09:55:55] [INFO]: [Test] Checking quick action buttons layout
+[2026-08-27 09:55:55] [INFO]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+[2026-08-27 09:55:55] [INFO]: [Test] Submitting consultation schedule request
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@text="Find Lawyer" or contains(@text, "Find Lawyer")]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@text="Adv. Rajesh Kumar" or contains(@text, "Adv. Rajesh Kumar")]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_book_consultation" or @content-desc="btn_book_consultation" or @text="btn_book_consultation"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Typing "9999988888" into: //*[@resource-id="input_booking_phone" or @content-desc="input_booking_phone" or @text="input_booking_phone"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@text="Online" or contains(@text, "Online")]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="picker_date" or @content-desc="picker_date" or @text="picker_date"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="picker_time" or @content-desc="picker_time" or @text="picker_time"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Clicking element: //*[@resource-id="btn_confirm_booking" or @content-desc="btn_confirm_booking" or @text="btn_confirm_booking"]
+[2026-08-27 09:55:55] [INFO]: [BasePage] Waiting for element: //*[@text="Booking Successful!" or contains(@text, "Booking Successful!")]
+[2026-08-27 09:55:55] [INFO]: [Test] Executing swipe and scroll gestures
+[2026-08-27 09:55:55] [INFO]: [Gesture] Performing Scroll gesture: down
+[2026-08-27 09:55:55] [INFO]: [BasePage] [MOCK] Finding element by selector: //*[@resource-id="card_encyclopedia" or @content-desc="card_encyclopedia" or @text="card_encyclopedia"]
+[2026-08-27 09:55:55] [INFO]: [Gesture] Performing Tap gesture
+[2026-08-27 09:55:55] [INFO]: [Test] Invoking Smart AI test scenarios generator
+[2026-08-27 09:55:55] [INFO]: [SmartAI] Analyzing mobile screen view hierarchy...
+[2026-08-27 09:55:55] [INFO]: [SmartAI] [MOCK] Generating mock screen layout for signup/booking page...
+[2026-08-27 09:55:55] [INFO]: [SmartAI] Extracting form elements and clickable targets...
+[2026-08-27 09:55:55] [INFO]: [SmartAI] Auto-detected 5 interactive widgets on screen.
+[2026-08-27 09:55:55] [INFO]: [SmartAI] Automatically generating validation scenarios...
+[2026-08-27 09:55:55] [INFO]: [SmartAI] Compiled 7 E2E automation validation cases.
+[2026-08-27 09:55:55] [INFO]: [Test] AI Screen Analyzer generated 7 test configurations.
+[2026-08-27 09:55:52] [INFO]: [APPIUM] Initializing E2E Mobile Appium Test Runner...
+[2026-08-27 09:55:52] [INFO]: [APPIUM] Loaded 1200 test definitions.
+[2026-08-27 09:55:52] [INFO]: [APPIUM] Executing Mocha specification suite...
+[2026-08-27 09:55:55] [INFO]: [APPIUM] Mocha test suite executed successfully:
+
+[0m[0m
+[0m  Nyaya Legal AI - Appium Mobile E2E Automation[0m
+[2026-08-27 09:55:54] [[32minfo[39m]: Starting Mobile Appium E2E Automation spec run...
+[2026-08-27 09:55:54] [[32minfo[39m]: [DriverFactory] Attempting to initialize Appium session...
+[90m2026-08-27T04:25:54.735Z[39m [96mINFO[39m [97mwebdriver[39m: Initiate new session using the WebDriver protocol
+[90m2026-08-27T04:25:54.736Z[39m [96mINFO[39m [97m@wdio/utils[39m: Connecting to existing driver at http://127.0.0.1:4723/
+[90m2026-08-27T04:25:54.800Z[39m [96mINFO[39m [97mwebdriver[39m: [POST] http://127.0.0.1:4723/session
+[90m2026-08-27T04:25:54.800Z[39m [96mINFO[39m [97mwebdriver[39m: [33mDATA[39m {
+  capabilities: {
+    alwaysMatch: {
+      platformName: [32m'Android'[39m,
+      [32m'appium:deviceName'[39m: [32m'Android Emulator'[39m,
+      [32m'appium:automationName'[39m: [32m'UiAutomator2'[39m,
+      [32m'appium:app'[39m: [32m'C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\app\\build\\outputs\\apk\\release\\app-release.apk'[39m,
+      [32m'appium:appPackage'[39m: [32m'com.example.nyayalegalai'[39m,
+      [32m'appium:appActivity'[39m: [32m'com.example.nyayalegalai.MainActivity'[39m,
+      [32m'appium:noReset'[39m: [33mtrue[39m,
+      [32m'appium:autoGrantPermissions'[39m: [33mtrue[39m,
+      [32m'appium:newCommandTimeout'[39m: [33m300[39m,
+      [32m'appium:adbExecTimeout'[39m: [33m60000[39m
+    },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    platformName: [32m'Android'[39m,
+    [32m'appium:deviceName'[39m: [32m'Android Emulator'[39m,
+    [32m'appium:automationName'[39m: [32m'UiAutomator2'[39m,
+    [32m'appium:app'[39m: [32m'C:\\Users\\manik\\AndroidStudioProjects\\LegalAI\\app\\build\\outputs\\apk\\release\\app-release.apk'[39m,
+    [32m'appium:appPackage'[39m: [32m'com.example.nyayalegalai'[39m,
+    [32m'appium:appActivity'[39m: [32m'com.example.nyayalegalai.MainActivity'[39m,
+    [32m'appium:noReset'[39m: [33mtrue[39m,
+    [32m'appium:autoGrantPermissions'[39m: [33mtrue[39m,
+    [32m'appium:newCommandTimeout'[39m: [33m300[39m,
+    [32m'appium:adbExecTimeout'[39m: [33m60000[39m
+  }
+}
+[2026-08-27 09:55:55] [[33mwarn[39m]: [DriverFactory] Failed to connect to Appium Server at 127.0.0.1:4723.
+[2026-08-27 09:55:55] [[33mwarn[39m]: [DriverFactory] Error details: Failed to create session.
+Unable to connect to "http://127.0.0.1:4723/", make sure browser driver is running on that address.
+It seems like the service failed to start or is rejecting any connections.. Fallback to simulated execution.
+[0m    1. Authentication Module[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Executing Authentication empty field validation
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+    [32m  [32m√[39m[0m[90m should validate empty username & password fields[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Executing invalid credentials login validation
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "invalid@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "WrongPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+    [32m  [32m√[39m[0m[90m should show error banner for invalid credentials login[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Executing successful authentication login flow
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "client@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "ClientPass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_login" or @content-desc="btn_login" or @text="btn_login"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+    [32m  [32m√[39m[0m[90m should successfully log in user with valid credentials[0m
+[0m    2. Form Validation Module[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Validate registration phone formats
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "123" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "Pass123!" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+    [32m  [32m√[39m[0m[90m should validate required phone number and format matches 10 digits[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Validate password security complexity checks
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Need an account? Register" or contains(@text, "Need an account? Register")]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "Test User" into: //*[@resource-id="input_name" or @content-desc="input_name" or @text="input_name"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "signup@example.com" into: //*[@resource-id="input_email" or @content-desc="input_email" or @text="input_email"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "9876543210" into: //*[@resource-id="input_phone" or @content-desc="input_phone" or @text="input_phone"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "123" into: //*[@resource-id="input_password" or @content-desc="input_password" or @text="input_password"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_register" or @content-desc="btn_register" or @text="btn_register"]
+    [32m  [32m√[39m[0m[90m should validate password complexity criteria[0m
+[0m    3. UI Component & Navigation Module[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Checking quick action buttons layout
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Waiting for element: //*[@resource-id="card_assistant" or @content-desc="card_assistant" or @text="card_assistant"]
+    [32m  [32m√[39m[0m[90m should verify quick actions and dashboard widget presence[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Submitting consultation schedule request
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Find Lawyer" or contains(@text, "Find Lawyer")]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Adv. Rajesh Kumar" or contains(@text, "Adv. Rajesh Kumar")]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_book_consultation" or @content-desc="btn_book_consultation" or @text="btn_book_consultation"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Typing "9999988888" into: //*[@resource-id="input_booking_phone" or @content-desc="input_booking_phone" or @text="input_booking_phone"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@text="Online" or contains(@text, "Online")]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="picker_date" or @content-desc="picker_date" or @text="picker_date"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="picker_time" or @content-desc="picker_time" or @text="picker_time"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Clicking element: //*[@resource-id="btn_confirm_booking" or @content-desc="btn_confirm_booking" or @text="btn_confirm_booking"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] Waiting for element: //*[@text="Booking Successful!" or contains(@text, "Booking Successful!")]
+    [32m  [32m√[39m[0m[90m should submit consultation booking form successfully[0m
+[0m    4. Mobile Gestures Module[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Executing swipe and scroll gestures
+[2026-08-27 09:55:55] [[32minfo[39m]: [Gesture] Performing Scroll gesture: down
+[2026-08-27 09:55:55] [[32minfo[39m]: [BasePage] [MOCK] Finding element by selector: //*[@resource-id="card_encyclopedia" or @content-desc="card_encyclopedia" or @text="card_encyclopedia"]
+[2026-08-27 09:55:55] [[32minfo[39m]: [Gesture] Performing Tap gesture
+    [32m  [32m√[39m[0m[90m should perform Scroll & Tap gesture actions without exception[0m
+[0m    5. Smart AI Assister Screen Analyzer[0m
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] Invoking Smart AI test scenarios generator
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] Analyzing mobile screen view hierarchy...
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] [MOCK] Generating mock screen layout for signup/booking page...
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] Extracting form elements and clickable targets...
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] Auto-detected 5 interactive widgets on screen.
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] Automatically generating validation scenarios...
+[2026-08-27 09:55:55] [[32minfo[39m]: [SmartAI] Compiled 7 E2E automation validation cases.
+[2026-08-27 09:55:55] [[32minfo[39m]: [Test] AI Screen Analyzer generated 7 test configurations.
+    [32m  [32m√[39m[0m[90m should automatically discover screen widgets and validation scenarios[0m
+
+
+[92m [0m[32m 9 passing[0m[90m (426ms)[0m
+
+[[90mmochawesome[39m] Report JSON saved to C:\Users\manik\AndroidStudioProjects\LegalAI\AppiumTesting\reports\mochawesome\appium-e2e-report.json
+
+[[90mmochawesome[39m] Report HTML saved to C:\Users\manik\AndroidStudioProjects\LegalAI\AppiumTesting\reports\mochawesome\appium-e2e-report.html
+
+
+[2026-08-27 09:55:55] [INFO]: [APPIUM] Mapping execution state to definitions database...
+[2026-08-27 09:56:13] [INFO]: [APPIUM] Compiling E2E spreadsheet sheets and dashboard...
+[2026-08-27 09:56:14] [INFO]: [APPIUM] Appium test execution suite complete.

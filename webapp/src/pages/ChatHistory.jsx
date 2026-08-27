@@ -36,37 +36,53 @@ async function fetchLastBotMessage(uid, sessionId) {
   }
 }
 
-export default function ChatHistory({ user, onNavigate }) {
+export default function ChatHistory({ user, onNavigate, initialTab }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTabIndex, setSelectedTabIndex] = useState(0); // 0: AI Assistant, 1: Legal Learning
   
+  // Fully Separate History States
   const [chatSessions, setChatSessions] = useState([]);
   const [learningHistory, setLearningHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Fully Separate Loading States
+  const [loadingChat, setLoadingChat] = useState(true);
+  const [loadingLearn, setLoadingLearn] = useState(true);
   
   const [previews, setPreviews] = useState({});
   
-  // Selection states
-  const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [selectedItems, setSelectedItems] = useState(new Set());
+  // Fully Separate Selection States
+  const [chatSelectionMode, setChatSelectionMode] = useState(false);
+  const [learnSelectionMode, setLearnSelectionMode] = useState(false);
+  
+  const [selectedChatItems, setSelectedChatItems] = useState(new Set());
+  const [selectedLearnItems, setSelectedLearnItems] = useState(new Set());
   
   // Active dropdown menu ID
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const tabs = ["AI Problem Assistant", "Legal Learning"];
-  const types = ["AI_ASSISTANT", "LEGAL_LEARNING"];
 
-  // Real-time listener for chatSessions and learningHistory
+  // Initialize selected tab based on initialTab prop
+  useEffect(() => {
+    if (initialTab === 'LEGAL_LEARNING' || initialTab === 1 || initialTab === 'legal-learning') {
+      setSelectedTabIndex(1);
+    } else {
+      setSelectedTabIndex(0);
+    }
+  }, [initialTab]);
+
+  // Reset dropdowns when tab changes
+  useEffect(() => {
+    setActiveMenuId(null);
+  }, [selectedTabIndex]);
+
+  // Real-time listener for chatSessions (AI Problem Assistant / Legal Help)
   useEffect(() => {
     if (!user || !user.uid) return;
-    setLoading(true);
+    setLoadingChat(true);
 
-    let unsubChat = () => {};
-    let unsubLearn = () => {};
-
-    // 1. Listen to chatSessions (AI Assistant)
     const chatRef = collection(db, 'users', user.uid, 'chatSessions');
-    unsubChat = onSnapshot(chatRef, (snap) => {
+    const unsubscribe = onSnapshot(chatRef, (snap) => {
       const list = [];
       snap.forEach(docSnap => {
         const data = docSnap.data();
@@ -77,20 +93,28 @@ export default function ChatHistory({ user, onNavigate }) {
             title.startsWith('New Chat') || 
             title.startsWith('Untitled');
           if (!isTitleEmptyOrDefault) {
-            list.push({ id: docSnap.id, ...data });
+            // Guard: ensure the document ID is placed AFTER doc data to prevent overwrite
+            list.push({ ...data, id: docSnap.id });
           }
         }
       });
       setChatSessions(list);
-      setLoading(false);
+      setLoadingChat(false);
     }, (err) => {
-      console.error(err);
-      setLoading(false);
+      console.error("Chat sync error:", err);
+      setLoadingChat(false);
     });
 
-    // 2. Listen to learningHistory (Legal Learning)
+    return () => unsubscribe();
+  }, [user]);
+
+  // Real-time listener for learningHistory (AI Legal Learning)
+  useEffect(() => {
+    if (!user || !user.uid) return;
+    setLoadingLearn(true);
+
     const learnRef = collection(db, 'users', user.uid, 'learningHistory');
-    unsubLearn = onSnapshot(learnRef, (snap) => {
+    const unsubscribe = onSnapshot(learnRef, (snap) => {
       const list = [];
       snap.forEach(docSnap => {
         const data = docSnap.data();
@@ -99,25 +123,24 @@ export default function ChatHistory({ user, onNavigate }) {
           queryText.startsWith('New Search') || 
           queryText.startsWith('Untitled');
         if (!isQuestionEmptyOrDefault) {
-          list.push({ id: docSnap.id, ...data });
+          // Guard: ensure the document ID is placed AFTER doc data to prevent overwrite
+          list.push({ ...data, id: docSnap.id });
         }
       });
       setLearningHistory(list);
-      setLoading(false);
+      setLoadingLearn(false);
     }, (err) => {
-      console.error(err);
-      setLoading(false);
+      console.error("Learn history sync error:", err);
+      setLoadingLearn(false);
     });
 
-    return () => {
-      unsubChat();
-      unsubLearn();
-    };
+    return () => unsubscribe();
   }, [user]);
 
-  // Combine and filter items based on active tab and search query
-  const rawItems = selectedTabIndex === 0 
-    ? chatSessions.map(c => {
+  // Process data based on active tab
+  const getMappedItems = () => {
+    if (selectedTabIndex === 0) {
+      return chatSessions.map(c => {
         let ms = 0;
         if (c.updatedAt) {
           ms = typeof c.updatedAt === 'number' ? c.updatedAt : (c.updatedAt.seconds * 1000 || 0);
@@ -131,8 +154,9 @@ export default function ChatHistory({ user, onNavigate }) {
           timestamp: ms,
           rawItem: c
         };
-      })
-    : learningHistory.map(l => {
+      });
+    } else {
+      return learningHistory.map(l => {
         let ms = 0;
         if (l.timestamp) {
           ms = typeof l.timestamp === 'number' ? l.timestamp : (l.timestamp.seconds * 1000 || 0);
@@ -146,11 +170,11 @@ export default function ChatHistory({ user, onNavigate }) {
           rawItem: l
         };
       });
+    }
+  };
 
-  // Sort by timestamp desc
-  const sortedItems = rawItems.sort((a, b) => b.timestamp - a.timestamp);
-
-  // Apply search query filter
+  const rawItems = getMappedItems();
+  const sortedItems = [...rawItems].sort((a, b) => b.timestamp - a.timestamp);
   const filteredItems = sortedItems.filter(item => {
     if (!searchQuery.trim()) return true;
     return item.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -171,10 +195,11 @@ export default function ChatHistory({ user, onNavigate }) {
   // Handle individual delete action
   const handleDeleteItem = async (item) => {
     if (!user || !user.uid) return;
-    if (!window.confirm(`Are you sure you want to delete this ${item.type === 'AI_ASSISTANT' ? 'chat session' : 'search history item'}?`)) return;
+    const isChat = item.type === 'AI_ASSISTANT';
+    if (!window.confirm(`Are you sure you want to delete this ${isChat ? 'chat session' : 'search history item'}?`)) return;
 
     try {
-      if (item.type === 'AI_ASSISTANT') {
+      if (isChat) {
         // Delete messages subcollection
         const messagesRef = collection(db, 'users', user.uid, 'chatSessions', item.id, 'messages');
         const snap = await getDocs(messagesRef);
@@ -183,15 +208,22 @@ export default function ChatHistory({ user, onNavigate }) {
         }
         // Delete session doc
         await deleteDoc(doc(db, 'users', user.uid, 'chatSessions', item.id));
+        
+        setSelectedChatItems(prev => {
+          const next = new Set(prev);
+          next.delete(item.id);
+          return next;
+        });
       } else {
         // Delete learningHistory entry
         await deleteDoc(doc(db, 'users', user.uid, 'learningHistory', item.id));
+        
+        setSelectedLearnItems(prev => {
+          const next = new Set(prev);
+          next.delete(item.id);
+          return next;
+        });
       }
-      setSelectedItems(prev => {
-        const next = new Set(prev);
-        next.delete(item.id);
-        return next;
-      });
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Error deleting item: " + err.message);
@@ -200,29 +232,34 @@ export default function ChatHistory({ user, onNavigate }) {
 
   // Toggle item selection
   const handleToggleSelectItem = (id) => {
-    setSelectedItems(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    if (selectedTabIndex === 0) {
+      setSelectedChatItems(prev => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } else {
+      setSelectedLearnItems(prev => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
   };
 
-  // Handle delete selected items
+  // Handle bulk delete selected items
   const handleDeleteSelected = async () => {
-    if (!user || !user.uid || selectedItems.size === 0) return;
-    if (!window.confirm(`Are you sure you want to delete the ${selectedItems.size} selected items permanently?`)) return;
+    const isChat = selectedTabIndex === 0;
+    const currentSet = isChat ? selectedChatItems : selectedLearnItems;
+    if (!user || !user.uid || currentSet.size === 0) return;
+    if (!window.confirm(`Are you sure you want to delete the ${currentSet.size} selected items permanently?`)) return;
 
     try {
       const promises = [];
-      for (const id of selectedItems) {
-        const item = sortedItems.find(i => i.id === id);
-        if (!item) continue;
-        
-        if (item.type === 'AI_ASSISTANT') {
+      for (const id of currentSet) {
+        if (isChat) {
           // Delete messages first
           const messagesRef = collection(db, 'users', user.uid, 'chatSessions', id, 'messages');
           const snap = await getDocs(messagesRef);
@@ -237,8 +274,13 @@ export default function ChatHistory({ user, onNavigate }) {
         }
       }
       await Promise.all(promises);
-      setSelectedItems(new Set());
-      setIsInSelectionMode(false);
+      if (isChat) {
+        setSelectedChatItems(new Set());
+        setChatSelectionMode(false);
+      } else {
+        setSelectedLearnItems(new Set());
+        setLearnSelectionMode(false);
+      }
     } catch (err) {
       console.error("Delete selected failed:", err);
       alert("Error deleting selected items: " + err.message);
@@ -248,21 +290,35 @@ export default function ChatHistory({ user, onNavigate }) {
   // Select all or Deselect all
   const handleToggleSelectAll = () => {
     const visibleIds = filteredItems.map(i => i.id);
-    const allSelected = visibleIds.length > 0 && visibleIds.every(id => selectedItems.has(id));
+    const currentSet = selectedTabIndex === 0 ? selectedChatItems : selectedLearnItems;
+    const allSelected = visibleIds.length > 0 && visibleIds.every(id => currentSet.has(id));
     
-    setSelectedItems(prev => {
-      const next = new Set(prev);
-      if (allSelected) {
-        visibleIds.forEach(id => next.delete(id));
-      } else {
-        visibleIds.forEach(id => next.add(id));
-      }
-      return next;
-    });
+    if (selectedTabIndex === 0) {
+      setSelectedChatItems(prev => {
+        const next = new Set(prev);
+        if (allSelected) {
+          visibleIds.forEach(id => next.delete(id));
+        } else {
+          visibleIds.forEach(id => next.add(id));
+        }
+        return next;
+      });
+    } else {
+      setSelectedLearnItems(prev => {
+        const next = new Set(prev);
+        if (allSelected) {
+          visibleIds.forEach(id => next.delete(id));
+        } else {
+          visibleIds.forEach(id => next.add(id));
+        }
+        return next;
+      });
+    }
   };
 
   const handleItemClick = (item) => {
-    if (isInSelectionMode) {
+    const isSelectionMode = selectedTabIndex === 0 ? chatSelectionMode : learnSelectionMode;
+    if (isSelectionMode) {
       handleToggleSelectItem(item.id);
     } else {
       if (item.type === 'AI_ASSISTANT') {
@@ -273,25 +329,33 @@ export default function ChatHistory({ user, onNavigate }) {
     }
   };
 
-  const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItems.has(i.id));
+  const currentSelectionMode = selectedTabIndex === 0 ? chatSelectionMode : learnSelectionMode;
+  const currentSet = selectedTabIndex === 0 ? selectedChatItems : selectedLearnItems;
+  const allSelected = filteredItems.length > 0 && filteredItems.every(i => currentSet.has(i.id));
+  const activeLoading = selectedTabIndex === 0 ? loadingChat : loadingLearn;
 
   return (
     <div className="fade-in-up" style={styles.container}>
       {/* Custom Header Bar */}
       <div className="glass-panel" style={styles.headerBar}>
-        {isInSelectionMode ? (
+        {currentSelectionMode ? (
           <div style={styles.selectionHeader}>
             <button 
               className="btn btn-secondary" 
               style={styles.circleBtn} 
               onClick={() => {
-                setSelectedItems(new Set());
-                setIsInSelectionMode(false);
+                if (selectedTabIndex === 0) {
+                  setSelectedChatItems(new Set());
+                  setChatSelectionMode(false);
+                } else {
+                  setSelectedLearnItems(new Set());
+                  setLearnSelectionMode(false);
+                }
               }}
             >
               <X size={18} />
             </button>
-            <span style={styles.selectionTitle}>{selectedItems.size} selected</span>
+            <span style={styles.selectionTitle}>{currentSet.size} selected</span>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px', alignItems: 'center' }}>
               <button 
                 className="btn btn-secondary"
@@ -304,7 +368,7 @@ export default function ChatHistory({ user, onNavigate }) {
                 className="btn btn-primary"
                 style={{ background: 'var(--error)', borderColor: 'var(--error)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onClick={handleDeleteSelected}
-                disabled={selectedItems.size === 0}
+                disabled={currentSet.size === 0}
               >
                 <Trash2 size={16} /> Delete Selected
               </button>
@@ -323,7 +387,10 @@ export default function ChatHistory({ user, onNavigate }) {
             <button 
               className="btn btn-secondary" 
               style={{ ...styles.circleBtn, marginLeft: 'auto', color: 'var(--error)' }}
-              onClick={() => setIsInSelectionMode(true)}
+              onClick={() => {
+                if (selectedTabIndex === 0) setChatSelectionMode(true);
+                else setLearnSelectionMode(true);
+              }}
               title="Delete Items"
             >
               <Trash2 size={18} />
@@ -354,8 +421,6 @@ export default function ChatHistory({ user, onNavigate }) {
             onClick={() => {
               setSelectedTabIndex(idx);
               setActiveMenuId(null);
-              setSelectedItems(new Set());
-              setIsInSelectionMode(false);
             }}
             style={{
               ...styles.tabBtn,
@@ -371,7 +436,7 @@ export default function ChatHistory({ user, onNavigate }) {
       </div>
 
       {/* History Items list */}
-      {loading ? (
+      {activeLoading ? (
         <div style={styles.loader}>Loading history...</div>
       ) : filteredItems.length === 0 ? (
         <div className="glass-panel" style={styles.emptyCard}>
@@ -382,7 +447,7 @@ export default function ChatHistory({ user, onNavigate }) {
       ) : (
         <div style={styles.list}>
           {filteredItems.map((item) => {
-            const isSelected = selectedItems.has(item.id);
+            const isSelected = currentSet.has(item.id);
             return (
               <div 
                 key={item.id} 
@@ -395,7 +460,7 @@ export default function ChatHistory({ user, onNavigate }) {
                 onClick={() => handleItemClick(item)}
               >
                 <div style={styles.cardHeader}>
-                  {isInSelectionMode && (
+                  {currentSelectionMode && (
                     <div style={{ marginRight: '8px' }} onClick={(e) => { e.stopPropagation(); handleToggleSelectItem(item.id); }}>
                       {isSelected ? (
                         <CheckSquare size={20} color="var(--primary)" />
@@ -419,7 +484,7 @@ export default function ChatHistory({ user, onNavigate }) {
                   </div>
                   
                   {/* Item Actions */}
-                  {!isInSelectionMode && (
+                  {!currentSelectionMode && (
                     <div style={{ marginLeft: 'auto', position: 'relative' }}>
                       <button 
                         onClick={(e) => {

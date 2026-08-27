@@ -158,3 +158,8 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(30, 41, 59, 0.9) !important;
   border-color: rgba(99, 102, 241, 0.45) !important;
 }
+
+/* Fix input text overlapping with absolute icons */
+.input-field-icon {
+  padding-left: 48px !important;
+}

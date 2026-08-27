@@ -29,6 +29,8 @@ import com.example.nyayalegalai.utils.NetworkUtils
 import com.example.nyayalegalai.utils.SessionManager
 import com.example.nyayalegalai.viewmodel.*
 import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.lifecycleScope
+import com.example.nyayalegalai.repository.ChatHistoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
@@ -36,16 +38,49 @@ import com.example.nyayalegalai.database.LearningHistory
 import com.example.nyayalegalai.database.ChatSession
 import com.google.firebase.firestore.DocumentSnapshot
 
-fun DocumentSnapshot.getSafeLong(fieldName: String, defaultValue: Long = 0L): Long {
+fun DocumentSnapshot.getSafeId(fieldName: String = "id"): String {
     return try {
         when (val value = get(fieldName)) {
+            null -> this.id
+            is String -> if (value.isBlank()) this.id else value
+            is Number -> value.toString()
+            else -> value.toString().ifBlank { this.id }
+        }
+    } catch (e: Exception) {
+        Log.e("FIRESTORE_HISTORY", "Error parsing ID for field $fieldName in doc $id", e)
+        this.id
+    }
+}
+
+fun DocumentSnapshot.getSafeLong(fieldName: String, defaultValue: Long = 0L): Long {
+    return try {
+        val value = get(fieldName)
+        when (value) {
+            null -> defaultValue
             is com.google.firebase.Timestamp -> value.toDate().time
             is Number -> value.toLong()
-            is String -> value.toLongOrNull() ?: defaultValue
+            is String -> {
+                val directLong = value.toLongOrNull()
+                if (directLong != null) {
+                    directLong
+                } else {
+                    try {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            java.time.Instant.parse(value).toEpochMilli()
+                        } else {
+                            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                            sdf.parse(value)?.time ?: defaultValue
+                        }
+                    } catch (parseEx: Exception) {
+                        defaultValue
+                    }
+                }
+            }
             else -> defaultValue
         }
     } catch (e: Exception) {
-        android.util.Log.e("FIRESTORE_HISTORY", "Invalid timestamp/Long in document $id for field $fieldName", e)
+        Log.e("FIRESTORE_HISTORY", "Invalid timestamp/Long in document $id for field $fieldName", e)
         defaultValue
     }
 }
@@ -55,6 +90,7 @@ fun DocumentSnapshot.toRoomChatSession(): ChatSession? {
     return try {
         val title = getString("title") ?: ""
         val type = getString("chatbotType") ?: "AI_ASSISTANT"
+        if (type == "ENCYCLOPEDIA") return null
         val createdAt = getSafeLong("createdAt", System.currentTimeMillis())
         val updatedAt = getSafeLong("updatedAt", System.currentTimeMillis())
         val isPinned = getBoolean("isPinned") ?: false
@@ -95,6 +131,20 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         android.util.Log.d("APP_CRASH_TRACE", "MainActivity onResume")
         android.util.Log.i("APP_LIFECYCLE", "MainActivity onResume")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (!uid.isNullOrBlank()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val database = AppDatabase.getDatabase(this@MainActivity)
+                    val sessionManager = SessionManager(this@MainActivity)
+                    val firestoreRepo = FirestoreRepository()
+                    val repo = ChatHistoryRepository(database.unifiedHistoryDao(), sessionManager, firestoreRepo, database.learningHistoryDao())
+                    repo.refreshHistoryFromServer(uid)
+                } catch (e: Exception) {
+                    Log.e("SYNC_DEBUG", "onResume history refresh failed", e)
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -247,6 +297,11 @@ class MainActivity : ComponentActivity() {
                                 sessionManager.setFontColor(settings.fontColor)
                                 settings.language?.let { sessionManager.setLanguage(it) }
                             }
+                            
+                            // 3. Initial server fetch
+                            val repo = ChatHistoryRepository(database.unifiedHistoryDao(), sessionManager, firestoreRepo, database.learningHistoryDao())
+                            repo.refreshHistoryFromServer(uid)
+                            
                             Log.d("MainActivity", "Initial profile/settings sync finished for UID: $uid")
                         } catch (e: Exception) {
                             Log.e("NYAYA_STARTUP", "NYAYA_STARTUP ERROR: Initial sync error = ${e.message}", e)
@@ -273,6 +328,10 @@ class MainActivity : ComponentActivity() {
                                     return@addSnapshotListener
                                 }
                                 if (snapshot != null) {
+                                    if (snapshot.metadata.isFromCache) {
+                                        Log.d("ACTIVITY_SYNC", "Ignoring cached snapshot for chatSessions")
+                                        return@addSnapshotListener
+                                    }
                                     Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Firestore update received for chatSessions")
                                     scope.launch(Dispatchers.IO) {
                                         try {
@@ -295,6 +354,20 @@ class MainActivity : ComponentActivity() {
                                                 if (localSess.sessionId !in firestoreSessionIds) {
                                                     database.unifiedHistoryDao().deleteSession(localSess)
                                                     database.unifiedHistoryDao().deleteMessagesForSession(localSess.sessionId)
+                                                    
+                                                    // ALSO delete corresponding LearningHistory item from Room!
+                                                    if (localSess.chatbotType == "LEGAL_LEARNING") {
+                                                        val firstMsg = database.unifiedHistoryDao().getMessagesForSessionList(localSess.sessionId)
+                                                            .firstOrNull { it.sender == "User" }
+                                                        if (firstMsg != null) {
+                                                            val queryText = firstMsg.message.trim()
+                                                            val matchingItems = database.learningHistoryDao().getAllHistoryList()
+                                                                .filter { it.question.trim().equals(queryText, ignoreCase = true) }
+                                                            for (item in matchingItems) {
+                                                                database.learningHistoryDao().deleteHistory(item)
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         } catch (e: Exception) {
@@ -311,22 +384,20 @@ class MainActivity : ComponentActivity() {
                                     return@addSnapshotListener
                                 }
                                 if (snapshot != null) {
+                                    if (snapshot.metadata.isFromCache) {
+                                        Log.d("ACTIVITY_SYNC", "Ignoring cached snapshot for learningHistory")
+                                        return@addSnapshotListener
+                                    }
                                     Log.d("ACTIVITY_SYNC", "ACTIVITY_SYNC: Firestore update received for learningHistory")
                                     scope.launch(Dispatchers.IO) {
                                         try {
-                                            val firestoreHistoryIds = mutableSetOf<Int>()
+                                            val firestoreHistoryIds = mutableSetOf<String>()
                                             for (doc in snapshot.documents) {
                                                 try {
                                                     val question = doc.getString("question") ?: doc.getString("query") ?: ""
                                                     val answer = doc.getString("answer") ?: doc.getString("explanation") ?: ""
                                                     val timestamp = doc.getSafeLong("timestamp", System.currentTimeMillis())
-                                                    
-                                                    val idVal = doc.get("id")
-                                                    val id = when (idVal) {
-                                                        is Number -> idVal.toInt()
-                                                        is String -> idVal.hashCode()
-                                                        else -> doc.id.hashCode()
-                                                    }
+                                                    val id = doc.getSafeId("id")
                                                     
                                                     val item = LearningHistory(id = id, question = question, answer = answer, timestamp = timestamp)
                                                     firestoreHistoryIds.add(id)
@@ -340,6 +411,20 @@ class MainActivity : ComponentActivity() {
                                             for (localItem in localHistory) {
                                                 if (localItem.id !in firestoreHistoryIds) {
                                                     database.learningHistoryDao().deleteHistory(localItem)
+                                                    
+                                                    // ALSO delete corresponding ChatSession from Room!
+                                                    val queryText = localItem.question.trim()
+                                                    val localSessions = database.unifiedHistoryDao().getAllSessionsList()
+                                                    for (session in localSessions) {
+                                                        if (session.chatbotType == "LEGAL_LEARNING") {
+                                                            val messages = database.unifiedHistoryDao().getMessagesForSessionList(session.sessionId)
+                                                            val firstMsg = messages.firstOrNull { it.sender == "User" }
+                                                            if (firstMsg != null && firstMsg.message.trim().equals(queryText, ignoreCase = true)) {
+                                                                database.unifiedHistoryDao().deleteSession(session)
+                                                                database.unifiedHistoryDao().deleteMessagesForSession(session.sessionId)
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         } catch (e: Exception) {

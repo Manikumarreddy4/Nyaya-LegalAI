@@ -98,12 +98,12 @@ fun LawyerProfileDetailScreen(
                             modifier = Modifier
                                 .height(50.dp)
                                 .padding(start = 16.dp),
-                            enabled = lawyer!!.isAvailable
+                            enabled = lawyer!!.isOnlineAvailable || lawyer!!.isInPersonOnlineAvailable
                         ) {
                             Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (lawyer!!.isAvailable) "Book Consultation" else "Unavailable",
+                                text = if (lawyer!!.isOnlineAvailable || lawyer!!.isInPersonOnlineAvailable) "Book Consultation" else "Unavailable",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
@@ -184,10 +184,6 @@ fun LawyerProfileDetailScreen(
                                         Text("Verified", color = Color(0xFF2E7D32), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                                     }
                                 }
-                            } else {
-                                Surface(color = Color(0xFFFFF3E0), shape = RoundedCornerShape(6.dp)) {
-                                    Text("Verification Pending", color = Color(0xFFEF6C00), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                                }
                             }
                         }
 
@@ -258,7 +254,7 @@ fun LawyerProfileDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         // Online Consultation Card
-                        val isOnlineAvailable = prof.isAvailable
+                        val isOnlineAvailable = prof.isOnlineAvailable
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
@@ -316,7 +312,7 @@ fun LawyerProfileDetailScreen(
                         }
 
                         // In-Person Consultation Card
-                        val isInPersonAvailable = prof.isAvailable && prof.isInPersonAvailable
+                        val isInPersonAvailable = prof.isInPersonOnlineAvailable
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),

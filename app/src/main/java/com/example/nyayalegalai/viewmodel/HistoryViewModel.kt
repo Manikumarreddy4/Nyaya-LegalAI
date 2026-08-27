@@ -65,4 +65,10 @@ class HistoryViewModel(private val repository: ChatHistoryRepository) : ViewMode
             repository.deleteAllHistory()
         }
     }
+
+    fun refreshHistory(uid: String) {
+        viewModelScope.launch {
+            repository.refreshHistoryFromServer(uid)
+        }
+    }
 }

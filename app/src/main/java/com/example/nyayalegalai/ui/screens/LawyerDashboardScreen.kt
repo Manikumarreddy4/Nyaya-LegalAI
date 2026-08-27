@@ -85,18 +85,35 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
     }
 
     var localAvailableOverride by remember { mutableStateOf<Boolean?>(null) }
-    val isOnline = localAvailableOverride ?: lawyerProfile?.isAvailable ?: true
+    val isOnline = localAvailableOverride ?: lawyerProfile?.let {
+        it.availability_status ?: it.isAvailable
+    } ?: false
 
     var localInPersonAvailableOverride by remember { mutableStateOf<Boolean?>(null) }
-    val isInPersonOnline = localInPersonAvailableOverride ?: lawyerProfile?.isInPersonAvailable ?: true
+    val isInPersonOnline = localInPersonAvailableOverride ?: lawyerProfile?.let {
+        it.in_person_consultation_available ?: it.isInPersonAvailable
+    } ?: false
 
     val allRequests by remember(viewModel) { viewModel.getLawyerRequestsFlow() }.collectAsState()
 
     // 2. Classify Consultations
-    val pendingRequests = remember(allRequests) { allRequests.filter { it.status.equals("PENDING", ignoreCase = true) } }
+    val pendingRequests = remember(allRequests) { 
+        allRequests.filter { 
+            val apptTime = it.parsedAppointmentDate()
+            val isPastAppt = apptTime != null && apptTime.before(java.util.Date())
+            it.status.equals("PENDING", ignoreCase = true) && !isPastAppt 
+        } 
+    }
     val acceptedRequests = remember(allRequests) { allRequests.filter { it.status.equals("ACCEPTED", ignoreCase = true) } }
     val rejectedRequests = remember(allRequests) { allRequests.filter { it.status.equals("REJECTED", ignoreCase = true) } }
     val completedRequests = remember(allRequests) { allRequests.filter { it.status.equals("COMPLETED", ignoreCase = true) } }
+    val expiredRequests = remember(allRequests) { 
+        allRequests.filter { 
+            val apptTime = it.parsedAppointmentDate()
+            val isPastAppt = apptTime != null && apptTime.before(java.util.Date())
+            it.status.equals("EXPIRED", ignoreCase = true) || (it.status.equals("PENDING", ignoreCase = true) && isPastAppt)
+        } 
+    }
     
     val totalEarnings = remember(allRequests) {
         allRequests.filter { it.status.equals("ACCEPTED", ignoreCase = true) || it.status.equals("COMPLETED", ignoreCase = true) }
@@ -165,6 +182,7 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
         "Accepted" -> acceptedRequests
         "Rejected" -> rejectedRequests
         "Completed" -> completedRequests
+        "Expired" -> expiredRequests
         else -> allRequests
     }
 
@@ -211,41 +229,40 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
             }
 
             // Verification Status Banner
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isVerified) Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
-                    ),
-                    border = BorderStroke(1.dp, if (isVerified) Color(0xFF2E7D32).copy(alpha = 0.3f) else Color(0xFFEF6C00).copy(alpha = 0.3f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+            if (isVerified) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFE8F5E9)
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFF2E7D32).copy(alpha = 0.3f))
                     ) {
-                        Icon(
-                            imageVector = if (isVerified) Icons.Default.Verified else Icons.Default.HourglassTop,
-                            contentDescription = null,
-                            tint = if (isVerified) Color(0xFF2E7D32) else Color(0xFFEF6C00),
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = if (isVerified) "✓ Verified Advocate" else "Verification Pending",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isVerified) Color(0xFF2E7D32) else Color(0xFFEF6C00)
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Verified,
+                                contentDescription = null,
+                                tint = Color(0xFF2E7D32),
+                                modifier = Modifier.size(32.dp)
                             )
-                            Text(
-                                text = if (isVerified) 
-                                    "Your profile is active and accepting consultation requests from clients." 
-                                else 
-                                    "Your bar council enrollment credentials are under review by administration. Displaying in pending mode.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "✓ Verified Advocate",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2E7D32)
+                                )
+                                Text(
+                                    text = "Your profile is active and accepting consultation requests from clients.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -522,7 +539,7 @@ fun LawyerDashboardScreen(navController: NavController, viewModel: ConsultationV
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(listOf("Pending", "Accepted", "Rejected", "Completed", "All")) { tab ->
+                        items(listOf("Pending", "Accepted", "Rejected", "Completed", "Expired", "All")) { tab ->
                             FilterChip(
                                 selected = selectedTab == tab,
                                 onClick = { selectedTab = tab },
@@ -647,7 +664,9 @@ fun LawyerRequestCard(
     onReject: () -> Unit,
     onClick: () -> Unit
 ) {
-    val safeStatus = request.status ?: "PENDING"
+    val apptTime = request.parsedAppointmentDate()
+    val isPastAppt = apptTime != null && apptTime.before(java.util.Date())
+    val safeStatus = if ((request.status ?: "PENDING").uppercase() == "PENDING" && isPastAppt) "EXPIRED" else request.status ?: "PENDING"
     val (statusLabel, statusBg, statusTextColor) = when (safeStatus.uppercase()) {
         "ACCEPTED" -> Triple("ACCEPTED", Color(0xFFE8F5E9), Color(0xFF2E7D32)) // Soft Green
         "REJECTED" -> Triple("REJECTED", Color(0xFFFFEBEE), Color(0xFFC62828)) // Soft Red
@@ -769,7 +788,7 @@ fun LawyerRequestCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Automatically expired because no response was given before the appointment time.",
+                        text = "This consultation request automatically expired because the scheduled appointment time was reached before the lawyer responded.",
                         color = Color(0xFF616161),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,

@@ -43,6 +43,13 @@ import java.util.*
 @Composable
 fun ChatHistoryScreen(navController: NavController, viewModel: HistoryViewModel = viewModel()) {
     val context = LocalContext.current
+    val sessionManager = remember { com.example.nyayalegalai.utils.SessionManager(context) }
+    val user = remember { sessionManager.getUser() }
+    LaunchedEffect(user) {
+        if (user != null && user.uid.isNotEmpty()) {
+            viewModel.refreshHistory(user.uid)
+        }
+    }
     val searchQuery by viewModel.searchQuery.collectAsState()
     
     val selectedSessions = remember { mutableStateListOf<Long>() }

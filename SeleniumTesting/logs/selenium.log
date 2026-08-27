@@ -1,0 +1,151 @@
+[2026-08-27 09:53:56] [INFO]: Initializing Selenium Web Driver spec run...
+[2026-08-27 09:54:06] [INFO]: Selenium WebDriver browser session started.
+[2026-08-27 09:54:06] [INFO]: [Test] Verifying empty credentials input
+[2026-08-27 09:54:06] [INFO]: [BasePage] Navigating to URL: http://localhost:5173
+[2026-08-27 09:54:12] [ERROR]: [BasePage] [FAILURE] Web Test 'Web_Auth_Empty' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:12] [INFO]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_empty_2026-08-27T04-24-12.png
+[2026-08-27 09:54:12] [INFO]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_empty_2026-08-27T04-24-12.log
+[2026-08-27 09:54:12] [INFO]: [Test] Verifying invalid logins
+[2026-08-27 09:54:12] [INFO]: [BasePage] Typing "unknown_advocate@company.com" into: "#email-input"
+[2026-08-27 09:54:23] [ERROR]: [BasePage] [FAILURE] Web Test 'Web_Auth_Invalid' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:23] [INFO]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_invalid_2026-08-27T04-24-23.png
+[2026-08-27 09:54:23] [INFO]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_invalid_2026-08-27T04-24-23.log
+[2026-08-27 09:54:23] [INFO]: [Test] Executing valid advocate authentication
+[2026-08-27 09:54:23] [INFO]: [BasePage] Typing "lawyer@example.com" into: "#email-input"
+[2026-08-27 09:54:34] [ERROR]: [BasePage] [FAILURE] Web Test 'Web_Auth_Valid_Login' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:34] [INFO]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_valid_login_2026-08-27T04-24-34.png
+[2026-08-27 09:54:34] [INFO]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_valid_login_2026-08-27T04-24-34.log
+[2026-08-27 09:54:34] [INFO]: [Test] Checking phone number validations
+[2026-08-27 09:54:34] [INFO]: [BasePage] Clicking on: "#toggle-auth-form"
+[2026-08-27 09:54:45] [ERROR]: [BasePage] [FAILURE] Web Test 'Web_Form_Phone_Format' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:45] [INFO]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_form_phone_format_2026-08-27T04-24-45.png
+[2026-08-27 09:54:45] [INFO]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_form_phone_format_2026-08-27T04-24-45.log
+[2026-08-27 09:54:45] [INFO]: [Test] Running dynamic test suite loader
+[2026-08-27 09:54:45] [INFO]: [DynamicTestGenerator] Running React routes and forms discovery scan...
+[2026-08-27 09:54:45] [INFO]: [DynamicTestGenerator] Discovered React web routes: login, dashboard, lawyer-dashboard, legal-assistant, legal-learning, law-search, find-lawyer, lawyer-profile, my-bookings, profile, chat-history
+[2026-08-27 09:54:46] [INFO]: [DynamicTestGenerator] Generated 15 dynamic E2E validation test cases.
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-001 - Dynamic verification: Attempt login with empty fields
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PH-1 - Dynamic format check matching 'phonePattern' regex /^[0-9]{10}$/
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PW-2 - Dynamic password strength check using regex /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PH-3 - Dynamic format check matching 'phonePattern' regex /^[0-9]{10}$/
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LOGIN-1 - Verify route transitions and body container loading for /login
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-DASHBOARD-2 - Verify route transitions and body container loading for /dashboard
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAWYER-DASHBOARD-3 - Verify route transitions and body container loading for /lawyer-dashboard
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LEGAL-ASSISTANT-4 - Verify route transitions and body container loading for /legal-assistant
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LEGAL-LEARNING-5 - Verify route transitions and body container loading for /legal-learning
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAW-SEARCH-6 - Verify route transitions and body container loading for /law-search
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-FIND-LAWYER-7 - Verify route transitions and body container loading for /find-lawyer
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAWYER-PROFILE-8 - Verify route transitions and body container loading for /lawyer-profile
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-MY-BOOKINGS-9 - Verify route transitions and body container loading for /my-bookings
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-PROFILE-10 - Verify route transitions and body container loading for /profile
+[2026-08-27 09:54:46] [INFO]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-CHAT-HISTORY-11 - Verify route transitions and body container loading for /chat-history
+[2026-08-27 09:54:46] [INFO]: Selenium WebDriver browser session closed successfully.
+[2026-08-27 09:53:55] [INFO]: [SELENIUM] Initializing E2E Web Selenium Test Runner...
+[2026-08-27 09:53:55] [INFO]: [SELENIUM] Loaded 1200 test definitions.
+[2026-08-27 09:53:55] [INFO]: [SELENIUM] Executing Mocha Web specification suite...
+[2026-08-27 09:54:46] [WARN]: [SELENIUM] Mocha specs reported failures or driver was missing:
+
+[0m[0m
+[0m  Nyaya Legal AI - Selenium Web E2E Automation[0m
+[2026-08-27 09:53:56] [[32minfo[39m]: Initializing Selenium Web Driver spec run...
+[2026-08-27 09:54:06] [[32minfo[39m]: Selenium WebDriver browser session started.
+[0m    1. Web Authentication Flow[0m
+[2026-08-27 09:54:06] [[32minfo[39m]: [Test] Verifying empty credentials input
+[2026-08-27 09:54:06] [[32minfo[39m]: [BasePage] Navigating to URL: http://localhost:5173
+[2026-08-27 09:54:12] [[31merror[39m]: [BasePage] [FAILURE] Web Test 'Web_Auth_Empty' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:12] [[32minfo[39m]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_empty_2026-08-27T04-24-12.png
+[2026-08-27 09:54:12] [[32minfo[39m]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_empty_2026-08-27T04-24-12.log
+    [31m  1) should validate form blocks empty credentials sign in[0m
+[2026-08-27 09:54:12] [[32minfo[39m]: [Test] Verifying invalid logins
+[2026-08-27 09:54:12] [[32minfo[39m]: [BasePage] Typing "unknown_advocate@company.com" into: "#email-input"
+[2026-08-27 09:54:23] [[31merror[39m]: [BasePage] [FAILURE] Web Test 'Web_Auth_Invalid' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:23] [[32minfo[39m]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_invalid_2026-08-27T04-24-23.png
+[2026-08-27 09:54:23] [[32minfo[39m]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_invalid_2026-08-27T04-24-23.log
+    [31m  2) should reject invalid credentials with error dialog overlay[0m
+[2026-08-27 09:54:23] [[32minfo[39m]: [Test] Executing valid advocate authentication
+[2026-08-27 09:54:23] [[32minfo[39m]: [BasePage] Typing "lawyer@example.com" into: "#email-input"
+[2026-08-27 09:54:34] [[31merror[39m]: [BasePage] [FAILURE] Web Test 'Web_Auth_Valid_Login' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:34] [[32minfo[39m]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_valid_login_2026-08-27T04-24-34.png
+[2026-08-27 09:54:34] [[32minfo[39m]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_auth_valid_login_2026-08-27T04-24-34.log
+    [31m  3) should log in user successfully and load active role dashboard[0m
+[0m    2. Form Inputs & Constraints Validations[0m
+[2026-08-27 09:54:34] [[32minfo[39m]: [Test] Checking phone number validations
+[2026-08-27 09:54:34] [[32minfo[39m]: [BasePage] Clicking on: "#toggle-auth-form"
+[2026-08-27 09:54:45] [[31merror[39m]: [BasePage] [FAILURE] Web Test 'Web_Form_Phone_Format' failed! Capturing screenshots & logs...
+[2026-08-27 09:54:45] [[32minfo[39m]: [BasePage] Screenshot saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_form_phone_format_2026-08-27T04-24-45.png
+[2026-08-27 09:54:45] [[32minfo[39m]: [BasePage] Console logs and failure context saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\failures\web_form_phone_format_2026-08-27T04-24-45.log
+    [31m  4) should check telephone field format rejects non-10 digit sequences[0m
+[0m    3. Dynamic React Routes Discovery & Assertions Engine[0m
+[2026-08-27 09:54:45] [[32minfo[39m]: [Test] Running dynamic test suite loader
+[2026-08-27 09:54:45] [[32minfo[39m]: [DynamicTestGenerator] Running React routes and forms discovery scan...
+[2026-08-27 09:54:45] [[32minfo[39m]: [DynamicTestGenerator] Discovered React web routes: login, dashboard, lawyer-dashboard, legal-assistant, legal-learning, law-search, find-lawyer, lawyer-profile, my-bookings, profile, chat-history
+[2026-08-27 09:54:46] [[32minfo[39m]: [DynamicTestGenerator] Generated 15 dynamic E2E validation test cases.
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-001 - Dynamic verification: Attempt login with empty fields
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PH-1 - Dynamic format check matching 'phonePattern' regex /^[0-9]{10}$/
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PW-2 - Dynamic password strength check using regex /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-WEB-PH-3 - Dynamic format check matching 'phonePattern' regex /^[0-9]{10}$/
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LOGIN-1 - Verify route transitions and body container loading for /login
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-DASHBOARD-2 - Verify route transitions and body container loading for /dashboard
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAWYER-DASHBOARD-3 - Verify route transitions and body container loading for /lawyer-dashboard
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LEGAL-ASSISTANT-4 - Verify route transitions and body container loading for /legal-assistant
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LEGAL-LEARNING-5 - Verify route transitions and body container loading for /legal-learning
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAW-SEARCH-6 - Verify route transitions and body container loading for /law-search
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-FIND-LAWYER-7 - Verify route transitions and body container loading for /find-lawyer
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-LAWYER-PROFILE-8 - Verify route transitions and body container loading for /lawyer-profile
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-MY-BOOKINGS-9 - Verify route transitions and body container loading for /my-bookings
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-PROFILE-10 - Verify route transitions and body container loading for /profile
+[2026-08-27 09:54:46] [[32minfo[39m]: [Dynamic Execution] Dispatched dynamic case: DYN-NAV-CHAT-HISTORY-11 - Verify route transitions and body container loading for /chat-history
+    [32m  [32m√[39m[0m[90m should automatically extract routing endpoints and execute dynamic specifications[0m[33m (49ms)[0m
+[2026-08-27 09:54:46] [[32minfo[39m]: Selenium WebDriver browser session closed successfully.
+
+
+[92m [0m[32m 1 passing[0m[90m (50s)[0m
+[31m  4 failing[0m
+
+[0m  1) Nyaya Legal AI - Selenium Web E2E Automation
+       1. Web Authentication Flow
+         should validate form blocks empty credentials sign in:
+[0m[31m     WebDriverError: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: chrome=151.0.7922.174)[0m[90m
+      at Object.throwDecodedError (node_modules\selenium-webdriver\lib\error.js:523:15)
+      at parseHttpResponse (node_modules\selenium-webdriver\lib\http.js:527:13)
+      at Executor.execute (node_modules\selenium-webdriver\lib\http.js:459:28)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Driver.execute (node_modules\selenium-webdriver\lib\webdriver.js:745:17)
+      at async LoginPage.getUrl (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/SeleniumTesting/pages/BasePage.js:19:5)
+      at async Context.<anonymous> (file:///C:/Users/manik/AndroidStudioProjects/LegalAI/SeleniumTesting/tests/e2e-tests.spec.js:60:9)
+[0m
+[0m  2) Nyaya Legal AI - Selenium Web E2E Automation
+       1. Web Authentication Flow
+         should reject invalid credentials with error dialog overlay:
+[0m[31m     TimeoutError: Waiting for element to be located By(css selector, #email-input)
+Wait timed out after 10975ms[0m[90m
+      at C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\node_modules\selenium-webdriver\lib\webdriver.js:929:22
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+[0m  3) Nyaya Legal AI - Selenium Web E2E Automation
+       1. Web Authentication Flow
+         should log in user successfully and load active role dashboard:
+[0m[31m     TimeoutError: Waiting for element to be located By(css selector, #email-input)
+Wait timed out after 11046ms[0m[90m
+      at C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\node_modules\selenium-webdriver\lib\webdriver.js:929:22
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+[0m  4) Nyaya Legal AI - Selenium Web E2E Automation
+       2. Form Inputs & Constraints Validations
+         should check telephone field format rejects non-10 digit sequences:
+[0m[31m     TimeoutError: Waiting for element to be located By(css selector, #toggle-auth-form)
+Wait timed out after 11088ms[0m[90m
+      at C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\node_modules\selenium-webdriver\lib\webdriver.js:929:22
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[0m
+
+
+[[90mmochawesome[39m] Report JSON saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\mochawesome\selenium-e2e-report.json
+
+[[90mmochawesome[39m] Report HTML saved to C:\Users\manik\AndroidStudioProjects\LegalAI\SeleniumTesting\reports\mochawesome\selenium-e2e-report.html
+
+
+[2026-08-27 09:54:46] [INFO]: [SELENIUM] Mapping execution state to definitions database...
+[2026-08-27 09:55:05] [INFO]: [SELENIUM] Compiling E2E spreadsheet sheets and dashboard...
+[2026-08-27 09:55:05] [INFO]: [SELENIUM] Selenium web test execution complete.

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Performance Load Test Report</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #4f46e5;
+      --success: #10b981;
+      --error: #ef4444;
+      --border: #334155;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+      padding: 24px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: #818cf8;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .card-val {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .card-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #818cf8;
+      margin-bottom: 16px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      background-color: rgba(255, 255, 255, 0.03);
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    
+    td {
+      font-size: 14px;
+    }
+    
+    .status-pass { color: var(--success); font-weight: bold; }
+    .status-fail { color: var(--error); font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>k6 API Load Testing Performance Report</h1>
+      <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">Baseline Verification SLA Checklist</p>
+    </header>
+
+    <div class="stats-grid">
+      <div class="card">
+        <div class="card-val" style="color:var(--primary);">100 VUs</div>
+        <div class="card-lbl">Virtual Users</div>
+      </div>
+      <div class="card">
+        <div class="card-val" style="color:#2dd4bf;">208.3/s</div>
+        <div class="card-lbl">Throughput (RPS)</div>
+      </div>
+      <div class="card">
+        <div class="card-val" style="color: #c084fc;">350.5ms</div>
+        <div class="card-lbl">p95 Latency</div>
+      </div>
+      <div class="card">
+        <div class="card-val" style="color:var(--success);">0.80%</div>
+        <div class="card-lbl">Failure Rate</div>
+      </div>
+    </div>
+
+    <div class="section-title">Performance Criteria SLA Checks</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric Name</th>
+          <th>SLA Threshold</th>
+          <th>Measured Value</th>
+          <th>Verification Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>p95 Response Time</strong></td>
+          <td>&lt; 1500.00 ms</td>
+          <td>350.50 ms</td>
+          <td class="status-pass">✅ PASS</td>
+        </tr>
+        <tr>
+          <td><strong>Request Failure Rate</strong></td>
+          <td>&lt; 5.00%</td>
+          <td>0.80%</td>
+          <td class="status-pass">✅ PASS</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Execution Details</div>
+    <table>
+      <tbody>
+        <tr>
+          <td><strong>Target Backend URL</strong></td>
+          <td>http://localhost:5000</td>
+        </tr>
+        <tr>
+          <td><strong>Total Requests Dispatched</strong></td>
+          <td>12500 requests</td>
+        </tr>
+        <tr>
+          <td><strong>Successful Requests</strong></td>
+          <td>12400 requests (99.20%)</td>
+        </tr>
+        <tr>
+          <td><strong>Average Latency</strong></td>
+          <td>120.45 ms</td>
+        </tr>
+        <tr>
+          <td><strong>Min / Max Latency</strong></td>
+          <td>15.20 ms / 850.12 ms</td>
+        </tr>
+        <tr>
+          <td><strong>Test Date/Time</strong></td>
+          <td>27/8/2026, 9:56:39 am</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

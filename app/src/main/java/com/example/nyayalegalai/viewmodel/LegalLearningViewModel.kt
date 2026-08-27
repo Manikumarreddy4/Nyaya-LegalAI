@@ -129,14 +129,14 @@ class LegalLearningViewModel(
                 Log.d(TAG, "Bot message saved (Learning)")
 
                 // Save to History (local SQLite and remote Firestore)
-                val learningItem = LearningHistory(question = trimmedQuery, answer = result, timestamp = System.currentTimeMillis())
-                val newId = db.learningHistoryDao().insertHistory(learningItem)
-                val savedItem = learningItem.copy(id = newId.toInt())
+                val docId = "learn_" + System.currentTimeMillis()
+                val learningItem = LearningHistory(id = docId, question = trimmedQuery, answer = result, timestamp = System.currentTimeMillis())
+                db.learningHistoryDao().insertHistory(learningItem)
 
                 val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
                 if (!uid.isNullOrBlank()) {
                     try {
-                        firestoreRepo.saveLearningHistory(uid, savedItem)
+                        firestoreRepo.saveLearningHistory(uid, learningItem)
                     } catch (e: Exception) {
                         if (e is kotlinx.coroutines.CancellationException) throw e
                         Log.e(TAG, "Error syncing learning history to Firestore", e)
@@ -154,35 +154,114 @@ class LegalLearningViewModel(
 
     fun deleteLearningHistory(item: LearningHistory) {
         viewModelScope.launch {
+            // Local optimistic delete from Room
+            db.learningHistoryDao().deleteHistory(item)
+            
+            // Find and delete matching ChatSession optimistically
+            val queryText = item.question.trim()
+            val localSessions = db.unifiedHistoryDao().getAllSessionsList()
+            val deletedSessions = mutableListOf<com.example.nyayalegalai.database.ChatSession>()
+            val deletedMessages = mutableListOf<List<com.example.nyayalegalai.database.ChatHistoryMessage>>()
+            
+            for (session in localSessions) {
+                if (session.chatbotType == "LEGAL_LEARNING") {
+                    val messages = db.unifiedHistoryDao().getMessagesForSessionList(session.sessionId)
+                    val firstMsg = messages.firstOrNull { it.sender == "User" }
+                    if (firstMsg != null && firstMsg.message.trim().equals(queryText, ignoreCase = true)) {
+                        db.unifiedHistoryDao().deleteSession(session)
+                        db.unifiedHistoryDao().deleteMessagesForSession(session.sessionId)
+                        deletedSessions.add(session)
+                        deletedMessages.add(messages)
+                    }
+                }
+            }
+
             try {
-                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Deleting history ID = ${item.id}")
-                db.learningHistoryDao().deleteHistory(item)
-                
                 val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
                 if (!uid.isNullOrBlank()) {
-                    firestoreRepo.deleteLearningHistoryItemByTimestamp(uid, item.timestamp)
+                    firestoreRepo.deleteLearningHistoryItem(uid, item.id)
+                    for (session in deletedSessions) {
+                        firestoreRepo.deleteRoomChatSession(uid, session.sessionId)
+                    }
                 }
                 Log.d("HISTORY_DELETE", "HISTORY_DELETE: Delete successful")
             } catch (e: Exception) {
-                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Delete failed = ${e.message}", e)
+                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Delete failed, rolling back local changes", e)
+                // Rollback local Room changes
+                db.learningHistoryDao().insertHistory(item)
+                for (i in deletedSessions.indices) {
+                    val session = deletedSessions[i]
+                    db.unifiedHistoryDao().insertSession(session)
+                    val messages = deletedMessages[i]
+                    for (msg in messages) {
+                        db.unifiedHistoryDao().insertMessage(msg)
+                    }
+                }
             }
         }
     }
 
     fun deleteLearningHistories(items: List<LearningHistory>) {
         viewModelScope.launch {
-            try {
-                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
-                items.forEach { item ->
-                    Log.d("HISTORY_DELETE", "HISTORY_DELETE: Deleting history ID = ${item.id}")
-                    db.learningHistoryDao().deleteHistory(item)
-                    if (!uid.isNullOrBlank()) {
-                        firestoreRepo.deleteLearningHistoryItemByTimestamp(uid, item.timestamp)
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
+            val rollbackHistoryList = mutableListOf<LearningHistory>()
+            val rollbackSessions = mutableListOf<com.example.nyayalegalai.database.ChatSession>()
+            val rollbackMessages = mutableListOf<List<com.example.nyayalegalai.database.ChatHistoryMessage>>()
+
+            // Local optimistic deletes
+            items.forEach { item ->
+                db.learningHistoryDao().deleteHistory(item)
+                rollbackHistoryList.add(item)
+                
+                val queryText = item.question.trim()
+                val localSessions = db.unifiedHistoryDao().getAllSessionsList()
+                for (session in localSessions) {
+                    if (session.chatbotType == "LEGAL_LEARNING") {
+                        val messages = db.unifiedHistoryDao().getMessagesForSessionList(session.sessionId)
+                        val firstMsg = messages.firstOrNull { it.sender == "User" }
+                        if (firstMsg != null && firstMsg.message.trim().equals(queryText, ignoreCase = true)) {
+                            db.unifiedHistoryDao().deleteSession(session)
+                            db.unifiedHistoryDao().deleteMessagesForSession(session.sessionId)
+                            rollbackSessions.add(session)
+                            rollbackMessages.add(messages)
+                        }
                     }
                 }
-                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Delete successful")
+            }
+
+            try {
+                if (!uid.isNullOrBlank()) {
+                    items.forEach { item ->
+                        firestoreRepo.deleteLearningHistoryItem(uid, item.id)
+                    }
+                    rollbackSessions.forEach { session ->
+                        firestoreRepo.deleteRoomChatSession(uid, session.sessionId)
+                    }
+                }
+                Log.d("HISTORY_DELETE", "HISTORY_DELETE: Bulk delete successful")
             } catch (e: Exception) {
-                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Delete failed = ${e.message}", e)
+                Log.e("HISTORY_DELETE", "HISTORY_DELETE: Bulk delete failed, rolling back local changes", e)
+                // Rollback local Room changes
+                rollbackHistoryList.forEach { item ->
+                    db.learningHistoryDao().insertHistory(item)
+                }
+                for (i in rollbackSessions.indices) {
+                    val session = rollbackSessions[i]
+                    db.unifiedHistoryDao().insertSession(session)
+                    val messages = rollbackMessages[i]
+                    for (msg in messages) {
+                        db.unifiedHistoryDao().insertMessage(msg)
+                    }
+                }
+            }
+        }
+    }
+
+    fun refreshHistory() {
+        viewModelScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: sessionManager.getUser()?.uid
+            if (!uid.isNullOrBlank()) {
+                chatHistoryRepository.refreshHistoryFromServer(uid)
             }
         }
     }

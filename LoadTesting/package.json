@@ -1,0 +1,13 @@
+{
+  "name": "load-testing",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API Load Testing Suite for Nyaya Legal AI",
+  "main": "parseK6Summary.js",
+  "scripts": {
+    "parse": "node parseK6Summary.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
