@@ -16,7 +16,20 @@ export class BasePage {
   async getUrl(url) {
     logger.info(`[BasePage] Navigating to URL: ${url}`);
     if (!this.driver) return;
-    await this.driver.get(url);
+    let retries = 5;
+    while (retries > 0) {
+      try {
+        await this.driver.get(url);
+        return;
+      } catch (err) {
+        retries--;
+        if (retries === 0) {
+          throw err;
+        }
+        logger.warn(`[BasePage] Navigation to ${url} failed: ${err.message}. Retrying in 2 seconds... (${retries} retries left)`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
   }
 
   async findEl(selector, timeout = seleniumConfig.explicitWaitMs) {
