@@ -36,6 +36,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'PythonTesting/requirements.txt'
 
       - name: Install Python Dependencies
         run: |
@@ -106,6 +107,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: AVD Cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb/*
+          key: avd-30
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -118,6 +128,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'PythonTesting/requirements.txt'
 
       - name: Install Python Dependencies
         run: |
@@ -149,6 +160,8 @@ jobs:
           api-level: 30
           target: google_apis
           arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
           script: |
             appium --port 4723 --log appium_server.log &
             for i in {1..10}; do
@@ -199,6 +212,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'PythonTesting/requirements.txt'
 
       - name: Install Python Dependencies
         run: |
@@ -271,6 +285,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'PythonTesting/requirements.txt'
 
       - name: Install Python Dependencies
         run: |
@@ -332,6 +347,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'PythonTesting/requirements.txt'
 
       - name: Install Python Dependencies
         run: |
